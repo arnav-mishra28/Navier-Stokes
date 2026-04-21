@@ -64,11 +64,11 @@ class FlowRenderer:
     def _apply_colormap(normalized: np.ndarray, cmap: str) -> np.ndarray:
         """Apply a colormap to normalized [0,1] data."""
         try:
-            import matplotlib.cm as cm
-            mapper = cm.get_cmap(cmap)
+            import matplotlib
+            mapper = matplotlib.colormaps[cmap]
             rgba = mapper(normalized)
             return rgba[..., :3]
-        except ImportError:
+        except (ImportError, KeyError):
             # Fallback: manual inferno-like colormap
             return FlowRenderer._manual_colormap(normalized, cmap)
     

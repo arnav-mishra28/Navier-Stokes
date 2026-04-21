@@ -85,10 +85,16 @@ class UnifiedTrainer:
     
     def setup_scheduler(self, epochs: int, warmup_epochs: int = 10):
         """Setup cosine annealing with warmup."""
+        # Guard against zero-division when epochs <= warmup_epochs
+        warmup_epochs = min(warmup_epochs, max(epochs - 1, 0))
+        
         def lr_lambda(epoch):
-            if epoch < warmup_epochs:
-                return epoch / warmup_epochs
-            progress = (epoch - warmup_epochs) / (epochs - warmup_epochs)
+            if warmup_epochs > 0 and epoch < warmup_epochs:
+                return max(epoch / warmup_epochs, 1e-6)
+            remaining = epochs - warmup_epochs
+            if remaining <= 0:
+                return 1.0
+            progress = (epoch - warmup_epochs) / remaining
             return 0.5 * (1 + np.cos(np.pi * progress))
         
         self.scheduler = optim.lr_scheduler.LambdaLR(self.optimizer, lr_lambda)
@@ -256,6 +262,183 @@ class UnifiedTrainer:
         
         self.save_checkpoint('pinn_final.pt')
         print(f"\nPINN training complete.")
+    
+    def train_deeponet(
+        self,
+        train_loader: DataLoader,
+        val_loader: Optional[DataLoader] = None,
+        epochs: int = 200,
+        gradient_clip: float = 1.0,
+        save_every: int = 50,
+    ):
+        """
+        Train DeepONet model.
+        
+        Data format: each batch = (branch_input, trunk_input, target)
+            branch_input: (B, n_sensors) — input function values
+            trunk_input:  (B, 2/3)       — query coordinates (x,y[,t])
+            target:       (B, output_dim) — solution values
+        """
+        self.setup_scheduler(epochs)
+        
+        print(f"\n{'='*60}")
+        print(f"Training DeepONet: {epochs} epochs")
+        print(f"{'='*60}\n")
+        
+        for epoch in range(epochs):
+            self.model.train()
+            epoch_loss = 0
+            n_batches = 0
+            
+            for batch in train_loader:
+                if len(batch) == 3:
+                    branch_in, trunk_in, target = [
+                        b.to(self.device) for b in batch
+                    ]
+                else:
+                    # Fallback: (input, target) pairs
+                    x, target = batch[0].to(self.device), batch[1].to(self.device)
+                    branch_in = x
+                    trunk_in = torch.zeros(x.shape[0], 2, device=self.device)
+                
+                self.optimizer.zero_grad()
+                pred = self.model(branch_in, trunk_in)
+                loss = nn.functional.mse_loss(pred, target)
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(self.model.parameters(), gradient_clip)
+                self.optimizer.step()
+                
+                epoch_loss += loss.item()
+                n_batches += 1
+            
+            avg_loss = epoch_loss / max(n_batches, 1)
+            self.train_history.append({'epoch': epoch, 'loss': avg_loss})
+            
+            if self.scheduler:
+                self.scheduler.step()
+            
+            # Validation
+            val_loss = None
+            if val_loader:
+                val_loss = self._validate_deeponet(val_loader)
+                self.val_history.append({'epoch': epoch, 'loss': val_loss})
+                if val_loss < self.best_val_loss:
+                    self.best_val_loss = val_loss
+                    self.save_checkpoint('best_deeponet.pt')
+            
+            if (epoch + 1) % 10 == 0 or epoch == 0:
+                lr = self.optimizer.param_groups[0]['lr']
+                msg = f"Epoch {epoch+1:4d}/{epochs} | Train: {avg_loss:.6f}"
+                if val_loss is not None:
+                    msg += f" | Val: {val_loss:.6f}"
+                msg += f" | LR: {lr:.2e}"
+                print(msg)
+            
+            if (epoch + 1) % save_every == 0:
+                self.save_checkpoint(f'deeponet_epoch_{epoch+1}.pt')
+            
+            self.epoch = epoch + 1
+        
+        self.save_checkpoint('deeponet_final.pt')
+        print(f"\nDeepONet training complete. Best val loss: {self.best_val_loss:.6f}")
+    
+    def _validate_deeponet(self, val_loader: DataLoader) -> float:
+        """Run validation pass for DeepONet."""
+        self.model.eval()
+        total_loss = 0
+        n_batches = 0
+        with torch.no_grad():
+            for batch in val_loader:
+                if len(batch) == 3:
+                    branch_in, trunk_in, target = [
+                        b.to(self.device) for b in batch
+                    ]
+                else:
+                    x, target = batch[0].to(self.device), batch[1].to(self.device)
+                    branch_in = x
+                    trunk_in = torch.zeros(x.shape[0], 2, device=self.device)
+                pred = self.model(branch_in, trunk_in)
+                loss = nn.functional.mse_loss(pred, target)
+                total_loss += loss.item()
+                n_batches += 1
+        return total_loss / max(n_batches, 1)
+    
+    def train_surrogate(
+        self,
+        train_loader: DataLoader,
+        val_loader: Optional[DataLoader] = None,
+        epochs: int = 200,
+        gradient_clip: float = 1.0,
+        save_every: int = 50,
+    ):
+        """
+        Train U-Net surrogate model.
+        
+        Data format: each batch = (input_fields, target_fields)
+            input_fields:  (B, C_in, H, W) — initial state
+            target_fields: (B, C_out, H, W) — predicted next state
+        """
+        self.setup_scheduler(epochs)
+        
+        print(f"\n{'='*60}")
+        print(f"Training U-Net Surrogate: {epochs} epochs")
+        print(f"{'='*60}\n")
+        
+        for epoch in range(epochs):
+            self.model.train()
+            epoch_loss = 0
+            n_batches = 0
+            
+            for batch in train_loader:
+                if len(batch) == 3:
+                    x, y, _ = batch
+                else:
+                    x, y = batch
+                x, y = x.to(self.device), y.to(self.device)
+                
+                self.optimizer.zero_grad()
+                pred = self.model(x)
+                
+                # Relative L2 loss for better scale-invariance
+                diff = pred - y
+                loss = torch.mean(diff**2) / (torch.mean(y**2) + 1e-8)
+                
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(self.model.parameters(), gradient_clip)
+                self.optimizer.step()
+                
+                epoch_loss += loss.item()
+                n_batches += 1
+            
+            avg_loss = epoch_loss / max(n_batches, 1)
+            self.train_history.append({'epoch': epoch, 'loss': avg_loss})
+            
+            if self.scheduler:
+                self.scheduler.step()
+            
+            val_loss = None
+            if val_loader:
+                val_loss = self._validate(val_loader)
+                self.val_history.append({'epoch': epoch, 'loss': val_loss})
+                if val_loss < self.best_val_loss:
+                    self.best_val_loss = val_loss
+                    self.save_checkpoint('best_surrogate.pt')
+            
+            if (epoch + 1) % 10 == 0 or epoch == 0:
+                lr = self.optimizer.param_groups[0]['lr']
+                msg = f"Epoch {epoch+1:4d}/{epochs} | Train: {avg_loss:.6f}"
+                if val_loss is not None:
+                    msg += f" | Val: {val_loss:.6f}"
+                msg += f" | LR: {lr:.2e}"
+                print(msg)
+            
+            if (epoch + 1) % save_every == 0:
+                self.save_checkpoint(f'surrogate_epoch_{epoch+1}.pt')
+            
+            self.epoch = epoch + 1
+        
+        self.save_checkpoint('surrogate_final.pt')
+        print(f"\nSurrogate training complete. Best val loss: {self.best_val_loss:.6f}")
     
     def _validate(self, val_loader: DataLoader) -> float:
         """Run validation pass."""

@@ -20,12 +20,15 @@
       python main.py --dashboard         → Launch Streamlit dashboard
       python main.py --train pinn        → Train PINN model
       python main.py --train fno         → Train FNO model
+      python main.py --train deeponet    → Train DeepONet model
+      python main.py --train surrogate   → Train U-Net surrogate model
       python main.py --benchmark         → Run CFD benchmarks
       python main.py --physics mhd       → Run MHD simulation
       python main.py --physics astro     → Run astrophysics simulation
       python main.py --physics bio       → Run biophysics simulation
       python main.py --physics climate   → Run climate simulation
       python main.py --physics quantum   → Run quantum fluid simulation
+      python main.py --no-gui            → Headless mode (no plt.show())
 =============================================================================
 """
 
@@ -39,6 +42,69 @@ import time
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, PROJECT_ROOT)
 
+# Global flag for headless mode
+HEADLESS = False
+
+
+# =============================================================================
+# Publication-quality plot styling
+# =============================================================================
+
+def setup_plot_style():
+    """Configure matplotlib for publication-quality dark-themed plots."""
+    import matplotlib.pyplot as plt
+    import matplotlib as mpl
+
+    plt.rcParams.update({
+        # Dark background
+        'figure.facecolor': '#0d1117',
+        'axes.facecolor': '#161b22',
+        'savefig.facecolor': '#0d1117',
+        # Text
+        'text.color': '#c9d1d9',
+        'axes.labelcolor': '#c9d1d9',
+        'xtick.color': '#8b949e',
+        'ytick.color': '#8b949e',
+        # Fonts
+        'font.family': 'sans-serif',
+        'font.sans-serif': ['Inter', 'Segoe UI', 'Helvetica Neue', 'DejaVu Sans'],
+        'font.size': 11,
+        'axes.titlesize': 13,
+        'axes.labelsize': 11,
+        # Grid
+        'axes.grid': False,
+        'grid.color': '#21262d',
+        'grid.alpha': 0.5,
+        # Axes
+        'axes.edgecolor': '#30363d',
+        'axes.linewidth': 0.8,
+        # Legend
+        'legend.facecolor': '#161b22',
+        'legend.edgecolor': '#30363d',
+        'legend.fontsize': 10,
+        # Figure
+        'figure.dpi': 150,
+        'savefig.dpi': 200,
+        'figure.titlesize': 16,
+        'figure.titleweight': 'bold',
+    })
+
+
+def show_or_close(fig):
+    """Show plot if GUI available, otherwise close to free memory."""
+    import matplotlib.pyplot as plt
+    if not HEADLESS:
+        try:
+            plt.show()
+        except Exception:
+            plt.close(fig)
+    else:
+        plt.close(fig)
+
+
+# =============================================================================
+# Banner
+# =============================================================================
 
 def print_banner():
     """Print the system banner."""
@@ -95,8 +161,12 @@ def check_dependencies():
     return deps
 
 
+# =============================================================================
+# Taylor-Green Vortex Demo
+# =============================================================================
+
 def run_demo():
-    """Run the Taylor-Green vortex decay demo with live plotting."""
+    """Run the Taylor-Green vortex decay demo with publication-quality plots."""
     print("\n" + "="*60)
     print("  DEMO: Taylor-Green Vortex Decay")
     print("  Analytical benchmark for NS solver validation")
@@ -155,71 +225,114 @@ def run_demo():
     print(f"\n  Simulation complete: {n_steps} steps in {elapsed:.2f}s")
     print(f"  Performance: {n_steps/elapsed:.0f} steps/sec")
     
-    # Plot results
+    # ---- Publication-quality visualization ----
     try:
         import matplotlib.pyplot as plt
+        import matplotlib.colors as mcolors
+        setup_plot_style()
         
-        fig, axes = plt.subplots(2, 3, figsize=(18, 11))
-        fig.suptitle(f'Taylor-Green Vortex Decay (Re={Re}, {nx}×{ny})',
-                    fontsize=16, fontweight='bold')
+        fig = plt.figure(figsize=(20, 12))
+        fig.suptitle(
+            f'Taylor-Green Vortex Decay   ·   Re = {Re}   ·   {nx}×{ny}',
+            fontsize=18, fontweight='bold', color='#58a6ff', y=0.97
+        )
         
-        # Vorticity
+        # — Vorticity field —
+        ax1 = fig.add_subplot(2, 3, 1)
         omega = compute_vorticity(solver.u, solver.v, solver.dx, solver.dy)
-        im1 = axes[0, 0].imshow(omega, cmap='RdBu_r', origin='lower',
-                                extent=[0, 2*np.pi, 0, 2*np.pi])
-        axes[0, 0].set_title('Vorticity ω')
-        plt.colorbar(im1, ax=axes[0, 0])
+        vmax = np.max(np.abs(omega))
+        im1 = ax1.imshow(
+            omega, cmap='RdBu_r', origin='lower',
+            extent=[0, 2*np.pi, 0, 2*np.pi],
+            norm=mcolors.TwoSlopeNorm(vcenter=0, vmin=-vmax, vmax=vmax),
+            interpolation='bicubic'
+        )
+        ax1.set_title('Vorticity  ω', color='#79c0ff')
+        ax1.set_xlabel('x'); ax1.set_ylabel('y')
+        cb1 = plt.colorbar(im1, ax=ax1, fraction=0.046, pad=0.04)
+        cb1.ax.yaxis.set_tick_params(color='#8b949e')
+        cb1.outline.set_edgecolor('#30363d')
         
-        # Velocity magnitude
+        # — Velocity magnitude —
+        ax2 = fig.add_subplot(2, 3, 2)
         speed = solver.get_velocity_magnitude()
-        im2 = axes[0, 1].imshow(speed, cmap='inferno', origin='lower',
-                                extent=[0, 2*np.pi, 0, 2*np.pi])
-        axes[0, 1].set_title('Velocity Magnitude |u|')
-        plt.colorbar(im2, ax=axes[0, 1])
+        im2 = ax2.imshow(
+            speed, cmap='magma', origin='lower',
+            extent=[0, 2*np.pi, 0, 2*np.pi],
+            interpolation='bicubic'
+        )
+        ax2.set_title('Velocity Magnitude  |u|', color='#79c0ff')
+        ax2.set_xlabel('x'); ax2.set_ylabel('y')
+        cb2 = plt.colorbar(im2, ax=ax2, fraction=0.046, pad=0.04)
+        cb2.ax.yaxis.set_tick_params(color='#8b949e')
+        cb2.outline.set_edgecolor('#30363d')
         
-        # Pressure
-        im3 = axes[0, 2].imshow(solver.p, cmap='viridis', origin='lower',
-                                extent=[0, 2*np.pi, 0, 2*np.pi])
-        axes[0, 2].set_title('Pressure p')
-        plt.colorbar(im3, ax=axes[0, 2])
+        # — Pressure —
+        ax3 = fig.add_subplot(2, 3, 3)
+        im3 = ax3.imshow(
+            solver.p, cmap='cividis', origin='lower',
+            extent=[0, 2*np.pi, 0, 2*np.pi],
+            interpolation='bicubic'
+        )
+        ax3.set_title('Pressure  p', color='#79c0ff')
+        ax3.set_xlabel('x'); ax3.set_ylabel('y')
+        cb3 = plt.colorbar(im3, ax=ax3, fraction=0.046, pad=0.04)
+        cb3.ax.yaxis.set_tick_params(color='#8b949e')
+        cb3.outline.set_edgecolor('#30363d')
         
-        # Velocity vectors
-        skip = 8
+        # — Streamlines —
+        ax4 = fig.add_subplot(2, 3, 4)
         X, Y = np.meshgrid(
             np.linspace(0, 2*np.pi, nx),
             np.linspace(0, 2*np.pi, ny)
         )
-        axes[1, 0].quiver(X[::skip, ::skip], Y[::skip, ::skip],
-                         solver.u[::skip, ::skip], solver.v[::skip, ::skip],
-                         speed[::skip, ::skip], cmap='coolwarm', scale=15)
-        axes[1, 0].set_title('Velocity Vectors')
-        axes[1, 0].set_aspect('equal')
+        ax4.imshow(
+            speed, cmap='magma', origin='lower', alpha=0.35,
+            extent=[0, 2*np.pi, 0, 2*np.pi], interpolation='bicubic'
+        )
+        strm = ax4.streamplot(
+            X, Y, solver.u, solver.v,
+            color=speed, cmap='cool', density=2.0, linewidth=0.8,
+            arrowsize=0.8, arrowstyle='->'
+        )
+        ax4.set_title('Streamlines', color='#79c0ff')
+        ax4.set_xlabel('x'); ax4.set_ylabel('y')
+        ax4.set_xlim(0, 2*np.pi); ax4.set_ylim(0, 2*np.pi)
         
-        # KE decay comparison
-        axes[1, 1].plot(times, ke_numerical, 'b-', lw=2, label='Numerical')
-        axes[1, 1].plot(times, ke_analytical, 'r--', lw=2, label='Analytical')
-        axes[1, 1].set_xlabel('Time')
-        axes[1, 1].set_ylabel('Kinetic Energy')
-        axes[1, 1].set_title('KE Decay (Validation)')
-        axes[1, 1].legend()
-        axes[1, 1].grid(True, alpha=0.3)
+        # — KE Decay —
+        ax5 = fig.add_subplot(2, 3, 5)
+        ax5.plot(times, ke_numerical, color='#58a6ff', lw=2.2, label='Numerical', zorder=3)
+        ax5.plot(times, ke_analytical, color='#f97583', lw=2.2, ls='--', label='Analytical', zorder=2)
+        ax5.fill_between(times, ke_numerical, ke_analytical, alpha=0.12, color='#58a6ff')
+        ax5.set_xlabel('Time  t')
+        ax5.set_ylabel('Kinetic Energy  E')
+        ax5.set_title('KE Decay  (Validation)', color='#79c0ff')
+        ax5.legend(framealpha=0.8)
+        ax5.grid(True, alpha=0.15, color='#30363d')
         
-        # Error
+        # — Error —
+        ax6 = fig.add_subplot(2, 3, 6)
         errors = [abs(n - a) / max(a, 1e-10) for n, a in zip(ke_numerical, ke_analytical)]
-        axes[1, 2].semilogy(times, errors, 'g-', lw=2)
-        axes[1, 2].set_xlabel('Time')
-        axes[1, 2].set_ylabel('Relative Error')
-        axes[1, 2].set_title('KE Relative Error')
-        axes[1, 2].grid(True, alpha=0.3)
+        ax6.semilogy(times, errors, color='#7ee787', lw=2.2)
+        ax6.fill_between(times, errors, alpha=0.10, color='#7ee787')
+        ax6.set_xlabel('Time  t')
+        ax6.set_ylabel('Relative Error')
+        ax6.set_title('KE Relative Error', color='#79c0ff')
+        ax6.grid(True, alpha=0.15, color='#30363d')
         
-        plt.tight_layout()
-        plt.savefig(os.path.join(PROJECT_ROOT, 'demo_taylor_green.png'), dpi=150)
-        plt.show()
-        print(f"\n  Plot saved to demo_taylor_green.png")
+        plt.tight_layout(rect=[0, 0, 1, 0.95])
+        filepath = os.path.join(PROJECT_ROOT, 'demo_taylor_green.png')
+        plt.savefig(filepath, bbox_inches='tight')
+        show_or_close(fig)
+        print(f"\n  Plot saved to {filepath}")
         
     except ImportError:
         print("  (matplotlib not available, skipping plots)")
 
+
+# =============================================================================
+# Benchmarks
+# =============================================================================
 
 def run_benchmark():
     """Run CFD solver benchmarks."""
@@ -288,8 +401,12 @@ def run_benchmark():
             print(f"    {method:>10s}: Failed ({e})")
 
 
+# =============================================================================
+# Physics Domain Demos
+# =============================================================================
+
 def run_physics_demo(domain: str):
-    """Run a physics domain-specific demo."""
+    """Run a physics domain-specific demo with publication-quality visuals."""
     print(f"\n{'='*60}")
     print(f"  PHYSICS DEMO: {domain.upper()}")
     print(f"{'='*60}\n")
@@ -341,74 +458,96 @@ def run_physics_demo(domain: str):
     
     print(f"  Completed in {elapsed:.2f}s ({n_steps/elapsed:.1f} steps/s)")
     
-    # Visualize final state
+    # ---- Publication-quality visualization ----
     try:
         import matplotlib.pyplot as plt
+        import matplotlib.colors as mcolors
+        setup_plot_style()
         
         state = solver.get_state()
         
-        fig, axes = plt.subplots(1, 3, figsize=(18, 5))
-        fig.suptitle(f'{title} (t = {state["time"]:.3f})', fontsize=14, fontweight='bold')
+        fig, axes = plt.subplots(1, 3, figsize=(21, 6))
+        fig.suptitle(
+            f'{title}   ·   t = {state["time"]:.3f}',
+            fontsize=16, fontweight='bold', color='#58a6ff', y=0.98
+        )
         
-        # Velocity magnitude
+        # — Field 1: Velocity magnitude —
         vel = state.get('velocity_magnitude', np.sqrt(state['u']**2 + state['v']**2))
-        im1 = axes[0].imshow(vel, cmap='inferno', origin='lower')
-        axes[0].set_title('Velocity Magnitude')
-        plt.colorbar(im1, ax=axes[0])
+        im1 = axes[0].imshow(vel, cmap='magma', origin='lower', interpolation='bicubic')
+        axes[0].set_title('Velocity Magnitude', color='#79c0ff')
+        cb1 = plt.colorbar(im1, ax=axes[0], fraction=0.046, pad=0.04)
+        cb1.outline.set_edgecolor('#30363d')
         
-        # Vorticity or domain-specific field
+        # — Field 2: Domain-specific —
         if 'Jz' in state:
-            field2 = state['Jz']
-            t2 = 'Current Density Jz'
+            field2, cmap2, t2 = state['Jz'], 'RdBu_r', 'Current Density  Jz'
+            vabs = np.max(np.abs(field2))
+            norm2 = mcolors.TwoSlopeNorm(vcenter=0, vmin=-vabs, vmax=vabs)
         elif 'rho' in state:
-            field2 = state['rho']
-            t2 = 'Density ρ'
+            field2, cmap2, t2 = state['rho'], 'inferno', 'Density  ρ'
+            norm2 = None
         elif 'density' in state:
-            field2 = state['density']
-            t2 = 'Superfluid Density |ψ|²'
-        elif 'wss' in state:
-            field2 = state['viscosity']
-            t2 = 'Viscosity Field'
+            field2, cmap2, t2 = state['density'], 'viridis', 'Superfluid Density  |ψ|²'
+            norm2 = None
         elif 'omega' in state:
-            field2 = state['omega']
-            t2 = 'Vorticity ω'
+            field2, cmap2, t2 = state['omega'], 'RdBu_r', 'Vorticity  ω'
+            vabs = np.max(np.abs(field2))
+            norm2 = mcolors.TwoSlopeNorm(vcenter=0, vmin=-vabs, vmax=vabs) if vabs > 0 else None
         else:
             vort = np.gradient(state['v'], axis=1) - np.gradient(state['u'], axis=0)
-            field2 = vort
-            t2 = 'Vorticity ω'
+            field2, cmap2, t2 = vort, 'RdBu_r', 'Vorticity  ω'
+            vabs = np.max(np.abs(vort))
+            norm2 = mcolors.TwoSlopeNorm(vcenter=0, vmin=-vabs, vmax=vabs) if vabs > 0 else None
         
-        im2 = axes[1].imshow(field2, cmap='RdBu_r', origin='lower')
-        axes[1].set_title(t2)
-        plt.colorbar(im2, ax=axes[1])
+        im2 = axes[1].imshow(field2, cmap=cmap2, origin='lower', norm=norm2,
+                             interpolation='bicubic')
+        axes[1].set_title(t2, color='#79c0ff')
+        cb2 = plt.colorbar(im2, ax=axes[1], fraction=0.046, pad=0.04)
+        cb2.outline.set_edgecolor('#30363d')
         
-        # Pressure or extra field
-        if 'p' in state:
-            im3 = axes[2].imshow(state['p'], cmap='viridis', origin='lower')
-            axes[2].set_title('Pressure p')
-        elif 'phase' in state:
-            im3 = axes[2].imshow(state['phase'], cmap='hsv', origin='lower')
-            axes[2].set_title('Phase arg(ψ)')
+        # — Field 3: Pressure / phase / temperature —
+        if 'phase' in state:
+            im3 = axes[2].imshow(state['phase'], cmap='twilight_shifted', origin='lower',
+                                 interpolation='bicubic')
+            axes[2].set_title('Phase  arg(ψ)', color='#79c0ff')
         elif 'T' in state:
-            im3 = axes[2].imshow(state['T'], cmap='hot', origin='lower')
-            axes[2].set_title('Temperature T')
+            im3 = axes[2].imshow(state['T'], cmap='inferno', origin='lower',
+                                 interpolation='bicubic')
+            axes[2].set_title('Temperature  T', color='#79c0ff')
+        elif 'p' in state:
+            im3 = axes[2].imshow(state['p'], cmap='cividis', origin='lower',
+                                 interpolation='bicubic')
+            axes[2].set_title('Pressure  p', color='#79c0ff')
         else:
-            im3 = axes[2].imshow(state['p'], cmap='viridis', origin='lower')
-            axes[2].set_title('Pressure')
-        plt.colorbar(im3, ax=axes[2])
+            # Compute vorticity as fallback
+            vort = np.gradient(state['v'], axis=1) - np.gradient(state['u'], axis=0)
+            im3 = axes[2].imshow(vort, cmap='RdBu_r', origin='lower',
+                                 interpolation='bicubic')
+            axes[2].set_title('Vorticity  ω', color='#79c0ff')
+        
+        cb3 = plt.colorbar(im3, ax=axes[2], fraction=0.046, pad=0.04)
+        cb3.outline.set_edgecolor('#30363d')
         
         for ax in axes:
             ax.set_xlabel('x')
             ax.set_ylabel('y')
+            ax.tick_params(axis='both', colors='#8b949e')
         
-        plt.tight_layout()
+        plt.tight_layout(rect=[0, 0, 1, 0.94])
         filename = f'demo_{domain}.png'
-        plt.savefig(os.path.join(PROJECT_ROOT, filename), dpi=150)
-        plt.show()
-        print(f"  Saved: {filename}")
+        filepath = os.path.join(PROJECT_ROOT, filename)
+        plt.savefig(filepath, bbox_inches='tight')
+        show_or_close(fig)
+        print(f"  Saved: {filepath}")
         
     except ImportError:
         print("  (matplotlib not available)")
 
+
+# =============================================================================
+# ML Training
+# =============================================================================
 
 def run_training(model_type: str):
     """Run ML model training."""
@@ -479,10 +618,63 @@ def run_training(model_type: str):
         trainer.train_fno(train_loader, val_loader, epochs=100)
         trainer.plot_training_history(save_path=os.path.join(PROJECT_ROOT, 'fno_training.png'))
     
+    elif model_type == "deeponet":
+        from models.deeponet import DeepONet
+        from training.data_generator import NSDataGenerator, create_dataloaders
+        from training.trainer import UnifiedTrainer
+        
+        # Generate training data (reuse FNO data format for simplicity)
+        print("  Generating training data...")
+        gen = NSDataGenerator(nx=64, ny=64, dt=0.01)
+        data = gen.generate_taylor_green_dataset(n_samples=50)
+        
+        train_loader, val_loader, _ = create_dataloaders(
+            data, batch_size=16, val_split=0.1, test_split=0.1
+        )
+        
+        # Create DeepONet
+        n_sensors = 3 * 64 * 64  # flattened (u,v,p) field
+        model = DeepONet(
+            branch_input_dim=n_sensors,
+            trunk_input_dim=2,
+            latent_dim=128,
+            n_outputs=3,
+        )
+        
+        trainer = UnifiedTrainer(model, model_type="deeponet", device=device, learning_rate=1e-3)
+        # Use FNO-style training as data has same shape
+        trainer.train_fno(train_loader, val_loader, epochs=100)
+        trainer.plot_training_history(save_path=os.path.join(PROJECT_ROOT, 'deeponet_training.png'))
+    
+    elif model_type == "surrogate":
+        from models.surrogate import UNetSurrogate
+        from training.data_generator import NSDataGenerator, create_dataloaders
+        from training.trainer import UnifiedTrainer
+        
+        # Generate training data
+        print("  Generating training data...")
+        gen = NSDataGenerator(nx=64, ny=64, dt=0.01)
+        data = gen.generate_taylor_green_dataset(n_samples=50)
+        
+        train_loader, val_loader, _ = create_dataloaders(
+            data, batch_size=16, val_split=0.1, test_split=0.1
+        )
+        
+        # Create U-Net Surrogate
+        model = UNetSurrogate(in_channels=3, out_channels=3)
+        
+        trainer = UnifiedTrainer(model, model_type="surrogate", device=device, learning_rate=1e-3)
+        trainer.train_surrogate(train_loader, val_loader, epochs=100)
+        trainer.plot_training_history(save_path=os.path.join(PROJECT_ROOT, 'surrogate_training.png'))
+    
     else:
-        print(f"  Training for {model_type} not yet configured.")
-        print(f"  Available: pinn, fno")
+        print(f"  Training for '{model_type}' not recognized.")
+        print(f"  Available: pinn, fno, deeponet, surrogate")
 
+
+# =============================================================================
+# Interactive Menu
+# =============================================================================
 
 def interactive_menu():
     """Interactive mode selector."""
@@ -491,19 +683,21 @@ def interactive_menu():
     
     print("  Select Mode:")
     print("  ─────────────────────────────────────────")
-    print("  [1] 🎬 Demo: Taylor-Green Vortex Decay")
-    print("  [2] 🎮 Real-Time 2D Visualizer (Pygame)")
-    print("  [3] 🌐 3D Visualizer (Matplotlib/PyVista)")
-    print("  [4] 📊 Streamlit Dashboard")
-    print("  [5] 🏋 Train PINN Model")
-    print("  [6] 🏋 Train FNO Model")
-    print("  [7] ⚡ MHD Simulation")
-    print("  [8] 🌟 Astrophysics Simulation")
-    print("  [9] ❤ Biophysics (Blood Flow)")
-    print("  [10] 🌍 Climate Simulation")
-    print("  [11] ⚛ Quantum Fluid Simulation")
-    print("  [12] 📏 CFD Benchmarks")
-    print("  [0] ❌ Exit")
+    print("  [1]  🎬 Demo: Taylor-Green Vortex Decay")
+    print("  [2]  🎮 Real-Time 2D Visualizer (Pygame)")
+    print("  [3]  🌐 3D Visualizer (Matplotlib/PyVista)")
+    print("  [4]  📊 Streamlit Dashboard")
+    print("  [5]  🏋 Train PINN Model")
+    print("  [6]  🏋 Train FNO Model")
+    print("  [7]  🏋 Train DeepONet Model")
+    print("  [8]  🏋 Train U-Net Surrogate")
+    print("  [9]  ⚡ MHD Simulation")
+    print("  [10] 🌟 Astrophysics Simulation")
+    print("  [11] ❤ Biophysics (Blood Flow)")
+    print("  [12] 🌍 Climate Simulation")
+    print("  [13] ⚛ Quantum Fluid Simulation")
+    print("  [14] 📏 CFD Benchmarks")
+    print("  [0]  ❌ Exit")
     print()
     
     try:
@@ -512,43 +706,51 @@ def interactive_menu():
         print("\n  Goodbye!")
         return
     
-    if choice == "1":
-        run_demo()
-    elif choice == "2":
-        from visualization.realtime_2d import RealtimeVisualizer2D
-        viz = RealtimeVisualizer2D()
-        viz.run()
-    elif choice == "3":
-        from visualization.realtime_3d import RealtimeVisualizer3D
-        viz = RealtimeVisualizer3D()
-        viz.run()
-    elif choice == "4":
-        print("\n  Launching Streamlit dashboard...")
-        os.system(f'streamlit run "{os.path.join(PROJECT_ROOT, "dashboard", "app.py")}"')
-    elif choice == "5":
-        run_training("pinn")
-    elif choice == "6":
-        run_training("fno")
-    elif choice == "7":
-        run_physics_demo("mhd")
-    elif choice == "8":
-        run_physics_demo("astro")
-    elif choice == "9":
-        run_physics_demo("bio")
-    elif choice == "10":
-        run_physics_demo("climate")
-    elif choice == "11":
-        run_physics_demo("quantum")
-    elif choice == "12":
-        run_benchmark()
-    elif choice == "0":
-        print("  Goodbye!")
+    dispatch = {
+        "1": lambda: run_demo(),
+        "2": lambda: _launch_viz2d(),
+        "3": lambda: _launch_viz3d(),
+        "4": lambda: os.system(f'streamlit run "{os.path.join(PROJECT_ROOT, "dashboard", "app.py")}"'),
+        "5": lambda: run_training("pinn"),
+        "6": lambda: run_training("fno"),
+        "7": lambda: run_training("deeponet"),
+        "8": lambda: run_training("surrogate"),
+        "9": lambda: run_physics_demo("mhd"),
+        "10": lambda: run_physics_demo("astro"),
+        "11": lambda: run_physics_demo("bio"),
+        "12": lambda: run_physics_demo("climate"),
+        "13": lambda: run_physics_demo("quantum"),
+        "14": lambda: run_benchmark(),
+        "0": lambda: print("  Goodbye!"),
+    }
+    
+    action = dispatch.get(choice)
+    if action:
+        action()
     else:
         print(f"  Unknown choice: {choice}")
 
 
+def _launch_viz2d():
+    from visualization.realtime_2d import RealtimeVisualizer2D
+    viz = RealtimeVisualizer2D()
+    viz.run()
+
+
+def _launch_viz3d():
+    from visualization.realtime_3d import RealtimeVisualizer3D
+    viz = RealtimeVisualizer3D()
+    viz.run()
+
+
+# =============================================================================
+# Main Entry Point
+# =============================================================================
+
 def main():
     """Main entry point with CLI argument parsing."""
+    global HEADLESS
+    
     parser = argparse.ArgumentParser(
         description="Navier-Stokes ML/DL Hybrid Simulation System",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -556,11 +758,14 @@ def main():
 Examples:
   python main.py                      Interactive menu
   python main.py --demo               Taylor-Green vortex demo
+  python main.py --demo --no-gui      Demo (headless, save plots only)
   python main.py --viz2d              Real-time 2D pygame visualizer
   python main.py --viz3d              3D matplotlib/PyVista visualizer
   python main.py --dashboard          Streamlit web dashboard
   python main.py --train pinn         Train PINN model
   python main.py --train fno          Train FNO model
+  python main.py --train deeponet     Train DeepONet model
+  python main.py --train surrogate    Train U-Net surrogate model
   python main.py --physics mhd        MHD simulation
   python main.py --physics quantum    Quantum fluid simulation
   python main.py --benchmark          CFD performance benchmarks
@@ -577,21 +782,25 @@ Examples:
                        choices=['mhd', 'astro', 'bio', 'climate', 'quantum'],
                        help='Run physics domain simulation')
     parser.add_argument('--benchmark', action='store_true', help='Run performance benchmarks')
+    parser.add_argument('--no-gui', action='store_true', dest='no_gui',
+                       help='Headless mode: save plots to disk, skip plt.show()')
     
     args = parser.parse_args()
+    
+    # Handle headless mode
+    if args.no_gui:
+        HEADLESS = True
+        import matplotlib
+        matplotlib.use('Agg')
     
     print_banner()
     
     if args.demo:
         run_demo()
     elif args.viz2d:
-        from visualization.realtime_2d import RealtimeVisualizer2D
-        viz = RealtimeVisualizer2D()
-        viz.run()
+        _launch_viz2d()
     elif args.viz3d:
-        from visualization.realtime_3d import RealtimeVisualizer3D
-        viz = RealtimeVisualizer3D()
-        viz.run()
+        _launch_viz3d()
     elif args.dashboard:
         os.system(f'streamlit run "{os.path.join(PROJECT_ROOT, "dashboard", "app.py")}"')
     elif args.train:
