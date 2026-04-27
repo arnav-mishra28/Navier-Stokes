@@ -48,7 +48,8 @@ class FluidSolver2D:
         density: float = 1.0,
         pressure_solver: str = "fft",
         advection_scheme: str = "central",
-        turbulence_model: str = "none"
+        turbulence_model: str = "none",
+        vorticity_confinement: float = 0.0,
     ):
         # Grid parameters
         self.nx = nx
@@ -101,6 +102,9 @@ class FluidSolver2D:
         self.turb_model = TurbulenceModelFactory.create(
             turbulence_model, self.dx, self.dy
         )
+        
+        # Vorticity confinement strength (ε_vc)
+        self.epsilon_vc = vorticity_confinement
         
         # Simulation state
         self.time = 0.0
@@ -253,17 +257,60 @@ class FluidSolver2D:
         
         return diff_u, diff_v
     
+    def _compute_vorticity_confinement(self) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Compute vorticity confinement force.
+        
+        Restores small-scale vortical structures that are lost to numerical
+        diffusion. Critical for visual realism in under-resolved simulations.
+        
+        Algorithm:
+            1. Compute vorticity ω = ∂v/∂x − ∂u/∂y
+            2. Compute |ω| gradient: η = ∇|ω|
+            3. Normalize: N = η / |η|
+            4. Confinement force: f_conf = ε_vc * (N × ω) * h
+        
+        Reference: Fedkiw, Stam, Jensen (2001) "Visual Simulation of Smoke"
+        """
+        omega = self.get_vorticity()
+        abs_omega = np.abs(omega)
+        
+        # Gradient of |ω|
+        eta_x = (np.roll(abs_omega, -1, axis=1) - np.roll(abs_omega, 1, axis=1)) / (2 * self.dx)
+        eta_y = (np.roll(abs_omega, -1, axis=0) - np.roll(abs_omega, 1, axis=0)) / (2 * self.dy)
+        
+        # Normalize
+        eta_mag = np.sqrt(eta_x**2 + eta_y**2) + 1e-10
+        Nx = eta_x / eta_mag
+        Ny = eta_y / eta_mag
+        
+        # Confinement force: N × ω (2D cross product → fconf_x = Ny*ω, fconf_y = -Nx*ω)
+        h = min(self.dx, self.dy)
+        fconf_x = self.epsilon_vc * h * Ny * omega
+        fconf_y = -self.epsilon_vc * h * Nx * omega
+        
+        return fconf_x, fconf_y
+    
     def _predict_velocity(self):
         """
         Step 1: Velocity prediction (explicit Euler).
         
-        u* = u^n + Δt * [-(u·∇)u + ν∇²u + f]
+        u* = u^n + Δt * [-(u·∇)u + ν∇²u + f + f_vc]
         """
         adv_u, adv_v = self._compute_advection(self.u, self.v)
         diff_u, diff_v = self._compute_diffusion(self.u, self.v)
         
-        self.u_star = self.u + self.dt * (-adv_u + diff_u + self.fx)
-        self.v_star = self.v + self.dt * (-adv_v + diff_v + self.fy)
+        # External + vorticity confinement forces
+        force_x = self.fx.copy()
+        force_y = self.fy.copy()
+        
+        if self.epsilon_vc > 0:
+            vc_x, vc_y = self._compute_vorticity_confinement()
+            force_x += vc_x
+            force_y += vc_y
+        
+        self.u_star = self.u + self.dt * (-adv_u + diff_u + force_x)
+        self.v_star = self.v + self.dt * (-adv_v + diff_v + force_y)
     
     def _solve_pressure(self):
         """
@@ -517,3 +564,166 @@ class SIMPLESolver2D:
                 return
         
         print(f"SIMPLE did not converge after {max_iter} iterations (residual={residual:.2e})")
+
+
+class GPUFluidSolver2D:
+    """
+    GPU-accelerated 2D incompressible NS solver using PyTorch tensors.
+    
+    Runs the projection method entirely on CUDA GPU for massive speedup
+    on large grids. Falls back to CPU if CUDA is unavailable.
+    
+    Uses spectral (FFT) pressure solver and periodic BCs.
+    """
+    
+    def __init__(
+        self,
+        nx: int = 256, ny: int = 256,
+        Lx: float = 2*np.pi, Ly: float = 2*np.pi,
+        nu: float = 0.01, dt: float = 0.005,
+        device: str = "auto",
+        vorticity_confinement: float = 0.0,
+    ):
+        try:
+            import torch
+        except ImportError:
+            raise RuntimeError("PyTorch required for GPU solver")
+        
+        if device == "auto":
+            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        else:
+            self.device = torch.device(device)
+        
+        self.nx, self.ny = nx, ny
+        self.Lx, self.Ly = Lx, Ly
+        self.dx, self.dy = Lx / nx, Ly / ny
+        self.nu = nu
+        self.dt = dt
+        self.epsilon_vc = vorticity_confinement
+        
+        # Fields on GPU
+        self.u = torch.zeros(ny, nx, device=self.device)
+        self.v = torch.zeros(ny, nx, device=self.device)
+        self.p = torch.zeros(ny, nx, device=self.device)
+        
+        # Precompute FFT eigenvalues for Poisson solver
+        kx = torch.fft.fftfreq(nx, d=self.dx, device=self.device) * 2 * np.pi
+        ky = torch.fft.fftfreq(ny, d=self.dy, device=self.device) * 2 * np.pi
+        KX, KY = torch.meshgrid(kx, ky, indexing='xy')
+        self.eigvals = (
+            2 * (torch.cos(2 * np.pi * torch.arange(nx, device=self.device) / nx) - 1)[None, :] / self.dx**2 +
+            2 * (torch.cos(2 * np.pi * torch.arange(ny, device=self.device) / ny) - 1)[:, None] / self.dy**2
+        )
+        self.eigvals[0, 0] = 1.0
+        
+        self.time = 0.0
+        self.step_count = 0
+        self.obstacle = np.zeros((ny, nx), dtype=bool)
+        
+        print(f"GPU Solver initialized on {self.device} ({nx}×{ny})")
+    
+    def initialize_taylor_green(self, amplitude: float = 1.0):
+        import torch
+        x = torch.linspace(0, self.Lx, self.nx, device=self.device, dtype=torch.float32)
+        y = torch.linspace(0, self.Ly, self.ny, device=self.device, dtype=torch.float32)
+        X, Y = torch.meshgrid(x, y, indexing='xy')
+        self.u = amplitude * torch.cos(X) * torch.sin(Y)
+        self.v = -amplitude * torch.sin(X) * torch.cos(Y)
+        self.p = -amplitude**2 / 4 * (torch.cos(2*X) + torch.cos(2*Y))
+    
+    def initialize_double_shear_layer(self, amplitude: float = 0.05, delta: float = 0.05):
+        import torch
+        x = torch.linspace(0, self.Lx, self.nx, device=self.device)
+        y = torch.linspace(0, self.Ly, self.ny, device=self.device)
+        X, Y = torch.meshgrid(x, y, indexing='xy')
+        y_norm = Y / self.Ly
+        self.u = torch.where(y_norm < 0.5,
+                             torch.tanh((y_norm - 0.25) / delta),
+                             torch.tanh((0.75 - y_norm) / delta))
+        self.v = amplitude * torch.sin(2 * np.pi * X / self.Lx)
+        self.p.zero_()
+    
+    def step(self):
+        import torch
+        # Advection (periodic central differences)
+        u, v = self.u, self.v
+        
+        dudx = (torch.roll(u, -1, 1) - torch.roll(u, 1, 1)) / (2 * self.dx)
+        dudy = (torch.roll(u, -1, 0) - torch.roll(u, 1, 0)) / (2 * self.dy)
+        dvdx = (torch.roll(v, -1, 1) - torch.roll(v, 1, 1)) / (2 * self.dx)
+        dvdy = (torch.roll(v, -1, 0) - torch.roll(v, 1, 0)) / (2 * self.dy)
+        
+        adv_u = u * dudx + v * dudy
+        adv_v = u * dvdx + v * dvdy
+        
+        # Diffusion (periodic Laplacian)
+        lap_u = ((torch.roll(u, -1, 1) - 2*u + torch.roll(u, 1, 1)) / self.dx**2 +
+                 (torch.roll(u, -1, 0) - 2*u + torch.roll(u, 1, 0)) / self.dy**2)
+        lap_v = ((torch.roll(v, -1, 1) - 2*v + torch.roll(v, 1, 1)) / self.dx**2 +
+                 (torch.roll(v, -1, 0) - 2*v + torch.roll(v, 1, 0)) / self.dy**2)
+        
+        # Predict
+        u_star = u + self.dt * (-adv_u + self.nu * lap_u)
+        v_star = v + self.dt * (-adv_v + self.nu * lap_v)
+        
+        # Vorticity confinement
+        if self.epsilon_vc > 0:
+            omega = dvdx - dudy
+            abs_omega = torch.abs(omega)
+            eta_x = (torch.roll(abs_omega, -1, 1) - torch.roll(abs_omega, 1, 1)) / (2 * self.dx)
+            eta_y = (torch.roll(abs_omega, -1, 0) - torch.roll(abs_omega, 1, 0)) / (2 * self.dy)
+            eta_mag = torch.sqrt(eta_x**2 + eta_y**2) + 1e-10
+            Nx, Ny = eta_x / eta_mag, eta_y / eta_mag
+            h = min(self.dx, self.dy)
+            u_star += self.dt * self.epsilon_vc * h * Ny * omega
+            v_star += self.dt * self.epsilon_vc * h * (-Nx * omega)
+        
+        # Pressure Poisson (FFT)
+        div = ((torch.roll(u_star, -1, 1) - torch.roll(u_star, 1, 1)) / (2 * self.dx) +
+               (torch.roll(v_star, -1, 0) - torch.roll(v_star, 1, 0)) / (2 * self.dy))
+        rhs = div / self.dt
+        rhs_hat = torch.fft.fft2(rhs)
+        p_hat = rhs_hat / self.eigvals
+        p_hat[0, 0] = 0.0
+        self.p = torch.real(torch.fft.ifft2(p_hat))
+        
+        # Correct
+        dpdx = (torch.roll(self.p, -1, 1) - torch.roll(self.p, 1, 1)) / (2 * self.dx)
+        dpdy = (torch.roll(self.p, -1, 0) - torch.roll(self.p, 1, 0)) / (2 * self.dy)
+        self.u = u_star - self.dt * dpdx
+        self.v = v_star - self.dt * dpdy
+        
+        self.time += self.dt
+        self.step_count += 1
+    
+    def advance(self, n_steps: int = 1, **kwargs):
+        for _ in range(n_steps):
+            self.step()
+    
+    def get_numpy(self):
+        """Return fields as numpy arrays (CPU)."""
+        return {
+            'u': self.u.cpu().numpy(),
+            'v': self.v.cpu().numpy(),
+            'p': self.p.cpu().numpy(),
+        }
+    
+    def get_vorticity(self):
+        dvdx = (torch.roll(self.v, -1, 1) - torch.roll(self.v, 1, 1)) / (2 * self.dx)
+        dudy = (torch.roll(self.u, -1, 0) - torch.roll(self.u, 1, 0)) / (2 * self.dy)
+        omega = dvdx - dudy
+        return omega.cpu().numpy() if hasattr(omega, 'cpu') else omega
+    
+    def get_velocity_magnitude(self):
+        import torch
+        speed = torch.sqrt(self.u**2 + self.v**2)
+        return speed.cpu().numpy()
+    
+    def get_state(self):
+        d = self.get_numpy()
+        d['time'] = self.time
+        d['step'] = self.step_count
+        d['vorticity'] = self.get_vorticity()
+        d['velocity_magnitude'] = self.get_velocity_magnitude()
+        d['obstacle'] = self.obstacle
+        return d
