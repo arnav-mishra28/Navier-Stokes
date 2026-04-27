@@ -486,43 +486,70 @@ class UnifiedTrainer:
         print(f"Loaded checkpoint from epoch {self.epoch}")
     
     def plot_training_history(self, save_path: Optional[str] = None):
-        """Plot training curves."""
+        """Plot training curves with publication-quality dark styling."""
+        import matplotlib
         import matplotlib.pyplot as plt
+        
+        # Publication-quality dark styling
+        plt.rcParams.update({
+            'figure.facecolor': '#0d1117',
+            'axes.facecolor': '#161b22',
+            'savefig.facecolor': '#0d1117',
+            'text.color': '#c9d1d9',
+            'axes.labelcolor': '#c9d1d9',
+            'xtick.color': '#8b949e',
+            'ytick.color': '#8b949e',
+            'axes.edgecolor': '#30363d',
+            'legend.facecolor': '#161b22',
+            'legend.edgecolor': '#30363d',
+            'figure.dpi': 150,
+        })
         
         fig, axes = plt.subplots(1, 2, figsize=(14, 5))
         
         # Training loss
         train_losses = [h['loss'] if 'loss' in h else h.get('total', 0) for h in self.train_history]
-        axes[0].semilogy(train_losses, label='Train', alpha=0.7)
+        axes[0].semilogy(train_losses, color='#58a6ff', lw=2, label='Train', alpha=0.9)
         
         if self.val_history:
             val_losses = [h['loss'] for h in self.val_history]
-            axes[0].semilogy(val_losses, label='Validation', alpha=0.7)
+            axes[0].semilogy(val_losses, color='#f97583', lw=2, ls='--', label='Validation', alpha=0.9)
         
         axes[0].set_xlabel('Epoch')
         axes[0].set_ylabel('Loss')
-        axes[0].set_title('Training Progress')
+        axes[0].set_title('Training Progress', color='#79c0ff')
         axes[0].legend()
-        axes[0].grid(True, alpha=0.3)
+        axes[0].grid(True, alpha=0.15, color='#30363d')
         
         # Component losses (for PINN)
         if self.train_history and 'pde' in self.train_history[0]:
+            colors = ['#58a6ff', '#f97583', '#7ee787', '#d2a8ff', '#ffa657']
             keys = [k for k in self.train_history[0].keys() if k not in ['epoch', 'total']]
-            for key in keys:
+            for ci, key in enumerate(keys):
                 vals = [h.get(key, 0) for h in self.train_history]
                 if any(v > 0 for v in vals):
-                    axes[1].semilogy(vals, label=key, alpha=0.7)
+                    axes[1].semilogy(vals, color=colors[ci % len(colors)], lw=2, label=key, alpha=0.9)
             axes[1].set_xlabel('Epoch')
             axes[1].set_ylabel('Loss Component')
-            axes[1].set_title('Loss Components')
+            axes[1].set_title('Loss Components', color='#79c0ff')
             axes[1].legend()
-            axes[1].grid(True, alpha=0.3)
+            axes[1].grid(True, alpha=0.15, color='#30363d')
         else:
             axes[1].text(0.5, 0.5, 'No component data', ha='center', va='center',
-                        transform=axes[1].transAxes, fontsize=14)
+                        transform=axes[1].transAxes, fontsize=14, color='#8b949e')
         
         plt.tight_layout()
         
         if save_path:
-            plt.savefig(save_path, dpi=150, bbox_inches='tight')
-        plt.show()
+            plt.savefig(save_path, dpi=200, bbox_inches='tight')
+            print(f"  Training plot saved: {save_path}")
+        
+        # Safe show: don't crash in headless environments
+        try:
+            backend = matplotlib.get_backend().lower()
+            if 'agg' not in backend:
+                plt.show()
+            else:
+                plt.close(fig)
+        except Exception:
+            plt.close(fig)
