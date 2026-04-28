@@ -416,10 +416,10 @@ def run_physics_demo(domain: str):
     
     if domain == "mhd":
         from physics.mhd import MHDSolver
-        solver = MHDSolver(nx=128, ny=128, nu=0.005, eta=0.005, dt=0.005)
+        solver = MHDSolver(nx=128, ny=128, nu=0.01, eta=0.01, dt=0.005)
         solver.initialize_orszag_tang()
         title = "Orszag-Tang MHD Vortex"
-        n_steps = 400
+        n_steps = 200
         
     elif domain == "astro":
         from physics.astrophysics import AstrophysicalFlowSolver
@@ -444,10 +444,10 @@ def run_physics_demo(domain: str):
         
     elif domain == "quantum":
         from physics.quantum_fluids import QuantumFluidSolver
-        solver = QuantumFluidSolver(nx=256, ny=256, g_int=500, dt=0.0005)
-        solver.initialize_quantum_turbulence(n_vortices=15)
+        solver = QuantumFluidSolver(nx=128, ny=128, g_int=500, dt=0.0005)
+        solver.initialize_quantum_turbulence(n_vortices=10)
         title = "Quantum Turbulence (Bose-Einstein Condensate)"
-        n_steps = 500
+        n_steps = 200
     else:
         print(f"  Unknown domain: {domain}")
         return
@@ -702,7 +702,7 @@ def interactive_menu():
     print("  [14] 📏 CFD Benchmarks")
     print("  [15] 🔥 Vorticity Confinement Demo")
     print("  [16] ⚡ GPU Solver Demo")
-    print("  [17] 🧪 Hybrid CFD→PINN Demo")
+    print("  [17] 🧪 Hybrid CFD->PINN Demo")
     print("  [0]  ❌ Exit")
     print()
     
@@ -767,11 +767,11 @@ def run_vorticity_confinement_demo():
     setup_plot_style()
     import matplotlib.pyplot as plt
     
-    n_steps = 300
+    n_steps = 200
     configs = [
         ("No Confinement (eps=0)", 0.0),
-        ("Mild (eps=3)", 3.0),
-        ("Strong (eps=10)", 10.0),
+        ("Mild (eps=2)", 2.0),
+        ("Strong (eps=5)", 5.0),
     ]
     
     fig, axes = plt.subplots(1, 3, figsize=(18, 5))
@@ -779,7 +779,7 @@ def run_vorticity_confinement_demo():
     for idx, (label, eps) in enumerate(configs):
         solver = FluidSolver2D(
             nx=128, ny=128, Lx=2*np.pi, Ly=2*np.pi,
-            nu=0.005, dt=0.01, pressure_solver="fft",
+            nu=0.01, dt=0.005, pressure_solver="fft",
             vorticity_confinement=eps,
         )
         solver.initialize_double_shear_layer(amplitude=0.05, delta=0.05)
@@ -787,13 +787,19 @@ def run_vorticity_confinement_demo():
         
         for _ in range(n_steps):
             solver.step()
+            # Clamp to prevent blowup with high confinement
+            if not np.isfinite(solver.u).all():
+                solver.u = np.nan_to_num(solver.u, nan=0.0, posinf=10.0, neginf=-10.0)
+                solver.v = np.nan_to_num(solver.v, nan=0.0, posinf=10.0, neginf=-10.0)
         
         omega = solver.get_vorticity()
+        omega = np.nan_to_num(omega, nan=0.0)
         v_max = max(np.max(np.abs(omega)), 1e-6)
         axes[idx].imshow(omega, cmap='coolwarm', vmin=-v_max, vmax=v_max,
                         origin='lower', extent=[0, 2*np.pi, 0, 2*np.pi])
         axes[idx].set_title(label, color='#79c0ff', fontsize=13)
         axes[idx].set_xlabel('x'); axes[idx].set_ylabel('y')
+        print(f"  {label}: max|omega|={v_max:.2f}")
     
     fig.suptitle('Vorticity Confinement: Restoring Turbulent Detail',
                 fontsize=15, color='#c9d1d9', fontweight='bold')
@@ -849,10 +855,10 @@ def run_gpu_demo():
 
 
 def run_hybrid_demo():
-    """Hybrid CFD→PINN demonstration."""
+    """Hybrid CFD->PINN demonstration."""
     print("\n" + "="*60)
-    print("  DEMO: Hybrid CFD → PINN Integration")
-    print("  CFD generates truth → trains PINN → PINN predicts")
+    print("  DEMO: Hybrid CFD -> PINN Integration")
+    print("  CFD generates truth -> trains PINN -> PINN predicts")
     print("="*60 + "\n")
     
     try:
@@ -942,7 +948,7 @@ def run_hybrid_demo():
     axes[1, 2].imshow(pred_omega, cmap='coolwarm', vmin=-v_max, vmax=v_max, origin='lower')
     axes[1, 2].set_title('PINN: ω', color='#7ee787')
     
-    fig.suptitle(f'Hybrid CFD→PINN (t={t_test:.2f}, loss={loss.item():.6f})',
+    fig.suptitle(f'Hybrid CFD->PINN (t={t_test:.2f}, loss={loss.item():.6f})',
                 fontsize=15, color='#c9d1d9', fontweight='bold')
     plt.tight_layout()
     
@@ -973,7 +979,7 @@ Examples:
   python main.py --dashboard          Streamlit web dashboard
   python main.py --train pinn         Train PINN model
   python main.py --physics mhd        MHD simulation
-  python main.py --hybrid             Hybrid CFD→PINN demo
+  python main.py --hybrid             Hybrid CFD->PINN demo
   python main.py --gpu                GPU solver demo
   python main.py --vort-conf 5.0      Vorticity confinement demo
   python main.py --benchmark          CFD performance benchmarks
@@ -990,7 +996,7 @@ Examples:
                        choices=['mhd', 'astro', 'bio', 'climate', 'quantum'],
                        help='Run physics domain simulation')
     parser.add_argument('--benchmark', action='store_true', help='Run performance benchmarks')
-    parser.add_argument('--hybrid', action='store_true', help='Run hybrid CFD→PINN demo')
+    parser.add_argument('--hybrid', action='store_true', help='Run hybrid CFD->PINN demo')
     parser.add_argument('--gpu', action='store_true', help='Run GPU solver demo')
     parser.add_argument('--vort-conf', type=float, dest='vort_conf', default=None,
                        help='Run vorticity confinement demo (specify ε strength)')
