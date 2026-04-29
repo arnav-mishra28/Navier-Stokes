@@ -2,10 +2,12 @@
 =============================================================================
   ╔═══════════════════════════════════════════════════════════════════════╗
   ║     NAVIER-STOKES ML/DL HYBRID SIMULATION SYSTEM                    ║
+  ║     + TURBULENCE DISCOVERY AI                                        ║
   ║     Research-Grade CFD + Deep Learning Platform                      ║
   ║                                                                     ║
   ║     Core: Incompressible Navier-Stokes (Projection Method)          ║
-  ║     ML:   PINN / FNO / DeepONet / U-Net Surrogate                  ║
+  ║     ML:   PINN / FNO / DeepONet / U-Net / Autoencoder / NeuralODE  ║
+  ║     AI:   SINDy / Genetic Programming / Blow-up Detection           ║
   ║     Physics: Fluid · MHD · Astro · Bio · Climate · Quantum          ║
   ║     Viz:  Real-time 2D (Pygame) + 3D (PyVista/Matplotlib)          ║
   ╚═══════════════════════════════════════════════════════════════════════╝
@@ -124,6 +126,7 @@ def print_banner():
     |___/  |_|  \___/ |_|\_\|___||___/            
     """)
     print("  ML/DL Hybrid Navier-Stokes Simulation System")
+    print("  + Turbulence Discovery AI (SINDy / GP / Neural ODE)")
     print("  du/dt + (u.grad)u = -grad(p) + nu*laplacian(u) + f")
     print("="*72 + "\n")
 
@@ -703,6 +706,12 @@ def interactive_menu():
     print("  [15] 🔥 Vorticity Confinement Demo")
     print("  [16] ⚡ GPU Solver Demo")
     print("  [17] 🧪 Hybrid CFD->PINN Demo")
+    print("  ─────────────────────────────────────────")
+    print("  [18] 🧠 Turbulence Discovery AI (Full Pipeline)")
+    print("  [19] 💥 Blow-up Detection & Stability Analysis")
+    print("  [20] 📈 Regularity Map (Re sweep)")
+    print("  [21] 📊 Turbulence Metrics (DNS vs LES comparison)")
+    print("  [22] 🔬 Symbolic Discovery (SINDy + GP)")
     print("  [0]  ❌ Exit")
     print()
     
@@ -730,6 +739,11 @@ def interactive_menu():
         "15": lambda: run_vorticity_confinement_demo(),
         "16": lambda: run_gpu_demo(),
         "17": lambda: run_hybrid_demo(),
+        "18": lambda: run_turbulence_discovery(),
+        "19": lambda: run_stability_analysis(),
+        "20": lambda: run_regularity_map(),
+        "21": lambda: run_turbulence_metrics(),
+        "22": lambda: run_symbolic_discovery_standalone(),
         "0": lambda: print("  Goodbye!"),
     }
     
@@ -959,6 +973,386 @@ def run_hybrid_demo():
 
 
 # =============================================================================
+# Turbulence Discovery AI
+# =============================================================================
+
+def run_turbulence_discovery():
+    """Run the full Turbulence Discovery AI pipeline."""
+    print("\n" + "="*60)
+    print("  TURBULENCE DISCOVERY AI — FULL PIPELINE")
+    print("  Compress → Learn Rules → Output Equations")
+    print("="*60 + "\n")
+    
+    try:
+        import torch
+    except ImportError:
+        print("  ERROR: PyTorch required. pip install torch")
+        return
+    
+    from training.discovery_trainer import TurbulenceDiscoveryTrainer
+    
+    trainer = TurbulenceDiscoveryTrainer(
+        checkpoint_dir=os.path.join(PROJECT_ROOT, 'checkpoints', 'discovery'),
+        log_dir=os.path.join(PROJECT_ROOT, 'logs', 'discovery'),
+    )
+    
+    results = trainer.run_full_pipeline(
+        nx=64, latent_dim=32,
+        n_ae_samples=30, n_paired_samples=20, n_stability_samples=30,
+        ae_epochs=30, ode_epochs=30, blowup_epochs=20,
+        gp_generations=20, verbose=True,
+    )
+    
+    # Plot results
+    save_path = os.path.join(PROJECT_ROOT, 'demo_turbulence_discovery.png')
+    trainer.plot_discovery_results(results.get('discovery', {}), save_path=save_path)
+    print(f"\n  Results saved: {save_path}")
+
+
+def run_stability_analysis():
+    """Blow-up detection and stability analysis."""
+    print("\n" + "="*60)
+    print("  BLOW-UP DETECTION & STABILITY ANALYSIS")
+    print("  Predicting when and why solutions fail")
+    print("="*60 + "\n")
+    
+    from models.regularity_analysis import StabilityAnalyzer, FlowDiagnostics
+    from core.fluid_solver_2d import FluidSolver2D
+    from utils.helpers import compute_vorticity
+    
+    setup_plot_style()
+    import matplotlib.pyplot as plt
+    
+    analyzer = StabilityAnalyzer()
+    
+    def solver_factory(nu, ic_type='taylor_green'):
+        s = FluidSolver2D(nx=64, ny=64, Lx=2*np.pi, Ly=2*np.pi,
+                          nu=nu, dt=0.005, pressure_solver="fft")
+        s.bc_manager.set_periodic()
+        if ic_type == 'taylor_green':
+            s.initialize_taylor_green()
+        elif ic_type == 'shear_layer':
+            s.initialize_double_shear_layer()
+        elif ic_type == 'vortex_pair':
+            s.initialize_vortex_pair()
+        return s
+    
+    print("  Sweeping Reynolds numbers (10 → 10000)...")
+    results = analyzer.analyze_ic_space(
+        solver_factory, n_samples=15, re_range=(10, 10000),
+        n_steps=200, verbose=True,
+    )
+    
+    summary = analyzer.get_stability_summary()
+    print(f"\n  Results: {summary['survived']}/{summary['total_simulations']} survived")
+    for k, v in summary.items():
+        if k.startswith('critical_re'):
+            print(f"  {k}: {v:.0f}")
+    
+    # Visualization
+    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    fig.suptitle('Stability Analysis — Empirical Regularity Map',
+                fontsize=15, color='#58a6ff', fontweight='bold')
+    
+    re_arr = np.array(results['reynolds'])
+    regime_colors = {'smooth': '#7ee787', 'transitional': '#ffa657',
+                     'turbulent': '#79c0ff', 'unstable': '#f97583',
+                     'singular_risk': '#ff0000'}
+    
+    for ic_type in set(results['ic_type']):
+        mask = [ic == ic_type for ic in results['ic_type']]
+        re_ic = re_arr[mask]
+        max_omega = np.array(results['max_vorticity_final'])[mask]
+        colors = [regime_colors.get(r, '#888') for i, r in enumerate(results['regime']) if mask[i]]
+        axes[0].scatter(re_ic, max_omega, c=colors, label=ic_type, s=30, alpha=0.8)
+    
+    axes[0].set_xscale('log'); axes[0].set_yscale('log')
+    axes[0].set_xlabel('Reynolds Number'); axes[0].set_ylabel('Max |ω|')
+    axes[0].set_title('Vorticity vs Re', color='#79c0ff')
+    axes[0].legend(fontsize=8)
+    
+    # BKM integral
+    bkm_arr = np.array(results['bkm_integral'])
+    valid = np.isfinite(bkm_arr)
+    if np.any(valid):
+        axes[1].scatter(re_arr[valid], bkm_arr[valid], c='#d2a8ff', s=30, alpha=0.7)
+    axes[1].set_xscale('log')
+    axes[1].set_xlabel('Reynolds Number'); axes[1].set_ylabel('BKM Integral')
+    axes[1].set_title('BKM Criterion Monitor', color='#79c0ff')
+    
+    # KE ratio
+    ke_arr = np.array(results['kinetic_energy_ratio'])
+    valid = np.isfinite(ke_arr)
+    if np.any(valid):
+        axes[2].scatter(re_arr[valid], ke_arr[valid], c='#ffa657', s=30, alpha=0.7)
+    axes[2].set_xscale('log')
+    axes[2].set_xlabel('Reynolds Number'); axes[2].set_ylabel('KE(final)/KE(initial)')
+    axes[2].set_title('Energy Dissipation', color='#79c0ff')
+    
+    for ax in axes:
+        ax.grid(True, alpha=0.15, color='#30363d')
+    
+    plt.tight_layout()
+    save_path = os.path.join(PROJECT_ROOT, 'demo_stability_analysis.png')
+    plt.savefig(save_path, dpi=200, bbox_inches='tight')
+    print(f"  Saved: {save_path}")
+    show_or_close(fig)
+
+
+def run_regularity_map():
+    """Generate empirical regularity map across Re and IC space."""
+    print("\n" + "="*60)
+    print("  REGULARITY MAP — Empirical Flow Classification")
+    print("="*60 + "\n")
+    
+    from core.fluid_solver_2d import FluidSolver2D
+    from models.regularity_analysis import FlowDiagnostics
+    from utils.helpers import compute_vorticity
+    
+    setup_plot_style()
+    import matplotlib.pyplot as plt
+    
+    re_values = np.logspace(1, 4, 20)
+    ic_types = ['taylor_green', 'shear_layer', 'vortex_pair']
+    
+    results = {ic: {'re': [], 'enstrophy': [], 'diss_rate': [], 'regime': []} 
+               for ic in ic_types}
+    
+    for ic_type in ic_types:
+        for re in re_values:
+            nu = 1.0 / re
+            try:
+                solver = FluidSolver2D(nx=64, ny=64, Lx=2*np.pi, Ly=2*np.pi,
+                                       nu=nu, dt=0.005, pressure_solver="fft")
+                solver.bc_manager.set_periodic()
+                if ic_type == 'taylor_green':
+                    solver.initialize_taylor_green()
+                elif ic_type == 'shear_layer':
+                    solver.initialize_double_shear_layer()
+                else:
+                    solver.initialize_vortex_pair()
+                
+                for _ in range(200):
+                    solver.step()
+                    if not np.all(np.isfinite(solver.u)):
+                        raise ValueError("Diverged")
+                
+                omega = compute_vorticity(solver.u, solver.v, solver.dx, solver.dy)
+                diag = FlowDiagnostics.compute_enstrophy_budget(
+                    solver.u, solver.v, omega, solver.dx, solver.dy, nu
+                )
+                
+                results[ic_type]['re'].append(re)
+                results[ic_type]['enstrophy'].append(diag['enstrophy'])
+                results[ic_type]['diss_rate'].append(diag['dissipation_rate'])
+                
+            except Exception:
+                results[ic_type]['re'].append(re)
+                results[ic_type]['enstrophy'].append(float('nan'))
+                results[ic_type]['diss_rate'].append(float('nan'))
+        
+        print(f"  Completed: {ic_type}")
+    
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    fig.suptitle('Empirical Regularity Map', fontsize=15, color='#58a6ff', fontweight='bold')
+    colors = {'taylor_green': '#58a6ff', 'shear_layer': '#f97583', 'vortex_pair': '#7ee787'}
+    
+    for ic in ic_types:
+        re = np.array(results[ic]['re'])
+        ens = np.array(results[ic]['enstrophy'])
+        valid = np.isfinite(ens)
+        if np.any(valid):
+            axes[0].loglog(re[valid], ens[valid], 'o-', color=colors[ic], label=ic, lw=2, ms=5)
+            diss = np.array(results[ic]['diss_rate'])
+            valid_d = np.isfinite(diss)
+            if np.any(valid_d):
+                axes[1].loglog(re[valid_d], diss[valid_d], 'o-', color=colors[ic], label=ic, lw=2, ms=5)
+    
+    axes[0].set_xlabel('Re'); axes[0].set_ylabel('Enstrophy')
+    axes[0].set_title('Enstrophy vs Re', color='#79c0ff')
+    axes[0].legend()
+    axes[1].set_xlabel('Re'); axes[1].set_ylabel('Dissipation Rate')
+    axes[1].set_title('Dissipation Rate vs Re', color='#79c0ff')
+    axes[1].legend()
+    for ax in axes:
+        ax.grid(True, alpha=0.15, color='#30363d')
+    
+    plt.tight_layout()
+    save_path = os.path.join(PROJECT_ROOT, 'demo_regularity_map.png')
+    plt.savefig(save_path, dpi=200, bbox_inches='tight')
+    print(f"  Saved: {save_path}")
+    show_or_close(fig)
+
+
+def run_turbulence_metrics():
+    """Compare DNS-like vs coarse resolution (LES-proxy) with full metrics."""
+    print("\n" + "="*60)
+    print("  TURBULENCE METRICS — DNS vs LES Comparison")
+    print("="*60 + "\n")
+    
+    from core.fluid_solver_2d import FluidSolver2D
+    from models.regularity_analysis import TurbulenceMetrics, FlowDiagnostics
+    from utils.helpers import compute_vorticity
+    
+    setup_plot_style()
+    import matplotlib.pyplot as plt
+    
+    Re = 500
+    nu = 1.0 / Re
+    n_steps = 300
+    
+    # DNS-like (fine grid)
+    print("  Running DNS-like (128×128)...")
+    dns = FluidSolver2D(nx=128, ny=128, Lx=2*np.pi, Ly=2*np.pi,
+                         nu=nu, dt=0.005, pressure_solver="fft")
+    dns.initialize_double_shear_layer(amplitude=0.05, delta=0.05)
+    dns.bc_manager.set_periodic()
+    for _ in range(n_steps): dns.step()
+    
+    # LES-proxy (coarse grid)
+    print("  Running LES-proxy (32×32)...")
+    les = FluidSolver2D(nx=32, ny=32, Lx=2*np.pi, Ly=2*np.pi,
+                         nu=nu, dt=0.005, pressure_solver="fft")
+    les.initialize_double_shear_layer(amplitude=0.05, delta=0.05)
+    les.bc_manager.set_periodic()
+    for _ in range(n_steps): les.step()
+    
+    # Downsample DNS to LES grid for comparison
+    from scipy.ndimage import zoom
+    factor = 32 / 128
+    u_dns_ds = zoom(dns.u, factor, order=3)
+    v_dns_ds = zoom(dns.v, factor, order=3)
+    
+    # Compute metrics
+    metrics = TurbulenceMetrics.compute_all_metrics(
+        les.u, les.v, u_dns_ds, v_dns_ds, les.dx, les.dy
+    )
+    
+    print("\n  Comparison Metrics:")
+    for k, v in metrics.items():
+        print(f"    {k:30s}: {v:.6f}")
+    
+    # Energy spectra comparison
+    spec_dns = FlowDiagnostics.compute_energy_spectrum(dns.u, dns.v)
+    spec_les = FlowDiagnostics.compute_energy_spectrum(les.u, les.v)
+    
+    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    fig.suptitle(f'DNS vs LES Comparison — Re={Re}', fontsize=15,
+                color='#58a6ff', fontweight='bold')
+    
+    # Vorticity fields
+    omega_dns = compute_vorticity(dns.u, dns.v, dns.dx, dns.dy)
+    omega_les = compute_vorticity(les.u, les.v, les.dx, les.dy)
+    vmax = max(np.max(np.abs(omega_dns)), 1e-3)
+    
+    axes[0].imshow(omega_dns, cmap='RdBu_r', vmin=-vmax, vmax=vmax, origin='lower')
+    axes[0].set_title('DNS (128²)', color='#79c0ff')
+    axes[1].imshow(omega_les, cmap='RdBu_r', vmin=-vmax*0.5, vmax=vmax*0.5, origin='lower')
+    axes[1].set_title('LES (32²)', color='#79c0ff')
+    
+    # Energy spectrum
+    k_dns = spec_dns['wavenumbers']
+    k_les = spec_les['wavenumbers']
+    axes[2].loglog(k_dns, spec_dns['spectrum'], '-', color='#58a6ff', lw=2, label='DNS')
+    axes[2].loglog(k_les, spec_les['spectrum'], '--', color='#f97583', lw=2, label='LES')
+    axes[2].loglog(k_dns, spec_dns['kolmogorov_reference'], ':', color='#8b949e', 
+                  lw=1.5, label='k⁻⁵ᐟ³')
+    axes[2].set_xlabel('Wavenumber k'); axes[2].set_ylabel('E(k)')
+    axes[2].set_title('Energy Spectrum', color='#79c0ff')
+    axes[2].legend()
+    axes[2].grid(True, alpha=0.15, color='#30363d')
+    
+    plt.tight_layout()
+    save_path = os.path.join(PROJECT_ROOT, 'demo_turbulence_metrics.png')
+    plt.savefig(save_path, dpi=200, bbox_inches='tight')
+    print(f"  Saved: {save_path}")
+    show_or_close(fig)
+
+
+def run_symbolic_discovery_standalone():
+    """Run SINDy + GP symbolic discovery on flow trajectories."""
+    print("\n" + "="*60)
+    print("  SYMBOLIC DISCOVERY — SINDy + Genetic Programming")
+    print("  Discovering equations from turbulence data...")
+    print("="*60 + "\n")
+    
+    from core.fluid_solver_2d import FluidSolver2D
+    from models.symbolic_discovery import SymbolicDiscoveryEngine
+    from utils.helpers import compute_vorticity, compute_kinetic_energy, compute_enstrophy
+    
+    setup_plot_style()
+    import matplotlib.pyplot as plt
+    
+    # Generate trajectory data (low-dim observables)
+    Re = 100
+    nu = 1.0 / Re
+    solver = FluidSolver2D(nx=64, ny=64, Lx=2*np.pi, Ly=2*np.pi,
+                            nu=nu, dt=0.01, pressure_solver="fft")
+    solver.initialize_taylor_green()
+    solver.bc_manager.set_periodic()
+    
+    print("  Generating flow trajectory (500 steps)...")
+    observables = []
+    for step in range(500):
+        solver.step()
+        if step % 2 == 0:
+            omega = compute_vorticity(solver.u, solver.v, solver.dx, solver.dy)
+            ke = compute_kinetic_energy(solver.u, solver.v)
+            ens = compute_enstrophy(omega)
+            max_omega = np.max(np.abs(omega))
+            max_u = np.max(np.abs(solver.u))
+            
+            observables.append([ke, ens, max_omega, max_u])
+    
+    Z = np.array(observables)
+    print(f"  Collected {Z.shape[0]} snapshots of {Z.shape[1]} observables")
+    
+    # Run discovery
+    engine = SymbolicDiscoveryEngine(
+        n_latent_dims=Z.shape[1],
+        sindy_threshold=0.05,
+        gp_population=100,
+        gp_generations=30,
+    )
+    
+    results = engine.discover_from_trajectories(Z, dt=0.02, verbose=True)
+    
+    # Plot
+    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+    fig.suptitle('Symbolic Discovery Results', fontsize=15,
+                color='#58a6ff', fontweight='bold')
+    
+    times = np.arange(len(Z)) * 0.02
+    labels = ['KE', 'Enstrophy', 'max|ω|', 'max|u|']
+    colors = ['#58a6ff', '#7ee787', '#f97583', '#d2a8ff']
+    
+    for i, (lbl, clr) in enumerate(zip(labels, colors)):
+        ax = axes[i // 2, i % 2]
+        ax.plot(times, Z[:, i], color=clr, lw=2, label=f'{lbl} (data)')
+        
+        # SINDy prediction
+        if results.get('sindy', {}).get('Xi') is not None:
+            try:
+                pred = engine.sindy.predict(Z)
+                ax.plot(times[1:-1], Z[1:-1, i] + pred[1:-1, i] * 0.02, 
+                       '--', color='#ffa657', lw=1.5, label='SINDy fit', alpha=0.7)
+            except Exception:
+                pass
+        
+        ax.set_xlabel('Time')
+        ax.set_ylabel(lbl)
+        ax.set_title(f'{lbl} Evolution', color='#79c0ff')
+        ax.legend(fontsize=8)
+        ax.grid(True, alpha=0.15, color='#30363d')
+    
+    plt.tight_layout()
+    save_path = os.path.join(PROJECT_ROOT, 'demo_symbolic_discovery.png')
+    plt.savefig(save_path, dpi=200, bbox_inches='tight')
+    print(f"  Saved: {save_path}")
+    show_or_close(fig)
+
+
+# =============================================================================
 # Main Entry Point
 # =============================================================================
 
@@ -967,7 +1361,7 @@ def main():
     global HEADLESS
     
     parser = argparse.ArgumentParser(
-        description="Navier-Stokes ML/DL Hybrid Simulation System",
+        description="Navier-Stokes ML/DL Hybrid Simulation System + Turbulence Discovery AI",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -983,6 +1377,11 @@ Examples:
   python main.py --gpu                GPU solver demo
   python main.py --vort-conf 5.0      Vorticity confinement demo
   python main.py --benchmark          CFD performance benchmarks
+  python main.py --discover           Turbulence Discovery AI (full pipeline)
+  python main.py --stability          Blow-up detection & stability analysis
+  python main.py --regularity         Empirical regularity map
+  python main.py --metrics            DNS vs LES turbulence metrics
+  python main.py --symbolic           Symbolic equation discovery (SINDy + GP)
         """
     )
     
@@ -999,9 +1398,20 @@ Examples:
     parser.add_argument('--hybrid', action='store_true', help='Run hybrid CFD->PINN demo')
     parser.add_argument('--gpu', action='store_true', help='Run GPU solver demo')
     parser.add_argument('--vort-conf', type=float, dest='vort_conf', default=None,
-                       help='Run vorticity confinement demo (specify ε strength)')
+                       help='Run vorticity confinement demo (specify eps strength)')
     parser.add_argument('--no-gui', action='store_true', dest='no_gui',
                        help='Headless mode: save plots to disk, skip plt.show()')
+    # Turbulence Discovery AI
+    parser.add_argument('--discover', action='store_true',
+                       help='Run full Turbulence Discovery AI pipeline')
+    parser.add_argument('--stability', action='store_true',
+                       help='Run blow-up detection & stability analysis')
+    parser.add_argument('--regularity', action='store_true',
+                       help='Generate empirical regularity map')
+    parser.add_argument('--metrics', action='store_true',
+                       help='Run DNS vs LES turbulence metrics comparison')
+    parser.add_argument('--symbolic', action='store_true',
+                       help='Run symbolic equation discovery (SINDy + GP)')
     
     args = parser.parse_args()
     
@@ -1033,6 +1443,16 @@ Examples:
         run_gpu_demo()
     elif args.vort_conf is not None:
         run_vorticity_confinement_demo()
+    elif args.discover:
+        run_turbulence_discovery()
+    elif args.stability:
+        run_stability_analysis()
+    elif args.regularity:
+        run_regularity_map()
+    elif args.metrics:
+        run_turbulence_metrics()
+    elif args.symbolic:
+        run_symbolic_discovery_standalone()
     else:
         interactive_menu()
 

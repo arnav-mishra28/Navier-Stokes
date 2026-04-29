@@ -1,5 +1,5 @@
 # =============================================================================
-# Navier-Stokes ML/DL Hybrid Simulation System - Dependencies
+# Navier-Stokes ML/DL Hybrid Simulation System + Turbulence Discovery AI
 # =============================================================================
 
 # Core Scientific Computing

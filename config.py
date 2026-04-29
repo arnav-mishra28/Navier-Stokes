@@ -35,6 +35,18 @@ class MLModel(Enum):
     DEEPONET = "deeponet"
     SURROGATE = "surrogate"
     TURBULENCE_NN = "turbulence_nn"
+    AUTOENCODER = "autoencoder"
+    LATENT_ODE = "latent_ode"
+    BLOWUP_DETECTOR = "blowup_detector"
+
+
+class DiscoveryMode(Enum):
+    """Turbulence discovery pipeline modes."""
+    FULL_PIPELINE = "full"
+    AUTOENCODER_ONLY = "autoencoder"
+    SYMBOLIC_ONLY = "symbolic"
+    STABILITY_ANALYSIS = "stability"
+    REGULARITY_MAP = "regularity"
 
 
 class PhysicsDomain(Enum):
@@ -247,6 +259,48 @@ class TrainingConfig:
 
 
 @dataclass
+class TurbulenceDiscoveryConfig:
+    """Turbulence Discovery AI pipeline configuration."""
+    # Autoencoder
+    latent_dim: int = 64
+    base_channels: int = 32
+    variational: bool = False
+    ae_epochs: int = 100
+    ae_lr: float = 1e-3
+    beta_vae: float = 0.001
+    physics_weight: float = 0.1
+    
+    # Latent ODE
+    ode_hidden_dim: int = 256
+    ode_layers: int = 4
+    ode_epochs: int = 100
+    ode_lr: float = 1e-3
+    
+    # Blow-up Detection
+    blowup_epochs: int = 50
+    blowup_lr: float = 1e-3
+    
+    # Symbolic Discovery
+    sindy_poly_order: int = 3
+    sindy_threshold: float = 0.1
+    sindy_include_trig: bool = True
+    gp_population: int = 200
+    gp_generations: int = 50
+    gp_max_depth: int = 5
+    gp_parsimony: float = 0.001
+    
+    # Data generation
+    n_ae_samples: int = 200
+    n_paired_samples: int = 100
+    n_stability_samples: int = 100
+    re_range_low: float = 10.0
+    re_range_high: float = 10000.0
+    
+    # Discovery mode
+    mode: str = "full"  # full, autoencoder, symbolic, stability
+
+
+@dataclass
 class MasterConfig:
     """Master configuration combining all sub-configs."""
     grid: GridConfig = field(default_factory=GridConfig)
@@ -258,6 +312,7 @@ class MasterConfig:
     surrogate: SurrogateConfig = field(default_factory=SurrogateConfig)
     visualization: VisualizationConfig = field(default_factory=VisualizationConfig)
     training: TrainingConfig = field(default_factory=TrainingConfig)
+    discovery: TurbulenceDiscoveryConfig = field(default_factory=TurbulenceDiscoveryConfig)
     
     # Active physics domain
     physics_domain: PhysicsDomain = PhysicsDomain.FLUID
