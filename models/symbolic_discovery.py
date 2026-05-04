@@ -596,10 +596,15 @@ class GeneticProgramming:
                 self.best_fitness = fitnesses[best_idx]
                 self.best_individual = self.population[best_idx].copy()
             
+            # Guard: if no individual ever had finite fitness, create a trivial one
+            if self.best_individual is None:
+                self.best_individual = ExprNode(value=0.0)
+                self.best_fitness = self._fitness(self.best_individual, Z, target)
+            
             self.history.append({
                 'generation': gen,
                 'best_fitness': float(self.best_fitness),
-                'mean_fitness': float(np.mean(fitnesses)),
+                'mean_fitness': float(np.nanmean(fitnesses)),
                 'best_complexity': self.best_individual.complexity(),
                 'best_equation': str(self.best_individual),
             })
@@ -697,22 +702,31 @@ class SymbolicDiscoveryEngine:
             print("  SYMBOLIC DISCOVERY ENGINE")
             print("="*60)
         
+        # Normalize data to prevent overflow in polynomial library
+        Z_mean = Z.mean(axis=0)
+        Z_std = Z.std(axis=0) + 1e-10
+        Z_norm = (Z - Z_mean) / Z_std
+        
+        if verbose:
+            print(f"  Data normalized: mean={np.mean(np.abs(Z_mean)):.4f}, "
+                  f"std={np.mean(Z_std):.4f}")
+        
         # 1. SINDy Discovery
         if verbose:
             print("\n  [1/2] SINDy — Sparse Regression Discovery")
             print("  " + "-"*50)
         
-        self.sindy.fit(Z, dt=dt)
+        self.sindy.fit(Z_norm, dt=dt)
         sindy_eqs = self.sindy.get_equations()
         sindy_complexity = self.sindy.get_complexity()
         
         # Compute error
-        dZdt = np.zeros_like(Z)
-        dZdt[1:-1] = (Z[2:] - Z[:-2]) / (2 * dt)
-        dZdt[0] = (Z[1] - Z[0]) / dt
-        dZdt[-1] = (Z[-1] - Z[-2]) / dt
+        dZdt = np.zeros_like(Z_norm)
+        dZdt[1:-1] = (Z_norm[2:] - Z_norm[:-2]) / (2 * dt)
+        dZdt[0] = (Z_norm[1] - Z_norm[0]) / dt
+        dZdt[-1] = (Z_norm[-1] - Z_norm[-2]) / dt
         
-        sindy_error = self.sindy.get_equation_error(Z, dZdt)
+        sindy_error = self.sindy.get_equation_error(Z_norm, dZdt)
         
         if verbose:
             print(f"\n  SINDy Results (complexity={sindy_complexity}, MSE={sindy_error:.6f}):")
@@ -733,21 +747,21 @@ class SymbolicDiscoveryEngine:
                 print("  " + "-"*50)
             
             gp_equations = {}
-            n_dims_to_fit = min(Z.shape[1], 4)  # Limit GP to first few dims
+            n_dims_to_fit = min(Z_norm.shape[1], 4)  # Limit GP to first few dims
             
             for dim in range(n_dims_to_fit):
                 if verbose:
                     print(f"\n  Evolving equation for dz{dim+1}/dt...")
                 
                 gp = GeneticProgramming(
-                    n_vars=Z.shape[1],
+                    n_vars=Z_norm.shape[1],
                     population_size=self.gp_config['population_size'],
                     max_depth=5,
                     parsimony_coefficient=0.001,
                 )
                 
                 best = gp.fit(
-                    Z, dZdt[:, dim],
+                    Z_norm, dZdt[:, dim],
                     n_generations=self.gp_config['n_generations'],
                     verbose=verbose,
                 )

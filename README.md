@@ -6,7 +6,8 @@
 </p>
 
 <h1 align="center">
-  🌊 Navier-Stokes ML/DL Hybrid Simulation System
+  🌊 Navier-Stokes ML/DL Hybrid Simulation System<br>
+  + 🧠 Turbulence Discovery AI
 </h1>
 
 <p align="center">
@@ -16,7 +17,7 @@
 
 ---
 
-A production-ready, hybrid Navier-Stokes simulation system that integrates **classical CFD solvers** with **deep learning surrogates** (PINN, FNO, DeepONet, U-Net). Supports 6 physics domains, real-time 2D/3D visualization, a Streamlit web dashboard, and a unified CLI for simulation, training, and benchmarking.
+A production-ready, hybrid Navier-Stokes simulation system that integrates **classical CFD solvers** with **deep learning surrogates** (PINN, FNO, DeepONet, U-Net) and a **Turbulence Discovery AI** pipeline (Autoencoder + Neural ODE + SINDy + Genetic Programming). Supports 6 physics domains, blow-up detection & regularity analysis, real-time 2D/3D visualization, a Streamlit web dashboard, and a unified CLI for simulation, training, discovery, and benchmarking.
 
 ## ✨ Features
 
@@ -24,8 +25,11 @@ A production-ready, hybrid Navier-Stokes simulation system that integrates **cla
 |----------|---------|
 | **CFD Solvers** | 2D/3D incompressible NS with projection method, FFT/Jacobi/SOR/CG pressure solvers, central/upwind/WENO-5 advection |
 | **ML Models** | PINN (physics-informed), FNO (Fourier operator), DeepONet (operator network), U-Net Surrogate (instant prediction) |
+| **Discovery AI** | Convolutional Autoencoder (flow compression), Neural ODE (latent dynamics), SINDy (sparse regression), Genetic Programming (symbolic equations) |
+| **Regularity** | Blow-up detection CNN, stability analysis (Re sweeps), BKM criterion monitoring, empirical regularity maps |
 | **Physics** | Classical Fluid · MHD · Astrophysics · Biophysics · Climate · Quantum Fluids |
-| **Turbulence** | DNS, Smagorinsky LES, Dynamic Smagorinsky, k-ε RANS |
+| **Turbulence** | DNS, Smagorinsky LES, Dynamic Smagorinsky, k-ε RANS, vorticity confinement |
+| **Metrics** | L2 error, energy spectrum error, vorticity accuracy, structure functions, DNS vs LES comparison |
 | **Visualization** | Real-time 2D (Pygame), 3D (PyVista/Matplotlib), Streamlit dashboard (Plotly) |
 | **Training** | AMP, cosine annealing + warmup LR, gradient clipping, checkpointing, curriculum learning |
 
@@ -52,7 +56,10 @@ Navier-Stokes/
 │   ├── fno.py              # Fourier Neural Operator (2D)
 │   ├── deeponet.py         # Deep Operator Network
 │   ├── surrogate.py        # U-Net Surrogate with attention gates
-│   └── turbulence_nn.py    # Neural turbulence closure model
+│   ├── turbulence_nn.py    # Neural turbulence closure model
+│   ├── autoencoder.py      # Flow Autoencoder + Latent ODE (discovery)
+│   ├── symbolic_discovery.py  # SINDy + Genetic Programming
+│   └── regularity_analysis.py # Blow-up detection + stability analysis
 │
 ├── physics/                # Cross-physics domain solvers
 │   ├── mhd.py              # Magnetohydrodynamics (Orszag-Tang vortex)
@@ -63,6 +70,8 @@ Navier-Stokes/
 │
 ├── training/               # ML training infrastructure
 │   ├── trainer.py          # Unified training loop (PINN, FNO, DeepONet, Surrogate)
+│   ├── discovery_trainer.py # 4-phase Turbulence Discovery pipeline
+│   ├── turbulence_data.py  # Multi-regime flow data generator
 │   ├── data_generator.py   # CFD-to-ML dataset generation
 │   └── losses.py           # Physics-informed loss functions
 │
@@ -103,7 +112,7 @@ pip install -r requirements.txt
 python main.py
 ```
 
-This launches a menu where you can select from 14 modes: demos, training, visualization, physics simulations, and benchmarks.
+This launches a menu where you can select from 22 modes: demos, training, visualization, physics simulations, discovery AI, regularity analysis, and benchmarks.
 
 ### 3. CLI Usage
 
@@ -135,6 +144,13 @@ python main.py --physics astro
 python main.py --physics bio
 python main.py --physics climate
 python main.py --physics quantum
+
+# Turbulence Discovery AI
+python main.py --discover           # Full pipeline (AE -> ODE -> Blow-up -> Symbolic)
+python main.py --stability           # Blow-up detection & stability analysis
+python main.py --regularity          # Empirical regularity map (Re sweep)
+python main.py --metrics             # DNS vs LES turbulence metrics comparison
+python main.py --symbolic            # SINDy + GP equation discovery
 
 # CFD performance benchmarks
 python main.py --benchmark
@@ -189,6 +205,61 @@ Bose-Einstein condensate dynamics via the Gross-Pitaevskii equation. Quantized v
 - Conditional variant with FiLM (Feature-wise Linear Modulation)
 - ~1000x faster than CFD (~10ms per prediction)
 - Input: conditions (obstacle mask, Re, BCs) → Output: flow fields (u, v, p)
+
+---
+
+## 🧠 Turbulence Discovery AI
+
+> **Goal:** Not just simulate turbulence — *discover hidden structure inside chaos.*
+
+The Turbulence Discovery AI is a 4-phase pipeline that compresses turbulent flow fields, learns their temporal dynamics, and discovers interpretable governing equations:
+
+### Phase 1: Flow Autoencoder
+- **Convolutional autoencoder** with residual blocks and GroupNorm
+- Compresses 4-channel flow fields `(u, v, p, ω)` → latent vector `z ∈ ℝ^d`
+- Physics-informed loss enforces divergence-free reconstructions (`∇·u ≈ 0`)
+- Optional **variational** (VAE) mode for generative modeling
+
+### Phase 2: Neural ODE (Latent Dynamics)
+- Learns `dz/dt = f_θ(z, t)` in latent space
+- Sinusoidal time embedding for temporal context
+- Euler and **RK4** integrators for forward prediction
+- Autoregressively predicts future flow fields
+
+### Phase 3: Blow-up Detection
+- CNN classifier predicts flow regime: `smooth / transitional / turbulent / unstable / singular_risk`
+- Binary blow-up probability head: `P(blow-up) ∈ [0, 1]`
+- **BKM criterion** monitoring: `∫‖ω‖_∞ dt`
+- Enstrophy budget analysis, strain-vorticity alignment
+
+### Phase 4: Symbolic Discovery (THE BIG MOVE)
+- **SINDy** (Sparse Identification of Nonlinear Dynamics):
+  - Builds library of candidate functions (polynomials, trig)
+  - STRidge sparse regression discovers parsimonious equations
+  - Output: `dz/dt = Θ(z) · ξ` where `ξ` is sparse
+- **Genetic Programming**:
+  - Evolves mathematical expression trees via tournament selection
+  - Subtree crossover + point mutation
+  - Parsimony pressure for interpretable equations
+
+### Validation & Metrics
+- DNS vs LES comparison with full turbulence metrics
+- Energy spectrum analysis (Kolmogorov `k^{-5/3}` reference)
+- Structure functions `S_n(r)` up to 4th order
+- Empirical regularity maps across Reynolds number space
+
+```bash
+# Run the full pipeline end-to-end
+python main.py --discover --no-gui
+
+# Individual components
+python main.py --symbolic     # SINDy + GP equation discovery
+python main.py --stability    # Blow-up detection & Re sweeps
+python main.py --regularity   # Enstrophy & dissipation vs Re
+python main.py --metrics      # DNS vs LES comparison
+```
+
+> ⚠️ **Disclaimer:** The Navier-Stokes existence and smoothness problem is **unsolved** (Millennium Prize). We do NOT claim to solve it. These are empirical tools for generating regularity maps, failure predictions, and possibly new conjectures.
 
 ---
 

@@ -980,7 +980,7 @@ def run_turbulence_discovery():
     """Run the full Turbulence Discovery AI pipeline."""
     print("\n" + "="*60)
     print("  TURBULENCE DISCOVERY AI — FULL PIPELINE")
-    print("  Compress → Learn Rules → Output Equations")
+    print("  Compress -> Learn Rules -> Output Equations")
     print("="*60 + "\n")
     
     try:
@@ -1037,7 +1037,7 @@ def run_stability_analysis():
             s.initialize_vortex_pair()
         return s
     
-    print("  Sweeping Reynolds numbers (10 → 10000)...")
+    print("  Sweeping Reynolds numbers (10 -> 10000)...")
     results = analyzer.analyze_ic_space(
         solver_factory, n_samples=15, re_range=(10, 10000),
         n_steps=200, verbose=True,
@@ -1287,7 +1287,8 @@ def run_symbolic_discovery_standalone():
     Re = 100
     nu = 1.0 / Re
     solver = FluidSolver2D(nx=64, ny=64, Lx=2*np.pi, Ly=2*np.pi,
-                            nu=nu, dt=0.01, pressure_solver="fft")
+                            nu=nu, dt=0.002, pressure_solver="fft",
+                            advection_scheme="upwind")
     solver.initialize_taylor_green()
     solver.bc_manager.set_periodic()
     
@@ -1295,6 +1296,10 @@ def run_symbolic_discovery_standalone():
     observables = []
     for step in range(500):
         solver.step()
+        # Check for divergence
+        if not np.all(np.isfinite(solver.u)):
+            print(f"  Warning: solver diverged at step {step}, using {len(observables)} snapshots")
+            break
         if step % 2 == 0:
             omega = compute_vorticity(solver.u, solver.v, solver.dx, solver.dy)
             ke = compute_kinetic_energy(solver.u, solver.v)
@@ -1305,7 +1310,10 @@ def run_symbolic_discovery_standalone():
             observables.append([ke, ens, max_omega, max_u])
     
     Z = np.array(observables)
-    print(f"  Collected {Z.shape[0]} snapshots of {Z.shape[1]} observables")
+    # Filter out any rows with NaN or Inf
+    valid = np.all(np.isfinite(Z), axis=1)
+    Z = Z[valid]
+    print(f"  Collected {Z.shape[0]} valid snapshots of {Z.shape[1]} observables")
     
     # Run discovery
     engine = SymbolicDiscoveryEngine(
