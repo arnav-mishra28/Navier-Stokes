@@ -8,7 +8,7 @@
   ║     Core: Incompressible Navier-Stokes (Projection Method)          ║
   ║     ML:   PINN / FNO / DeepONet / U-Net / Autoencoder / NeuralODE  ║
   ║     AI:   SINDy / Genetic Programming / Blow-up Detection           ║
-  ║     Physics: Fluid · MHD · Astro · Bio · Climate · Quantum          ║
+  ║     Physics: Fluid · MHD · Astro · Bio · Climate · Quantum · Rel   ║
   ║     Viz:  Real-time 2D (Pygame) + 3D (PyVista/Matplotlib)          ║
   ╚═══════════════════════════════════════════════════════════════════════╝
 
@@ -30,6 +30,7 @@
       python main.py --physics bio       → Run biophysics simulation
       python main.py --physics climate   → Run climate simulation
       python main.py --physics quantum   → Run quantum fluid simulation
+      python main.py --physics relativistic → Run relativistic NS (Israel-Stewart)
       python main.py --hybrid            → Run hybrid CFD→PINN demo
       python main.py --gpu               → Use GPU-accelerated solver
       python main.py --vort-conf 5.0     → Enable vorticity confinement
@@ -453,6 +454,13 @@ def run_physics_demo(domain: str):
         solver.initialize_quantum_turbulence(n_vortices=10)
         title = "Quantum Turbulence (Bose-Einstein Condensate)"
         n_steps = 200
+
+    elif domain == "relativistic":
+        from physics.relativistic import RelativisticNSSolver
+        solver = RelativisticNSSolver(nx=128, ny=128, eta_s=0.2, tau_pi=0.5, dt=0.005)
+        solver.initialize_bjorken_flow(e0=10.0, sigma=1.5)
+        title = "Relativistic NS — QGP Fireball (Israel-Stewart)"
+        n_steps = 300
     else:
         print(f"  Unknown domain: {domain}")
         return
@@ -715,6 +723,7 @@ def interactive_menu():
     print("  [21] 📊 Turbulence Metrics (DNS vs LES comparison)")
     print("  [22] 🔬 Symbolic Discovery (SINDy + GP)")
     print("  [23] 🌀 Quantum Fluid Extensions (GPE + Madelung)")
+    print("  [24] 🚀 Relativistic NS (Israel-Stewart Causal Theory)")
     print("  [0]  ❌ Exit")
     print()
     
@@ -748,6 +757,7 @@ def interactive_menu():
         "21": lambda: run_turbulence_metrics(),
         "22": lambda: run_symbolic_discovery_standalone(),
         "23": lambda: run_quantum_extensions(),
+        "24": lambda: run_relativistic_ns(),
         "0": lambda: print("  Goodbye!"),
     }
     
@@ -1668,6 +1678,246 @@ def run_quantum_extensions():
 
 
 # =============================================================================
+# Relativistic Navier-Stokes (Israel-Stewart Causal Theory)
+# =============================================================================
+
+def run_relativistic_ns():
+    """
+    Relativistic Navier-Stokes — Israel-Stewart Causal Formulation.
+
+    Naive relativistic NS is acausal and unstable.  The Israel-Stewart
+    theory promotes viscous stresses to dynamical variables with a
+    finite relaxation time tau_pi, restoring causality.
+
+    Governing equation:
+        d_mu T^{mu nu} = 0
+        T^{mu nu} = (e+p) u^mu u^nu + p g^{mu nu} + pi^{mu nu}
+        tau_pi D(pi^{ij}) + pi^{ij} = 2 eta sigma^{ij}
+
+    Pipeline:
+      1. Build T^{mu nu} energy-momentum tensor
+      2. Solve conservation laws for energy + momentum
+      3. Evolve pi^{mu nu} via IS relaxation
+      4. Recover primitives (e, v) from conserved variables
+      5. Publication-quality 8-panel visualization
+    """
+    print("\n" + "=" * 72)
+    print("  RELATIVISTIC NAVIER-STOKES")
+    print("  Israel-Stewart Causal Dissipation")
+    print("  d_mu T^{mu nu} = 0   |   tau_pi D(pi) + pi = 2 eta sigma")
+    print("=" * 72 + "\n")
+
+    from physics.relativistic import RelativisticNSSolver
+
+    setup_plot_style()
+    import matplotlib.pyplot as plt
+    import matplotlib.colors as mcolors
+
+    # ── Phase 1: QGP Fireball (Bjorken-like) ─────────────────────────
+    print("  [1/5] Initializing QGP fireball (Bjorken-like)...")
+    nx, ny = 192, 192
+    Lx, Ly = 12.0, 12.0
+    eta_s = 0.2        # eta/s ~ 1/(4 pi) is near the KSS bound
+    tau_pi = 0.5       # Relaxation time
+    dt = 0.004
+
+    solver = RelativisticNSSolver(
+        nx=nx, ny=ny, Lx=Lx, Ly=Ly,
+        eta_s=eta_s, tau_pi=tau_pi, dt=dt,
+        eos="ultrarelativistic",
+    )
+    solver.initialize_bjorken_flow(e0=15.0, sigma=1.5)
+    print(f"    Grid: {nx}x{ny}")
+    print(f"    Domain: [{-Lx/2:.1f}, {Lx/2:.1f}]^2")
+    print(f"    eta/s = {eta_s}   tau_pi = {tau_pi}")
+    print(f"    EOS: ultrarelativistic  (p = e/3)")
+    print(f"    dt = {dt}")
+
+    # ── Phase 2: Time evolution ───────────────────────────────────────
+    n_steps = 500
+    record_interval = 5
+    print(f"\n  [2/5] Evolving d_mu T^{{mu nu}} = 0  ({n_steps} steps)...")
+
+    time_hist, energy_hist, gamma_hist = [], [], []
+    speed_hist, entropy_hist, pi_hist = [], [], []
+
+    t_start = time.perf_counter()
+    for step in range(n_steps):
+        solver.step()
+
+        if step % record_interval == 0:
+            gamma = solver.lorentz_factor()
+            speed = np.sqrt(solver.vx**2 + solver.vy**2)
+            pi_mag = np.sqrt(solver.pi_xx**2 + 2*solver.pi_xy**2 + solver.pi_yy**2)
+
+            time_hist.append(solver.time)
+            energy_hist.append(float(np.sum(solver.energy_density) * solver.dx * solver.dy))
+            gamma_hist.append(float(np.max(gamma)))
+            speed_hist.append(float(np.max(speed)))
+            entropy_hist.append(float(np.sum(solver.entropy) * solver.dx * solver.dy))
+            pi_hist.append(float(np.max(pi_mag)))
+
+            if step % 100 == 0:
+                print(f"    Step {step:4d} | t={solver.time:.3f} | "
+                      f"E_tot={energy_hist[-1]:.2f} | "
+                      f"gamma_max={gamma_hist[-1]:.3f} | "
+                      f"|v|_max={speed_hist[-1]:.4f}c")
+
+    elapsed = time.perf_counter() - t_start
+    print(f"\n    Completed: {n_steps} steps in {elapsed:.2f}s "
+          f"({n_steps/elapsed:.0f} steps/s)")
+
+    # ── Phase 3: Compute final state ─────────────────────────────────
+    print("\n  [3/5] Computing final state diagnostics...")
+    state = solver.get_state()
+    gamma_final = state['lorentz_factor']
+    speed_final = state['velocity_magnitude']
+    e_final = state['energy_density']
+    p_final = state['pressure']
+    pi_mag_final = state['pi_magnitude']
+    entropy_final = state['entropy']
+
+    print(f"    Energy density: min={e_final.min():.4f}  max={e_final.max():.4f}")
+    print(f"    Lorentz factor: min={gamma_final.min():.4f}  max={gamma_final.max():.4f}")
+    print(f"    |v|/c:          max={speed_final.max():.6f}")
+    print(f"    |pi^{{ij}}|:      max={pi_mag_final.max():.4f}")
+
+    # ── Phase 4: T^{mu nu} analysis ──────────────────────────────────
+    print("\n  [4/5] Analyzing energy-momentum tensor...")
+    T00 = state['T00']
+    T0x = state['T0x']
+    T0y = state['T0y']
+    print(f"    T^00 (lab energy):   max={np.max(T00):.4f}")
+    print(f"    T^0x (x-momentum):   max|={np.max(np.abs(T0x)):.4f}")
+    print(f"    T^0y (y-momentum):   max|={np.max(np.abs(T0y)):.4f}")
+
+    # ── Phase 5: 8-panel visualization ───────────────────────────────
+    print("\n  [5/5] Generating publication-quality visualization...")
+
+    extent = [-Lx/2, Lx/2, -Ly/2, Ly/2]
+    fig = plt.figure(figsize=(24, 20))
+    fig.suptitle(
+        'Relativistic Navier-Stokes   \u00b7   Israel-Stewart Causal Theory',
+        fontsize=20, fontweight='bold', color='#58a6ff', y=0.98,
+    )
+
+    # Panel 1: Energy density e
+    ax1 = fig.add_subplot(2, 4, 1)
+    im1 = ax1.imshow(e_final, cmap='inferno', origin='lower', extent=extent,
+                     interpolation='bicubic')
+    ax1.set_title('Energy Density  e', color='#79c0ff', fontsize=13)
+    ax1.set_xlabel('x'); ax1.set_ylabel('y')
+    cb1 = plt.colorbar(im1, ax=ax1, fraction=0.046, pad=0.04)
+    cb1.outline.set_edgecolor('#30363d')
+
+    # Panel 2: Lorentz factor gamma
+    ax2 = fig.add_subplot(2, 4, 2)
+    im2 = ax2.imshow(gamma_final, cmap='hot', origin='lower', extent=extent,
+                     interpolation='bicubic')
+    ax2.set_title('Lorentz Factor  \u03b3', color='#79c0ff', fontsize=13)
+    ax2.set_xlabel('x'); ax2.set_ylabel('y')
+    cb2 = plt.colorbar(im2, ax=ax2, fraction=0.046, pad=0.04)
+    cb2.outline.set_edgecolor('#30363d')
+
+    # Panel 3: Velocity magnitude |v|/c
+    ax3 = fig.add_subplot(2, 4, 3)
+    im3 = ax3.imshow(speed_final, cmap='magma', origin='lower', extent=extent,
+                     interpolation='bicubic')
+    ax3.set_title('Velocity  |v|/c', color='#79c0ff', fontsize=13)
+    ax3.set_xlabel('x'); ax3.set_ylabel('y')
+    cb3 = plt.colorbar(im3, ax=ax3, fraction=0.046, pad=0.04)
+    cb3.outline.set_edgecolor('#30363d')
+
+    # Panel 4: Pressure p
+    ax4 = fig.add_subplot(2, 4, 4)
+    im4 = ax4.imshow(p_final, cmap='viridis', origin='lower', extent=extent,
+                     interpolation='bicubic')
+    ax4.set_title('Pressure  p = e/3', color='#79c0ff', fontsize=13)
+    ax4.set_xlabel('x'); ax4.set_ylabel('y')
+    cb4 = plt.colorbar(im4, ax=ax4, fraction=0.046, pad=0.04)
+    cb4.outline.set_edgecolor('#30363d')
+
+    # Panel 5: Viscous stress |pi^{ij}|
+    ax5 = fig.add_subplot(2, 4, 5)
+    im5 = ax5.imshow(pi_mag_final, cmap='plasma', origin='lower', extent=extent,
+                     interpolation='bicubic')
+    ax5.set_title('Viscous Stress  |\u03c0\u1d5e\u1d5b|  (IS)', color='#79c0ff', fontsize=13)
+    ax5.set_xlabel('x'); ax5.set_ylabel('y')
+    cb5 = plt.colorbar(im5, ax=ax5, fraction=0.046, pad=0.04)
+    cb5.outline.set_edgecolor('#30363d')
+
+    # Panel 6: T^{00} lab-frame energy
+    ax6 = fig.add_subplot(2, 4, 6)
+    im6 = ax6.imshow(T00, cmap='inferno', origin='lower', extent=extent,
+                     interpolation='bicubic')
+    ax6.set_title('T\u2070\u2070  (Lab Energy)', color='#79c0ff', fontsize=13)
+    ax6.set_xlabel('x'); ax6.set_ylabel('y')
+    cb6 = plt.colorbar(im6, ax=ax6, fraction=0.046, pad=0.04)
+    cb6.outline.set_edgecolor('#30363d')
+
+    # Panel 7: Time evolution diagnostics
+    ax7 = fig.add_subplot(2, 4, 7)
+    t_arr = np.array(time_hist)
+    ax7.plot(t_arr, energy_hist, '-', color='#58a6ff', lw=2, label='Total Energy')
+    ax7_twin = ax7.twinx()
+    ax7_twin.plot(t_arr, gamma_hist, '-', color='#f97583', lw=2, label='max \u03b3')
+    ax7.set_xlabel('Time')
+    ax7.set_ylabel('Total Energy', color='#58a6ff')
+    ax7_twin.set_ylabel('max \u03b3', color='#f97583')
+    ax7.set_title('Evolution Diagnostics', color='#79c0ff', fontsize=13)
+    ax7.tick_params(axis='y', labelcolor='#58a6ff')
+    ax7_twin.tick_params(axis='y', labelcolor='#f97583')
+    ax7.grid(True, alpha=0.15, color='#30363d')
+
+    # Panel 8: Entropy + viscous stress evolution
+    ax8 = fig.add_subplot(2, 4, 8)
+    ax8.plot(t_arr, entropy_hist, '-', color='#7ee787', lw=2, label='Total Entropy')
+    ax8_twin = ax8.twinx()
+    ax8_twin.plot(t_arr, pi_hist, '-', color='#d2a8ff', lw=2, label='max |\u03c0|')
+    ax8.set_xlabel('Time')
+    ax8.set_ylabel('Total Entropy', color='#7ee787')
+    ax8_twin.set_ylabel('max |\u03c0\u1d5e\u1d5b|', color='#d2a8ff')
+    ax8.set_title('Entropy & Dissipation', color='#79c0ff', fontsize=13)
+    ax8.tick_params(axis='y', labelcolor='#7ee787')
+    ax8_twin.tick_params(axis='y', labelcolor='#d2a8ff')
+    ax8.grid(True, alpha=0.15, color='#30363d')
+
+    for ax in [ax1, ax2, ax3, ax4, ax5, ax6]:
+        ax.tick_params(axis='both', colors='#8b949e')
+
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    save_path = os.path.join(IMAGES_DIR, 'relativistic_ns.png')
+    plt.savefig(save_path, dpi=200, bbox_inches='tight')
+    show_or_close(fig)
+    print(f"\n  Visualization saved: {save_path}")
+
+    # ── Summary ──
+    print("\n" + "=" * 72)
+    print("  RELATIVISTIC NAVIER-STOKES — SUMMARY")
+    print("=" * 72)
+    print(f"  Governing eq:   d_mu T^{{mu nu}} = 0")
+    print(f"  T^{{mu nu}}:      (e+p) u^mu u^nu + p g^{{mu nu}} + pi^{{mu nu}}")
+    print(f"  Dissipation:    Israel-Stewart (causal, 2nd order)")
+    print(f"  Relaxation:     tau_pi D(pi) + pi = 2 eta sigma")
+    print(f"  EOS:            Ultrarelativistic  p = e/3")
+    print(f"  Grid:           {nx}x{ny},  L = {Lx}")
+    print(f"  eta/s:          {eta_s}  (KSS bound ~ 1/4pi ~ 0.08)")
+    print(f"  tau_pi:         {tau_pi}")
+    print(f"  Steps:          {n_steps}  (dt={dt})")
+    print(f"  max gamma:      {gamma_hist[-1]:.4f}")
+    print(f"  max |v|/c:      {speed_hist[-1]:.6f}")
+    print(f"  max |pi^ij|:    {pi_hist[-1]:.4f}")
+    print()
+    print("  Results:")
+    print("    [+] Causal relativistic viscous hydrodynamics")
+    print("    [+] Israel-Stewart relaxation (no acausal runaway)")
+    print("    [+] 4-velocity & Lorentz factor tracking")
+    print("    [+] Energy-momentum tensor T^{mu nu} evolution")
+    print("    [+] Applicable: QGP, neutron stars, astrophysical jets")
+    print("=" * 72 + "\n")
+
+
+# =============================================================================
 # Main Entry Point
 # =============================================================================
 
@@ -1697,6 +1947,7 @@ Examples:
   python main.py --regularity         Empirical regularity map
   python main.py --metrics            DNS vs LES turbulence metrics
   python main.py --symbolic           Symbolic equation discovery (SINDy + GP)
+  python main.py --relativistic       Relativistic NS (Israel-Stewart causal theory)
         """
     )
     
@@ -1707,7 +1958,7 @@ Examples:
     parser.add_argument('--train', type=str, choices=['pinn', 'fno', 'deeponet', 'surrogate'],
                        help='Train ML model')
     parser.add_argument('--physics', type=str,
-                       choices=['mhd', 'astro', 'bio', 'climate', 'quantum'],
+                       choices=['mhd', 'astro', 'bio', 'climate', 'quantum', 'relativistic'],
                        help='Run physics domain simulation')
     parser.add_argument('--benchmark', action='store_true', help='Run performance benchmarks')
     parser.add_argument('--hybrid', action='store_true', help='Run hybrid CFD->PINN demo')
@@ -1730,6 +1981,9 @@ Examples:
     # Quantum Fluid Extensions
     parser.add_argument('--quantum-ext', action='store_true', dest='quantum_ext',
                        help='Quantum Fluid Extensions (GPE + Madelung transform)')
+    # Relativistic NS
+    parser.add_argument('--relativistic', action='store_true',
+                       help='Relativistic NS with Israel-Stewart causal theory')
     
     args = parser.parse_args()
     
@@ -1773,6 +2027,8 @@ Examples:
         run_symbolic_discovery_standalone()
     elif args.quantum_ext:
         run_quantum_extensions()
+    elif args.relativistic:
+        run_relativistic_ns()
     else:
         interactive_menu()
 

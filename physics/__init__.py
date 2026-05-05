@@ -4,8 +4,9 @@ from .astrophysics import AstrophysicalFlowSolver
 from .biophysics import BiophysicsFlowSolver
 from .climate import ClimateFlowSolver
 from .quantum_fluids import QuantumFluidSolver
+from .relativistic import RelativisticNSSolver
 
 __all__ = [
     'MHDSolver', 'AstrophysicalFlowSolver', 'BiophysicsFlowSolver',
-    'ClimateFlowSolver', 'QuantumFluidSolver'
+    'ClimateFlowSolver', 'QuantumFluidSolver', 'RelativisticNSSolver'
 ]

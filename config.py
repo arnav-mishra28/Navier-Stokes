@@ -57,6 +57,7 @@ class PhysicsDomain(Enum):
     BIOPHYSICS = "biophysics"
     CLIMATE = "climate"
     QUANTUM_FLUID = "quantum_fluid"
+    RELATIVISTIC = "relativistic"
 
 
 class BoundaryType(Enum):
