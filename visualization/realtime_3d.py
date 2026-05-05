@@ -186,9 +186,10 @@ class RealtimeVisualizer3D:
             if 'agg' not in backend_name:
                 plt.show()
             else:
-                plt.savefig('3d_flow_animation.png', dpi=150, bbox_inches='tight')
+                img_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'images', '3d_flow_animation.png')
+                plt.savefig(img_path, dpi=150, bbox_inches='tight')
                 plt.close(fig)
-                print("  Saved: 3d_flow_animation.png")
+                print(f"  Saved: {img_path}")
         except Exception:
             plt.close(fig)
         

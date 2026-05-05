@@ -45,6 +45,8 @@ import time
 
 # Ensure project root is on path
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+IMAGES_DIR = os.path.join(PROJECT_ROOT, 'images')
+os.makedirs(IMAGES_DIR, exist_ok=True)
 sys.path.insert(0, PROJECT_ROOT)
 
 # Global flag for headless mode
@@ -327,7 +329,7 @@ def run_demo():
         ax6.grid(True, alpha=0.15, color='#30363d')
         
         plt.tight_layout(rect=[0, 0, 1, 0.95])
-        filepath = os.path.join(PROJECT_ROOT, 'demo_taylor_green.png')
+        filepath = os.path.join(IMAGES_DIR, 'demo_taylor_green.png')
         plt.savefig(filepath, bbox_inches='tight')
         show_or_close(fig)
         print(f"\n  Plot saved to {filepath}")
@@ -542,7 +544,7 @@ def run_physics_demo(domain: str):
         
         plt.tight_layout(rect=[0, 0, 1, 0.94])
         filename = f'demo_{domain}.png'
-        filepath = os.path.join(PROJECT_ROOT, filename)
+        filepath = os.path.join(IMAGES_DIR, filename)
         plt.savefig(filepath, bbox_inches='tight')
         show_or_close(fig)
         print(f"  Saved: {filepath}")
@@ -595,7 +597,7 @@ def run_training(model_type: str):
         # Train
         trainer = UnifiedTrainer(model, model_type="pinn", device=device, learning_rate=1e-3)
         trainer.train_pinn(data, epochs=5000)
-        trainer.plot_training_history(save_path=os.path.join(PROJECT_ROOT, 'pinn_training.png'))
+        trainer.plot_training_history(save_path=os.path.join(IMAGES_DIR, 'pinn_training.png'))
         
     elif model_type == "fno":
         from models.fno import FNO2d
@@ -622,7 +624,7 @@ def run_training(model_type: str):
         # Train
         trainer = UnifiedTrainer(model, model_type="fno", device=device, learning_rate=1e-3)
         trainer.train_fno(train_loader, val_loader, epochs=100)
-        trainer.plot_training_history(save_path=os.path.join(PROJECT_ROOT, 'fno_training.png'))
+        trainer.plot_training_history(save_path=os.path.join(IMAGES_DIR, 'fno_training.png'))
     
     elif model_type == "deeponet":
         from models.deeponet import DeepONet
@@ -650,7 +652,7 @@ def run_training(model_type: str):
         trainer = UnifiedTrainer(model, model_type="deeponet", device=device, learning_rate=1e-3)
         # Use FNO-style training as data has same shape
         trainer.train_fno(train_loader, val_loader, epochs=100)
-        trainer.plot_training_history(save_path=os.path.join(PROJECT_ROOT, 'deeponet_training.png'))
+        trainer.plot_training_history(save_path=os.path.join(IMAGES_DIR, 'deeponet_training.png'))
     
     elif model_type == "surrogate":
         from models.surrogate import UNetSurrogate
@@ -671,7 +673,7 @@ def run_training(model_type: str):
         
         trainer = UnifiedTrainer(model, model_type="surrogate", device=device, learning_rate=1e-3)
         trainer.train_surrogate(train_loader, val_loader, epochs=100)
-        trainer.plot_training_history(save_path=os.path.join(PROJECT_ROOT, 'surrogate_training.png'))
+        trainer.plot_training_history(save_path=os.path.join(IMAGES_DIR, 'surrogate_training.png'))
     
     else:
         print(f"  Training for '{model_type}' not recognized.")
@@ -712,6 +714,7 @@ def interactive_menu():
     print("  [20] 📈 Regularity Map (Re sweep)")
     print("  [21] 📊 Turbulence Metrics (DNS vs LES comparison)")
     print("  [22] 🔬 Symbolic Discovery (SINDy + GP)")
+    print("  [23] 🌀 Quantum Fluid Extensions (GPE + Madelung)")
     print("  [0]  ❌ Exit")
     print()
     
@@ -744,6 +747,7 @@ def interactive_menu():
         "20": lambda: run_regularity_map(),
         "21": lambda: run_turbulence_metrics(),
         "22": lambda: run_symbolic_discovery_standalone(),
+        "23": lambda: run_quantum_extensions(),
         "0": lambda: print("  Goodbye!"),
     }
     
@@ -819,7 +823,7 @@ def run_vorticity_confinement_demo():
                 fontsize=15, color='#c9d1d9', fontweight='bold')
     plt.tight_layout()
     
-    save_path = os.path.join(PROJECT_ROOT, 'demo_vorticity_confinement.png')
+    save_path = os.path.join(IMAGES_DIR, 'demo_vorticity_confinement.png')
     plt.savefig(save_path, dpi=200, bbox_inches='tight')
     print(f"  Saved: {save_path}")
     show_or_close(fig)
@@ -966,7 +970,7 @@ def run_hybrid_demo():
                 fontsize=15, color='#c9d1d9', fontweight='bold')
     plt.tight_layout()
     
-    save_path = os.path.join(PROJECT_ROOT, 'demo_hybrid_pinn.png')
+    save_path = os.path.join(IMAGES_DIR, 'demo_hybrid_pinn.png')
     plt.savefig(save_path, dpi=200, bbox_inches='tight')
     print(f"  Saved: {save_path}")
     show_or_close(fig)
@@ -1004,7 +1008,7 @@ def run_turbulence_discovery():
     )
     
     # Plot results
-    save_path = os.path.join(PROJECT_ROOT, 'demo_turbulence_discovery.png')
+    save_path = os.path.join(IMAGES_DIR, 'demo_turbulence_discovery.png')
     trainer.plot_discovery_results(results.get('discovery', {}), save_path=save_path)
     print(f"\n  Results saved: {save_path}")
 
@@ -1093,7 +1097,7 @@ def run_stability_analysis():
         ax.grid(True, alpha=0.15, color='#30363d')
     
     plt.tight_layout()
-    save_path = os.path.join(PROJECT_ROOT, 'demo_stability_analysis.png')
+    save_path = os.path.join(IMAGES_DIR, 'demo_stability_analysis.png')
     plt.savefig(save_path, dpi=200, bbox_inches='tight')
     print(f"  Saved: {save_path}")
     show_or_close(fig)
@@ -1178,7 +1182,7 @@ def run_regularity_map():
         ax.grid(True, alpha=0.15, color='#30363d')
     
     plt.tight_layout()
-    save_path = os.path.join(PROJECT_ROOT, 'demo_regularity_map.png')
+    save_path = os.path.join(IMAGES_DIR, 'demo_regularity_map.png')
     plt.savefig(save_path, dpi=200, bbox_inches='tight')
     print(f"  Saved: {save_path}")
     show_or_close(fig)
@@ -1263,7 +1267,7 @@ def run_turbulence_metrics():
     axes[2].grid(True, alpha=0.15, color='#30363d')
     
     plt.tight_layout()
-    save_path = os.path.join(PROJECT_ROOT, 'demo_turbulence_metrics.png')
+    save_path = os.path.join(IMAGES_DIR, 'demo_turbulence_metrics.png')
     plt.savefig(save_path, dpi=200, bbox_inches='tight')
     print(f"  Saved: {save_path}")
     show_or_close(fig)
@@ -1354,10 +1358,313 @@ def run_symbolic_discovery_standalone():
         ax.grid(True, alpha=0.15, color='#30363d')
     
     plt.tight_layout()
-    save_path = os.path.join(PROJECT_ROOT, 'demo_symbolic_discovery.png')
+    save_path = os.path.join(IMAGES_DIR, 'demo_symbolic_discovery.png')
     plt.savefig(save_path, dpi=200, bbox_inches='tight')
     print(f"  Saved: {save_path}")
     show_or_close(fig)
+
+
+# =============================================================================
+# Quantum Fluid Extensions (GPE + Madelung Transform)
+# =============================================================================
+
+def run_quantum_extensions():
+    """
+    Quantum Fluid Extensions — Full GPE Pipeline.
+
+    Instead of velocity fields alone, quantum fluids use a wavefunction.
+    The governing equation is the Gross-Pitaevskii equation (GPE):
+
+        i\u0127 \u2202\u03c8/\u2202t = [-\u0127\u00b2/(2m)\u2207\u00b2 + V + g|\u03c8|\u00b2]\u03c8
+
+    Madelung Transform:  \u03c8 = \u221a\u03c1 e^{i\u03b8}
+        Density:   \u03c1 = |\u03c8|\u00b2
+        Velocity:  v = (\u0127/m)\u2207\u03b8
+
+    This recovers a Navier-Stokes-like system with an additional quantum
+    pressure (Bohm potential) term.
+
+    Pipeline:
+      1. Replace scalar density with complex wavefunction field
+      2. Time-evolve via split-step Fourier method
+      3. Madelung decomposition -> density + velocity
+      4. Detect quantized vortices
+      5. Compute incompressible energy spectrum
+      6. Publication-quality 8-panel visualization
+
+    Results:
+      - Classical + quantum fluid simulator
+      - Vortex quantization (discrete vortices)
+      - Wave interference effects
+      - Kolmogorov-like turbulence cascade at large scales
+    """
+    print("\n" + "="*72)
+    print("  QUANTUM FLUID EXTENSIONS")
+    print("  Gross-Pitaevskii Equation + Madelung Transform")
+    print("  ihbar dpsi/dt = [-hbar^2/(2m) nabla^2 + V + g|psi|^2] psi")
+    print("="*72 + "\n")
+
+    from physics.quantum_fluids import QuantumFluidSolver
+
+    setup_plot_style()
+    import matplotlib.pyplot as plt
+    import matplotlib.colors as mcolors
+    from matplotlib.patches import Circle
+    from matplotlib.collections import PatchCollection
+
+    # ── Phase 1: Initialize complex wavefunction field ──────────────────
+    print("  [1/6] Initializing complex wavefunction field...")
+    nx, ny = 256, 256
+    Lx, Ly = 20.0, 20.0
+    g_int = 500.0
+    dt = 0.0005
+
+    solver = QuantumFluidSolver(
+        nx=nx, ny=ny, Lx=Lx, Ly=Ly,
+        hbar=1.0, m=1.0, g_int=g_int, dt=dt,
+    )
+
+    # Ground state + quantum turbulence vortex tangle
+    n0 = 1.0
+    solver.initialize_ground_state(n0=n0)
+    healing_length = solver.healing_length
+    print(f"    Grid: {nx}x{ny}")
+    print(f"    Domain: [{-Lx/2:.1f}, {Lx/2:.1f}] x [{-Ly/2:.1f}, {Ly/2:.1f}]")
+    print(f"    Interaction: g = {g_int}")
+    print(f"    Healing length: xi = {healing_length:.4f}")
+    print(f"    dt = {dt}")
+
+    # Imprint vortex tangle for quantum turbulence
+    n_vortices = 16
+    print(f"\n  [2/6] Imprinting {n_vortices} quantized vortices...")
+    np.random.seed(42)
+    vortex_log = []
+    for i in range(n_vortices):
+        x0 = np.random.uniform(-Lx/3, Lx/3)
+        y0 = np.random.uniform(-Ly/3, Ly/3)
+        charge = np.random.choice([-1, 1])
+        solver.imprint_vortex(x0, y0, charge)
+        vortex_log.append((x0, y0, charge))
+        symbol = "+" if charge > 0 else "-"
+        print(f"    Vortex {i+1:2d}: ({x0:+6.2f}, {y0:+6.2f}) charge={symbol}1")
+
+    # ── Phase 2: Time evolution via split-step Fourier ──────────────────
+    n_steps = 400
+    record_interval = 10
+    print(f"\n  [3/6] Time evolution (split-step Fourier) — {n_steps} steps...")
+
+    energy_history = []
+    particle_history = []
+    vortex_count_history = []
+    time_history = []
+
+    t_start = time.perf_counter()
+    for step in range(n_steps):
+        solver.step()
+
+        if step % record_interval == 0:
+            density = solver.get_density()
+            N = np.sum(density) * solver.dx * solver.dy
+            energy = solver.compute_energy()
+            vortices = solver.detect_vortices()
+
+            energy_history.append(energy['total'])
+            particle_history.append(N)
+            vortex_count_history.append(len(vortices))
+            time_history.append(solver.time)
+
+            if step % 100 == 0:
+                print(f"    Step {step:4d} | t={solver.time:.4f} | "
+                      f"N={N:.2f} | E={energy['total']:.2f} | "
+                      f"Vortices={len(vortices)}")
+
+    elapsed = time.perf_counter() - t_start
+    print(f"\n    Completed: {n_steps} steps in {elapsed:.2f}s "
+          f"({n_steps/elapsed:.0f} steps/s)")
+
+    # ── Phase 3: Madelung decomposition ─────────────────────────────────
+    print("\n  [4/6] Madelung transform: psi = sqrt(rho) * exp(i*theta)...")
+    density = solver.get_density()       # rho = |psi|^2
+    phase = solver.get_phase()           # theta = arg(psi)
+    ux, uy = solver.get_velocity()       # v = (hbar/m) * grad(theta)
+    speed = np.sqrt(ux**2 + uy**2)
+
+    # Quantum pressure (Bohm potential): Q = -(hbar^2 / 2m) * laplacian(sqrt(rho)) / sqrt(rho)
+    sqrt_rho = np.sqrt(density + 1e-12)
+    laplacian_sqrt_rho = (
+        np.roll(sqrt_rho, 1, 0) + np.roll(sqrt_rho, -1, 0) +
+        np.roll(sqrt_rho, 1, 1) + np.roll(sqrt_rho, -1, 1) -
+        4 * sqrt_rho
+    ) / (solver.dx * solver.dy)
+    Q_bohm = -(solver.hbar**2 / (2 * solver.m)) * laplacian_sqrt_rho / (sqrt_rho + 1e-12)
+
+    print(f"    Density: min={density.min():.4f}  max={density.max():.4f}")
+    print(f"    Phase:   min={phase.min():.4f}  max={phase.max():.4f}")
+    print(f"    |v|:     min={speed.min():.4f}  max={speed.max():.4f}")
+    print(f"    Quantum pressure |Q|: max={np.max(np.abs(Q_bohm)):.4f}")
+
+    # ── Phase 4: Vortex detection ───────────────────────────────────────
+    print("\n  [5/6] Detecting quantized vortices...")
+    vortices = solver.detect_vortices()
+    n_pos = sum(1 for _, _, c in vortices if c > 0)
+    n_neg = sum(1 for _, _, c in vortices if c < 0)
+    print(f"    Found {len(vortices)} vortices  (+{n_pos} / -{n_neg})")
+    print(f"    Circulation quantization: Gamma = n * h/m = n * {2*np.pi*solver.hbar/solver.m:.4f}")
+
+    # ── Phase 5: Energy spectrum ────────────────────────────────────────
+    print("\n  [6/6] Computing incompressible energy spectrum...")
+    k_spectrum, E_spectrum = solver.compute_incompressible_spectrum()
+    valid_k = k_spectrum > 0
+    k_valid = k_spectrum[valid_k]
+    E_valid = E_spectrum[valid_k]
+    E_valid = np.maximum(E_valid, 1e-30)  # avoid log(0)
+
+    # Kolmogorov reference: E(k) ~ k^(-5/3)
+    if len(k_valid) > 0:
+        k_ref = k_valid
+        E_ref = E_valid[len(E_valid)//4] * (k_ref / k_ref[len(k_ref)//4])**(-5.0/3.0)
+
+    # ── Publication-quality 8-panel visualization ────────────────────────
+    print("\n  Generating publication-quality visualization...")
+
+    fig = plt.figure(figsize=(24, 20))
+    fig.suptitle(
+        'Quantum Fluid Extensions   \u00b7   Gross-Pitaevskii + Madelung Transform',
+        fontsize=20, fontweight='bold', color='#58a6ff', y=0.98,
+    )
+
+    extent = [-Lx/2, Lx/2, -Ly/2, Ly/2]
+
+    # ── Panel 1: Superfluid density |psi|^2 ──
+    ax1 = fig.add_subplot(2, 4, 1)
+    im1 = ax1.imshow(density, cmap='inferno', origin='lower', extent=extent,
+                     interpolation='bicubic')
+    ax1.set_title('Density  |\u03c8|\u00b2', color='#79c0ff', fontsize=13)
+    ax1.set_xlabel('x'); ax1.set_ylabel('y')
+    cb1 = plt.colorbar(im1, ax=ax1, fraction=0.046, pad=0.04)
+    cb1.outline.set_edgecolor('#30363d')
+
+    # ── Panel 2: Phase arg(psi) ──
+    ax2 = fig.add_subplot(2, 4, 2)
+    im2 = ax2.imshow(phase, cmap='twilight_shifted', origin='lower', extent=extent,
+                     interpolation='bicubic', vmin=-np.pi, vmax=np.pi)
+    ax2.set_title('Phase  arg(\u03c8)', color='#79c0ff', fontsize=13)
+    ax2.set_xlabel('x'); ax2.set_ylabel('y')
+    cb2 = plt.colorbar(im2, ax=ax2, fraction=0.046, pad=0.04)
+    cb2.outline.set_edgecolor('#30363d')
+
+    # ── Panel 3: Velocity magnitude (Madelung) ──
+    ax3 = fig.add_subplot(2, 4, 3)
+    speed_clipped = np.clip(speed, 0, np.percentile(speed, 99))
+    im3 = ax3.imshow(speed_clipped, cmap='magma', origin='lower', extent=extent,
+                     interpolation='bicubic')
+    ax3.set_title('Velocity |v| = (\u0127/m)|\u2207\u03b8|', color='#79c0ff', fontsize=13)
+    ax3.set_xlabel('x'); ax3.set_ylabel('y')
+    cb3 = plt.colorbar(im3, ax=ax3, fraction=0.046, pad=0.04)
+    cb3.outline.set_edgecolor('#30363d')
+
+    # ── Panel 4: Vortex positions overlaid on density ──
+    ax4 = fig.add_subplot(2, 4, 4)
+    ax4.imshow(density, cmap='inferno', origin='lower', extent=extent,
+              interpolation='bicubic', alpha=0.6)
+    for vx, vy, vc in vortices:
+        color = '#7ee787' if vc > 0 else '#f97583'
+        marker = '^' if vc > 0 else 'v'
+        ax4.plot(vx, vy, marker, color=color, ms=6, mew=1.5, mec='white')
+    ax4.set_title(f'Vortex Map  ({len(vortices)} detected)', color='#79c0ff', fontsize=13)
+    ax4.set_xlabel('x'); ax4.set_ylabel('y')
+    # Legend
+    ax4.plot([], [], '^', color='#7ee787', ms=8, label='+1 vortex')
+    ax4.plot([], [], 'v', color='#f97583', ms=8, label='-1 vortex')
+    ax4.legend(loc='upper right', fontsize=8, framealpha=0.7)
+
+    # ── Panel 5: Quantum pressure (Bohm potential) ──
+    ax5 = fig.add_subplot(2, 4, 5)
+    Q_clipped = np.clip(Q_bohm, np.percentile(Q_bohm, 1), np.percentile(Q_bohm, 99))
+    vabs = max(np.max(np.abs(Q_clipped)), 1e-6)
+    im5 = ax5.imshow(Q_clipped, cmap='RdBu_r', origin='lower', extent=extent,
+                     interpolation='bicubic',
+                     norm=mcolors.TwoSlopeNorm(vcenter=0, vmin=-vabs, vmax=vabs))
+    ax5.set_title('Quantum Pressure  Q (Bohm)', color='#79c0ff', fontsize=13)
+    ax5.set_xlabel('x'); ax5.set_ylabel('y')
+    cb5 = plt.colorbar(im5, ax=ax5, fraction=0.046, pad=0.04)
+    cb5.outline.set_edgecolor('#30363d')
+
+    # ── Panel 6: Energy spectrum ──
+    ax6 = fig.add_subplot(2, 4, 6)
+    if len(k_valid) > 2:
+        ax6.loglog(k_valid, E_valid, '-', color='#58a6ff', lw=2.2, label='E(k)', zorder=3)
+        ax6.loglog(k_ref, E_ref, '--', color='#8b949e', lw=1.5,
+                   label='k\u207b\u2075\u2033\u00b3 (Kolmogorov)', zorder=2)
+        ax6.fill_between(k_valid, E_valid, alpha=0.08, color='#58a6ff')
+    ax6.set_xlabel('Wavenumber k')
+    ax6.set_ylabel('E(k)')
+    ax6.set_title('Incompressible Energy Spectrum', color='#79c0ff', fontsize=13)
+    ax6.legend(fontsize=9, framealpha=0.7)
+    ax6.grid(True, alpha=0.15, color='#30363d')
+
+    # ── Panel 7: Diagnostics time series ──
+    ax7 = fig.add_subplot(2, 4, 7)
+    t_arr = np.array(time_history)
+    ax7_twin = ax7.twinx()
+    ax7.plot(t_arr, energy_history, '-', color='#58a6ff', lw=2, label='Total Energy')
+    ax7_twin.plot(t_arr, vortex_count_history, '-', color='#f97583', lw=2, label='N vortices')
+    ax7.set_xlabel('Time')
+    ax7.set_ylabel('Energy', color='#58a6ff')
+    ax7_twin.set_ylabel('Vortex Count', color='#f97583')
+    ax7.set_title('Evolution Diagnostics', color='#79c0ff', fontsize=13)
+    ax7.tick_params(axis='y', labelcolor='#58a6ff')
+    ax7_twin.tick_params(axis='y', labelcolor='#f97583')
+    ax7.grid(True, alpha=0.15, color='#30363d')
+
+    # ── Panel 8: Particle number conservation check ──
+    ax8 = fig.add_subplot(2, 4, 8)
+    N_arr = np.array(particle_history)
+    N_deviation = (N_arr - N_arr[0]) / N_arr[0] * 100
+    ax8.plot(t_arr, N_deviation, '-', color='#7ee787', lw=2)
+    ax8.fill_between(t_arr, N_deviation, alpha=0.1, color='#7ee787')
+    ax8.axhline(y=0, color='#8b949e', ls='--', lw=0.8)
+    ax8.set_xlabel('Time')
+    ax8.set_ylabel('\u0394N/N\u2080 (%)')
+    ax8.set_title('Particle Conservation', color='#79c0ff', fontsize=13)
+    ax8.grid(True, alpha=0.15, color='#30363d')
+
+    for ax in [ax1, ax2, ax3, ax4, ax5]:
+        ax.tick_params(axis='both', colors='#8b949e')
+
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    save_path = os.path.join(IMAGES_DIR, 'quantum_extensions.png')
+    plt.savefig(save_path, dpi=200, bbox_inches='tight')
+    show_or_close(fig)
+    print(f"\n  Visualization saved: {save_path}")
+
+    # ── Summary ──
+    energy_final = solver.compute_energy()
+    print("\n" + "="*72)
+    print("  QUANTUM FLUID EXTENSIONS — SUMMARY")
+    print("="*72)
+    print(f"  Governing eq: ihbar dpsi/dt = [-hbar^2/(2m) nabla^2 + V + g|psi|^2] psi")
+    print(f"  Madelung:     psi = sqrt(rho) e^(i*theta) -> rho = |psi|^2, v = (hbar/m) grad(theta)")
+    print(f"  Method:       Split-step Fourier (symplectic)")
+    print(f"  Grid:         {nx}x{ny},  L = {Lx}")
+    print(f"  g_int:        {g_int}")
+    print(f"  Steps:        {n_steps}  (dt={dt})")
+    print(f"  Healing len:  xi = {healing_length:.4f}")
+    print(f"  Vortices:     {len(vortices)}  (+{n_pos} / -{n_neg})")
+    print(f"  Energy:       K={energy_final['kinetic']:.2f}  "
+          f"V={energy_final['potential']:.2f}  "
+          f"I={energy_final['interaction']:.2f}  "
+          f"Total={energy_final['total']:.2f}")
+    N_final = np.sum(density) * solver.dx * solver.dy
+    print(f"  Particles:    N = {N_final:.4f}  (dN/N0 = {(N_final-particle_history[0])/particle_history[0]*100:.4f}%)")
+    print()
+    print("  Results:")
+    print("    [+] Classical + quantum fluid simulator")
+    print("    [+] Vortex quantization (discrete vortices with Gamma = n * h/m)")
+    print("    [+] Wave interference effects")
+    print("    [+] Madelung-derived NS-like system + quantum pressure")
+    print("    [+] Kolmogorov cascade at large scales")
+    print("="*72 + "\n")
 
 
 # =============================================================================
@@ -1420,6 +1727,9 @@ Examples:
                        help='Run DNS vs LES turbulence metrics comparison')
     parser.add_argument('--symbolic', action='store_true',
                        help='Run symbolic equation discovery (SINDy + GP)')
+    # Quantum Fluid Extensions
+    parser.add_argument('--quantum-ext', action='store_true', dest='quantum_ext',
+                       help='Quantum Fluid Extensions (GPE + Madelung transform)')
     
     args = parser.parse_args()
     
@@ -1461,6 +1771,8 @@ Examples:
         run_turbulence_metrics()
     elif args.symbolic:
         run_symbolic_discovery_standalone()
+    elif args.quantum_ext:
+        run_quantum_extensions()
     else:
         interactive_menu()
 

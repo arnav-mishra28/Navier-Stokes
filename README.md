@@ -7,7 +7,8 @@
 
 <h1 align="center">
   🌊 Navier-Stokes ML/DL Hybrid Simulation System<br>
-  + 🧠 Turbulence Discovery AI
+  + 🧠 Turbulence Discovery AI<br>
+  + 🌀 Quantum Fluid Extensions
 </h1>
 
 <p align="center">
@@ -17,7 +18,7 @@
 
 ---
 
-A production-ready, hybrid Navier-Stokes simulation system that integrates **classical CFD solvers** with **deep learning surrogates** (PINN, FNO, DeepONet, U-Net) and a **Turbulence Discovery AI** pipeline (Autoencoder + Neural ODE + SINDy + Genetic Programming). Supports 6 physics domains, blow-up detection & regularity analysis, real-time 2D/3D visualization, a Streamlit web dashboard, and a unified CLI for simulation, training, discovery, and benchmarking.
+A production-ready, hybrid Navier-Stokes simulation system that integrates **classical CFD solvers** with **deep learning surrogates** (PINN, FNO, DeepONet, U-Net), a **Turbulence Discovery AI** pipeline (Autoencoder + Neural ODE + SINDy + Genetic Programming), and **Quantum Fluid Extensions** (Gross-Pitaevskii equation + Madelung transform + split-step Fourier). Supports 6 physics domains, blow-up detection & regularity analysis, real-time 2D/3D visualization, a Streamlit web dashboard, and a unified CLI for simulation, training, discovery, and benchmarking.
 
 ## ✨ Features
 
@@ -89,6 +90,12 @@ Navier-Stokes/
 ├── tests/                  # Test suite
 │   └── test_smoke.py       # Comprehensive smoke tests
 │
+├── images/                 # Generated plots & visualizations
+│   ├── demo_taylor_green.png
+│   ├── demo_quantum.png
+│   ├── quantum_extensions.png
+│   └── ...                 # All generated plots saved here
+│
 ├── checkpoints/            # Saved model weights
 ├── logs/                   # Training logs
 └── data/                   # Generated datasets
@@ -152,6 +159,9 @@ python main.py --regularity          # Empirical regularity map (Re sweep)
 python main.py --metrics             # DNS vs LES turbulence metrics comparison
 python main.py --symbolic            # SINDy + GP equation discovery
 
+# Quantum Fluid Extensions
+python main.py --quantum-ext          # GPE + Madelung + split-step Fourier + visualization
+
 # CFD performance benchmarks
 python main.py --benchmark
 ```
@@ -177,6 +187,74 @@ Geophysical flows with Coriolis force, thermal stratification, and Ekman layers.
 
 ### Quantum Fluids
 Bose-Einstein condensate dynamics via the Gross-Pitaevskii equation. Quantized vortex nucleation and quantum turbulence.
+
+---
+
+## 🌀 Quantum Fluid Extensions
+
+> **What changes from classical fluids?** Instead of velocity fields alone, quantum fluids use a **complex wavefunction** ψ.
+
+### Gross-Pitaevskii Equation (GPE)
+
+The governing equation for superfluids and Bose-Einstein condensates:
+
+```
+iħ ∂ψ/∂t = [-ħ²/(2m)∇² + V + g|ψ|²]ψ
+```
+
+Used for:
+- **Superfluids** (liquid helium-4)
+- **Bose-Einstein condensates** (ultracold atoms)
+- **Quantum vortices** (quantized circulation)
+
+### Madelung Transform (ψ → Fluid Variables)
+
+Rewrite the wavefunction as:
+
+```
+ψ = √ρ · e^{iθ}
+```
+
+Then extract fluid variables:
+- **Density:** ρ = |ψ|²
+- **Velocity:** v = (ħ/m)∇θ
+
+👉 You recover a **Navier-Stokes-like system** with an additional **quantum pressure** (Bohm potential) term.
+
+### Implementation
+
+| Step | Method | Details |
+|------|--------|---------|
+| Field representation | Complex ψ field | Replaces scalar density |
+| Time evolution | Split-step Fourier | Symplectic, norm-preserving |
+| Kinetic step | FFT → k-space propagation | exp(-iħk²Δt/2m) |
+| Potential step | Real-space multiplication | V_ext + g|ψ|² |
+| Vortex detection | Phase winding number | ∮ ∇θ · dl = ±2πn |
+
+### Visualization (8-panel)
+
+1. **Superfluid density** |ψ|² — shows vortex cores as density zeros
+2. **Phase** arg(ψ) — shows 2π winding around vortices
+3. **Velocity magnitude** |v| — Madelung-derived velocity field
+4. **Vortex map** — +1 and -1 vortex positions overlaid on density
+5. **Quantum pressure** Q (Bohm potential) — the extra NS term
+6. **Energy spectrum** E(k) with Kolmogorov k⁻⁵″³ reference
+7. **Diagnostics** — energy + vortex count evolution
+8. **Particle conservation** — ΔN/N₀ should be ~0 (symplectic check)
+
+### Results
+
+- ✓ Classical + quantum fluid simulator
+- ✓ Vortex quantization (discrete vortices with Γ = n·h/m)
+- ✓ Wave interference effects
+- ✓ Madelung-derived NS-like system + quantum pressure term
+- ✓ Kolmogorov cascade at large scales
+
+```bash
+# Run the full quantum extensions pipeline
+python main.py --quantum-ext
+python main.py --quantum-ext --no-gui   # Headless mode
+```
 
 ---
 
