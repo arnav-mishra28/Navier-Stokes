@@ -8,6 +8,7 @@
   ║     Core: Incompressible Navier-Stokes (Projection Method)          ║
   ║     ML:   PINN / FNO / DeepONet / U-Net / Autoencoder / NeuralODE  ║
   ║     AI:   SINDy / Genetic Programming / Blow-up Detection           ║
+  ║     AGI:  Physics Discovery / Hypothesis Engine / Knowledge Base    ║
   ║     Physics: Fluid · MHD · Astro · Bio · Climate · Quantum · Rel   ║
   ║     Viz:  Real-time 2D (Pygame) + 3D (PyVista/Matplotlib)          ║
   ╚═══════════════════════════════════════════════════════════════════════╝
@@ -34,6 +35,8 @@
       python main.py --hybrid            → Run hybrid CFD→PINN demo
       python main.py --gpu               → Use GPU-accelerated solver
       python main.py --vort-conf 5.0     → Enable vorticity confinement
+      python main.py --agi               → Full AGI scientific discovery system
+      python main.py --physics-discover  → Physics-aware equation discovery
       python main.py --no-gui            → Headless mode (no plt.show())
 =============================================================================
 """
@@ -724,6 +727,9 @@ def interactive_menu():
     print("  [22] 🔬 Symbolic Discovery (SINDy + GP)")
     print("  [23] 🌀 Quantum Fluid Extensions (GPE + Madelung)")
     print("  [24] 🚀 Relativistic NS (Israel-Stewart Causal Theory)")
+    print("  ─────────────────────────────────────────")
+    print("  [25] 🤖 AGI Scientific Discovery System (Full Pipeline)")
+    print("  [26] 🔬 Physics-Aware Equation Discovery")
     print("  [0]  ❌ Exit")
     print()
     
@@ -758,6 +764,8 @@ def interactive_menu():
         "22": lambda: run_symbolic_discovery_standalone(),
         "23": lambda: run_quantum_extensions(),
         "24": lambda: run_relativistic_ns(),
+        "25": lambda: run_agi_discovery(),
+        "26": lambda: run_physics_aware_discovery(),
         "0": lambda: print("  Goodbye!"),
     }
     
@@ -1678,6 +1686,241 @@ def run_quantum_extensions():
 
 
 # =============================================================================
+# AGI Scientific Discovery System
+# =============================================================================
+
+def run_agi_discovery():
+    """Run the full AGI-style scientific discovery pipeline."""
+    from training.agi_pipeline import AGIScientificPipeline
+
+    pipeline = AGIScientificPipeline(
+        checkpoint_dir=os.path.join(PROJECT_ROOT, 'checkpoints', 'agi_discovery'),
+        log_dir=os.path.join(PROJECT_ROOT, 'logs', 'agi_discovery'),
+        verbose=True,
+    )
+
+    results = pipeline.run(
+        nx=64, n_regimes=5, steps_per_regime=200, latent_dim=4,
+    )
+
+    # Plot results
+    save_path = os.path.join(IMAGES_DIR, 'agi_scientific_discovery.png')
+    pipeline.plot_results(save_path=save_path)
+    print(f"\n  Visualization saved: {save_path}")
+
+
+def run_physics_aware_discovery():
+    """Run physics-aware equation discovery on flow fields."""
+    print("\n" + "="*60)
+    print("  PHYSICS-AWARE EQUATION DISCOVERY")
+    print("  Data -> Gradients + Laplacians -> Sparse Regression -> Equations")
+    print("  du/dt = -u*nabla(u) + nu*nabla2(u) - grad(p) + corrections")
+    print("="*60 + "\n")
+
+    from core.fluid_solver_2d import FluidSolver2D
+    from utils.helpers import compute_vorticity
+    from models.physics_discovery import PhysicsAwareSINDy, CorrectionTermDiscovery, ConservationValidator
+    from models.hypothesis_engine import HypothesisGenerator, ExperimentValidator, KnowledgeBase
+
+    setup_plot_style()
+    import matplotlib.pyplot as plt
+
+    # Generate multi-Re flow data
+    re_values = [100, 500, 2000]
+    all_results = {}
+
+    for Re in re_values:
+        nu = 1.0 / Re
+        print(f"\n  --- Re = {Re} ---")
+
+        solver = FluidSolver2D(
+            nx=64, ny=64, Lx=2*np.pi, Ly=2*np.pi,
+            nu=nu, dt=0.005, pressure_solver="fft"
+        )
+        solver.initialize_taylor_green()
+        solver.bc_manager.set_periodic()
+
+        # Warmup
+        for _ in range(20):
+            solver.step()
+
+        # Collect field snapshots
+        u_fields, v_fields, p_fields, omega_fields = [], [], [], []
+        for step in range(100):
+            solver.step()
+            if not np.all(np.isfinite(solver.u)):
+                solver.u = np.nan_to_num(solver.u)
+                solver.v = np.nan_to_num(solver.v)
+            if step % 5 == 0:
+                omega = compute_vorticity(solver.u, solver.v, solver.dx, solver.dy)
+                u_fields.append(solver.u.copy())
+                v_fields.append(solver.v.copy())
+                p_fields.append(solver.p.copy())
+                omega_fields.append(omega.copy())
+
+        # Run physics-aware SINDy
+        sindy = PhysicsAwareSINDy(
+            threshold=0.05, alpha=0.01,
+            poly_order=2, include_physics=True,
+        )
+        results = sindy.fit_from_fields(
+            u_fields, v_fields, p_fields, omega_fields,
+            dt=solver.dt * 5, dx=solver.dx, dy=solver.dy,
+            verbose=True,
+        )
+
+        if 'error' not in results:
+            # Extract corrections
+            corr_finder = CorrectionTermDiscovery()
+            corrections = corr_finder.extract_corrections(
+                results['Xi'], results['feature_names'], nu
+            )
+            results['corrections'] = corrections
+
+            # Validate
+            validator = ConservationValidator()
+            validation = validator.full_validation(
+                u_fields, v_fields, p_fields, omega_fields,
+                results['Xi'], results['feature_names'],
+                dt=solver.dt * 5, dx=solver.dx, dy=solver.dy, nu=nu,
+            )
+            results['validation'] = validation
+            print(f"    Conservation score: {validation['overall_score']:.0%}")
+
+        all_results[Re] = results
+
+    # Generate hypotheses
+    hyp_gen = HypothesisGenerator()
+    all_corrections = []
+    for Re, res in all_results.items():
+        for c in res.get('corrections', [])[:5]:
+            all_corrections.append(c)
+    if all_corrections:
+        hyp_gen.generate_from_corrections(all_corrections[:10], nu=0.01, verbose=True)
+
+    # Save knowledge
+    kb = KnowledgeBase(os.path.join(PROJECT_ROOT, 'checkpoints', 'physics_discovery_kb'))
+    for hyp in hyp_gen.hypotheses:
+        kb.add_hypothesis(hyp)
+        kb.add_equation(hyp.equation)
+    kb.save()
+
+    # ---- Visualization ----
+    fig = plt.figure(figsize=(20, 12))
+    fig.suptitle('Physics-Aware Equation Discovery',
+                fontsize=18, fontweight='bold', color='#58a6ff', y=0.97)
+
+    # Panel 1: SINDy coefficient matrix
+    ax1 = fig.add_subplot(2, 3, 1)
+    for Re in re_values:
+        res = all_results.get(Re, {})
+        Xi = res.get('Xi')
+        if Xi is not None:
+            im = ax1.imshow(np.log10(np.abs(Xi) + 1e-10), cmap='viridis',
+                           aspect='auto', interpolation='nearest')
+            break
+    ax1.set_title('SINDy Coefficients (log|xi|)', color='#79c0ff', fontsize=13)
+    ax1.set_xlabel('Variable'); ax1.set_ylabel('Candidate')
+    plt.colorbar(im, ax=ax1, fraction=0.046, pad=0.04)
+
+    # Panel 2: Correction terms
+    ax2 = fig.add_subplot(2, 3, 2)
+    if all_corrections:
+        terms = [c['term'][:18] for c in all_corrections[:8]]
+        sigs = [c['significance'] for c in all_corrections[:8]]
+        types = [c['type'] for c in all_corrections[:8]]
+        colors = ['#f97583' if t == 'novel' else '#58a6ff' for t in types]
+        ax2.barh(range(len(terms)), sigs, color=colors, alpha=0.8)
+        ax2.set_yticks(range(len(terms)))
+        ax2.set_yticklabels(terms, fontsize=8)
+    ax2.set_title('Correction Terms', color='#79c0ff', fontsize=13)
+    ax2.set_xlabel('Significance')
+    ax2.grid(True, alpha=0.15, color='#30363d')
+
+    # Panel 3: Conservation validation
+    ax3 = fig.add_subplot(2, 3, 3)
+    re_labels = []
+    scores = []
+    for Re, res in all_results.items():
+        v = res.get('validation', {})
+        if v:
+            re_labels.append(f'Re={Re}')
+            scores.append(v.get('overall_score', 0))
+    if scores:
+        ax3.bar(range(len(re_labels)), scores, color='#7ee787', alpha=0.8)
+        ax3.set_xticks(range(len(re_labels)))
+        ax3.set_xticklabels(re_labels)
+        ax3.set_ylim(0, 1.1)
+    ax3.set_title('Conservation Score', color='#79c0ff', fontsize=13)
+    ax3.set_ylabel('Score')
+    ax3.grid(True, alpha=0.15, color='#30363d')
+
+    # Panel 4: Fit errors across Re
+    ax4 = fig.add_subplot(2, 3, 4)
+    for Re, res in all_results.items():
+        fe = res.get('fit_error', {})
+        if fe:
+            ax4.bar(f'Re={Re}\nu', fe.get('u', 0), color='#58a6ff', alpha=0.7, label='u' if Re == re_values[0] else '')
+            ax4.bar(f'Re={Re}\nv', fe.get('v', 0), color='#d2a8ff', alpha=0.7, label='v' if Re == re_values[0] else '')
+    ax4.set_title('Equation Fit Error (MSE)', color='#79c0ff', fontsize=13)
+    ax4.set_ylabel('MSE')
+    ax4.legend(fontsize=9)
+    ax4.grid(True, alpha=0.15, color='#30363d')
+
+    # Panel 5: Hypotheses
+    ax5 = fig.add_subplot(2, 3, 5)
+    ax5.axis('off')
+    ax5.set_title('Generated Hypotheses', color='#79c0ff', fontsize=13)
+    lines = []
+    for h in hyp_gen.hypotheses[:8]:
+        lines.append(f"[{h.id}] {h.description[:55]}")
+    if lines:
+        ax5.text(0.05, 0.95, '\n'.join(lines), transform=ax5.transAxes,
+                va='top', fontsize=8, color='#c9d1d9', fontfamily='monospace',
+                bbox=dict(boxstyle='round,pad=0.5', facecolor='#21262d',
+                         edgecolor='#30363d', alpha=0.9))
+
+    # Panel 6: Discovered equations
+    ax6 = fig.add_subplot(2, 3, 6)
+    ax6.axis('off')
+    ax6.set_title('Discovered Equations', color='#79c0ff', fontsize=13)
+    eq_lines = ["Physics-Aware Discovery Results\n"]
+    for Re, res in all_results.items():
+        eq_lines.append(f"Re={Re}:")
+        u_eq = res.get('u_equation', '')
+        if u_eq:
+            eq_lines.append(f"  {u_eq[:60]}")
+        n_c = len(res.get('corrections', []))
+        eq_lines.append(f"  Corrections: {n_c}")
+    ax6.text(0.05, 0.95, '\n'.join(eq_lines), transform=ax6.transAxes,
+            va='top', fontsize=8, color='#c9d1d9', fontfamily='monospace',
+            bbox=dict(boxstyle='round,pad=0.5', facecolor='#21262d',
+                     edgecolor='#30363d', alpha=0.9))
+
+    plt.tight_layout(rect=[0, 0, 1, 0.94])
+    save_path = os.path.join(IMAGES_DIR, 'physics_aware_discovery.png')
+    plt.savefig(save_path, dpi=200, bbox_inches='tight')
+    show_or_close(fig)
+    print(f"\n  Visualization saved: {save_path}")
+
+    # Summary
+    print("\n" + "="*60)
+    print("  PHYSICS-AWARE DISCOVERY -- SUMMARY")
+    print("="*60)
+    print(f"  Standard NS: du/dt = -u*nabla(u) + nu*nabla2(u) - grad(p)")
+    for Re, res in all_results.items():
+        n_c = len(res.get('corrections', []))
+        fe = res.get('fit_error', {})
+        print(f"  Re={Re}: {n_c} corrections, MSE_u={fe.get('u', 0):.2e}, MSE_v={fe.get('v', 0):.2e}")
+    if all_corrections:
+        print(f"\n  Top correction terms (beyond standard NS):")
+        for c in all_corrections[:5]:
+            print(f"    {c['discovered_coeff']:+.6f} * {c['term']} [{c['type']}]")
+    print(f"  Hypotheses generated: {len(hyp_gen.hypotheses)}")
+    print("="*60 + "\n")
+
+
+# =============================================================================
 # Relativistic Navier-Stokes (Israel-Stewart Causal Theory)
 # =============================================================================
 
@@ -1948,6 +2191,8 @@ Examples:
   python main.py --metrics            DNS vs LES turbulence metrics
   python main.py --symbolic           Symbolic equation discovery (SINDy + GP)
   python main.py --relativistic       Relativistic NS (Israel-Stewart causal theory)
+  python main.py --agi                Full AGI scientific discovery system
+  python main.py --physics-discover   Physics-aware equation discovery
         """
     )
     
@@ -1984,6 +2229,11 @@ Examples:
     # Relativistic NS
     parser.add_argument('--relativistic', action='store_true',
                        help='Relativistic NS with Israel-Stewart causal theory')
+    # AGI Discovery
+    parser.add_argument('--agi', action='store_true',
+                       help='Full AGI scientific discovery system')
+    parser.add_argument('--physics-discover', action='store_true', dest='physics_discover',
+                       help='Physics-aware equation discovery')
     
     args = parser.parse_args()
     
@@ -2029,6 +2279,10 @@ Examples:
         run_quantum_extensions()
     elif args.relativistic:
         run_relativistic_ns()
+    elif args.agi:
+        run_agi_discovery()
+    elif args.physics_discover:
+        run_physics_aware_discovery()
     else:
         interactive_menu()
 

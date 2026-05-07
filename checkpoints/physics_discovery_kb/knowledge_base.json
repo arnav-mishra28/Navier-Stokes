@@ -1,0 +1,158 @@
+{
+  "equations": [
+    {
+      "equation_str": "dv/dt += -0.989372 * v*p",
+      "variable": "dv/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:25:08"
+    },
+    {
+      "equation_str": "du/dt += -0.032999 * u*du/dx+v*du/dy",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:25:08"
+    },
+    {
+      "equation_str": "du/dt += -0.090392 * dp/dx",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:25:08"
+    },
+    {
+      "equation_str": "du/dt += -0.090392 * dp/dx",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:25:08"
+    },
+    {
+      "equation_str": "du/dt += +0.838599 * u*p",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:25:08"
+    },
+    {
+      "equation_str": "dv/dt += +39118090668493263831562190848.000000 * v",
+      "variable": "dv/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:25:08"
+    },
+    {
+      "equation_str": "dv/dt += +37866014389896572053531656192.000000 * u",
+      "variable": "dv/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:25:08"
+    },
+    {
+      "equation_str": "du/dt += -29284293700404284677146279936.000000 * u",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:25:08"
+    },
+    {
+      "equation_str": "du/dt += -11120191188027071550535499776.000000 * v",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:25:08"
+    },
+    {
+      "equation_str": "du/dt += -10193377548032470233596821504.000000 * dv/dy",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:25:08"
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H0001",
+      "description": "The equation for dv/dt contains a previously unmodeled term: -0.989372*v*p. Physical interpretation: Novel interaction: v*p",
+      "status": "proposed",
+      "confidence": 1.0,
+      "timestamp": "2026-05-07 13:25:08"
+    },
+    {
+      "id": "H0002",
+      "description": "The coefficient of u*du/dx+v*du/dy in du/dt deviates from expected (-1.0000) to discovered (-0.0330). Novel interaction: u*du/dx+v*du/dy",
+      "status": "proposed",
+      "confidence": 1.0,
+      "timestamp": "2026-05-07 13:25:08"
+    },
+    {
+      "id": "H0003",
+      "description": "The coefficient of dp/dx in du/dt deviates from expected (-1.0000) to discovered (-0.0904). Pressure gradient force (x)",
+      "status": "proposed",
+      "confidence": 1.0,
+      "timestamp": "2026-05-07 13:25:08"
+    },
+    {
+      "id": "H0004",
+      "description": "The coefficient of dp/dx in du/dt deviates from expected (-1.0000) to discovered (-0.0904). Pressure gradient force (x)",
+      "status": "proposed",
+      "confidence": 1.0,
+      "timestamp": "2026-05-07 13:25:08"
+    },
+    {
+      "id": "H0005",
+      "description": "The equation for du/dt contains a previously unmodeled term: +0.838599*u*p. Physical interpretation: Novel interaction: u*p",
+      "status": "proposed",
+      "confidence": 1.0,
+      "timestamp": "2026-05-07 13:25:08"
+    },
+    {
+      "id": "H0006",
+      "description": "The equation for dv/dt contains a previously unmodeled term: +39118090668493263831562190848.000000*v. Physical interpretation: Novel interaction: v",
+      "status": "proposed",
+      "confidence": 1.0,
+      "timestamp": "2026-05-07 13:25:08"
+    },
+    {
+      "id": "H0007",
+      "description": "The equation for dv/dt contains a previously unmodeled term: +37866014389896572053531656192.000000*u. Physical interpretation: Novel interaction: u",
+      "status": "proposed",
+      "confidence": 1.0,
+      "timestamp": "2026-05-07 13:25:08"
+    },
+    {
+      "id": "H0008",
+      "description": "The equation for du/dt contains a previously unmodeled term: -29284293700404284677146279936.000000*u. Physical interpretation: Novel interaction: u",
+      "status": "proposed",
+      "confidence": 1.0,
+      "timestamp": "2026-05-07 13:25:08"
+    },
+    {
+      "id": "H0009",
+      "description": "The equation for du/dt contains a previously unmodeled term: -11120191188027071550535499776.000000*v. Physical interpretation: Novel interaction: v",
+      "status": "proposed",
+      "confidence": 1.0,
+      "timestamp": "2026-05-07 13:25:08"
+    },
+    {
+      "id": "H0010",
+      "description": "The equation for du/dt contains a previously unmodeled term: -10193377548032470233596821504.000000*dv/dy. Physical interpretation: Novel interaction: dv/dy",
+      "status": "proposed",
+      "confidence": 1.0,
+      "timestamp": "2026-05-07 13:25:08"
+    }
+  ],
+  "discoveries": [],
+  "n_experiments": 0
+}

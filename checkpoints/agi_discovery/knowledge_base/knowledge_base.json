@@ -1,0 +1,508 @@
+{
+  "equations": [
+    {
+      "equation_str": "dz1/dt = 1.3924\u00b71 + 0.4450\u00b7z1 + 1.1302\u00b7z2 + 1.7327\u00b7z3 + 1.2063\u00b7z4 + 0.3692\u00b7z1\u00b7z1 + 0.1246\u00b7z1\u00b7z2 + 0.1200\u00b7z1\u00b7z3 + 0.1556\u00b7z1\u00b7z4 + 0.0845\u00b7z2\u00b7z2 + 0.1568\u00b7z2\u00b7z3 + 0.1139\u00b7z2\u00b7z4 + 0.2748\u00b7z3\u00b7z3 + 0.1990\u00b7z3\u00b7z4 + 0.1618\u00b7z4\u00b7z4 + 0.0094\u00b7z1\u00b7z1\u00b7z1 -0.0019\u00b7z1\u00b7z1\u00b7z2 + 0.0251\u00b7z1\u00b7z1\u00b7z3 -0.0128\u00b7z1\u00b7z2\u00b7z2 + 0.0061\u00b7z1\u00b7z2\u00b7z3 -0.0106\u00b7z1\u00b7z2\u00b7z4 + 0.0310\u00b7z1\u00b7z3\u00b7z3 + 0.0106\u00b7z1\u00b7z3\u00b7z4 -0.0087\u00b7z1\u00b7z4\u00b7z4 -0.0227\u00b7z2\u00b7z2\u00b7z2 -0.0097\u00b7z2\u00b7z2\u00b7z3 -0.0211\u00b7z2\u00b7z2\u00b7z4 + 0.0095\u00b7z2\u00b7z3\u00b7z3 -0.0060\u00b7z2\u00b7z3\u00b7z4 -0.0190\u00b7z2\u00b7z4\u00b7z4 + 0.0371\u00b7z3\u00b7z3\u00b7z3 + 0.0162\u00b7z3\u00b7z3\u00b7z4 -0.0011\u00b7z3\u00b7z4\u00b7z4 -0.0160\u00b7z4\u00b7z4\u00b7z4 + 0.1985\u00b7sin(z1) + 0.4598\u00b7cos(z1) + 2.6628\u00b7sin(z2) + 0.7516\u00b7cos(z2) + 3.6245\u00b7sin(z3) + 1.0122\u00b7cos(z3) + 2.5498\u00b7sin(z4) + 0.7108\u00b7cos(z4); dz2/dt = 2.0604\u00b71 + 0.9366\u00b7z1 + 1.2876\u00b7z2 + 1.4652\u00b7z3 + 0.8058\u00b7z4 + 0.7124\u00b7z1\u00b7z1 + 0.4007\u00b7z1\u00b7z2 + 0.5257\u00b7z1\u00b7z3 + 0.3754\u00b7z1\u00b7z4 + 0.2358\u00b7z2\u00b7z2 + 0.3968\u00b7z2\u00b7z3 + 0.2071\u00b7z2\u00b7z4 + 0.5915\u00b7z3\u00b7z3 + 0.3364\u00b7z3\u00b7z4 + 0.1571\u00b7z4\u00b7z4 + 0.0445\u00b7z1\u00b7z1\u00b7z1 + 0.0036\u00b7z1\u00b7z1\u00b7z2 + 0.0657\u00b7z1\u00b7z1\u00b7z3 + 0.0027\u00b7z1\u00b7z1\u00b7z4 -0.0342\u00b7z1\u00b7z2\u00b7z2 + 0.0054\u00b7z1\u00b7z2\u00b7z3 -0.0370\u00b7z1\u00b7z2\u00b7z4 + 0.0567\u00b7z1\u00b7z3\u00b7z3 + 0.0026\u00b7z1\u00b7z3\u00b7z4 -0.0419\u00b7z1\u00b7z4\u00b7z4 -0.0604\u00b7z2\u00b7z2\u00b7z2 -0.0348\u00b7z2\u00b7z2\u00b7z3 -0.0648\u00b7z2\u00b7z2\u00b7z4 + 0.0013\u00b7z2\u00b7z3\u00b7z3 -0.0396\u00b7z2\u00b7z3\u00b7z4 -0.0706\u00b7z2\u00b7z4\u00b7z4 + 0.0489\u00b7z3\u00b7z3\u00b7z3 -0.0055\u00b7z3\u00b7z3\u00b7z4 -0.0472\u00b7z3\u00b7z4\u00b7z4 -0.0791\u00b7z4\u00b7z4\u00b7z4 -0.6613\u00b7sin(z1) -0.1381\u00b7cos(z1) + 1.0753\u00b7sin(z2) -0.2272\u00b7cos(z2) + 1.4672\u00b7sin(z3) + 0.6209\u00b7cos(z3) + 0.9101\u00b7sin(z4) + 0.6880\u00b7cos(z4); dz3/dt = 1.7875\u00b71 + 0.3696\u00b7z1 + 0.9822\u00b7z2 + 1.3041\u00b7z3 + 0.7085\u00b7z4 + 0.5830\u00b7z1\u00b7z1 + 0.2940\u00b7z1\u00b7z2 + 0.3627\u00b7z1\u00b7z3 + 0.3305\u00b7z1\u00b7z4 + 0.1650\u00b7z2\u00b7z2 + 0.2775\u00b7z2\u00b7z3 + 0.1773\u00b7z2\u00b7z4 + 0.4142\u00b7z3\u00b7z3 + 0.2834\u00b7z3\u00b7z4 + 0.2084\u00b7z4\u00b7z4 + 0.0128\u00b7z1\u00b7z1\u00b7z1 -0.0100\u00b7z1\u00b7z1\u00b7z2 + 0.0337\u00b7z1\u00b7z1\u00b7z3 -0.0160\u00b7z1\u00b7z1\u00b7z4 -0.0338\u00b7z1\u00b7z2\u00b7z2 -0.0038\u00b7z1\u00b7z2\u00b7z3 -0.0370\u00b7z1\u00b7z2\u00b7z4 + 0.0351\u00b7z1\u00b7z3\u00b7z3 -0.0054\u00b7z1\u00b7z3\u00b7z4 -0.0411\u00b7z1\u00b7z4\u00b7z4 -0.0524\u00b7z2\u00b7z2\u00b7z2 -0.0323\u00b7z2\u00b7z2\u00b7z3 -0.0553\u00b7z2\u00b7z2\u00b7z4 -0.0039\u00b7z2\u00b7z3\u00b7z3 -0.0340\u00b7z2\u00b7z3\u00b7z4 -0.0579\u00b7z2\u00b7z4\u00b7z4 + 0.0335\u00b7z3\u00b7z3\u00b7z3 -0.0043\u00b7z3\u00b7z3\u00b7z4 -0.0347\u00b7z3\u00b7z4\u00b7z4 -0.0599\u00b7z4\u00b7z4\u00b7z4 -1.0558\u00b7sin(z1) + 0.0854\u00b7cos(z1) + 0.6740\u00b7sin(z2) + 0.1208\u00b7cos(z2) + 1.6512\u00b7sin(z3) + 0.9095\u00b7cos(z3) + 0.5889\u00b7sin(z4) + 0.3311\u00b7cos(z4); dz4/dt = 1.8075\u00b71 + 1.7478\u00b7z1 + 1.7263\u00b7z2 + 2.0209\u00b7z3 + 1.6819\u00b7z4 + 0.7200\u00b7z1\u00b7z1 + 0.1620\u00b7z1\u00b7z2 -0.1579\u00b7z1\u00b7z3 -0.1627\u00b7z1\u00b7z4 + 0.2138\u00b7z2\u00b7z2 + 0.3156\u00b7z2\u00b7z3 + 0.0523\u00b7z2\u00b7z4 + 0.4682\u00b7z3\u00b7z3 + 0.0874\u00b7z3\u00b7z4 -0.1555\u00b7z4\u00b7z4 + 0.1819\u00b7z1\u00b7z1\u00b7z1 + 0.0703\u00b7z1\u00b7z1\u00b7z2 + 0.1728\u00b7z1\u00b7z1\u00b7z3 + 0.0705\u00b7z1\u00b7z1\u00b7z4 -0.0142\u00b7z1\u00b7z2\u00b7z2 + 0.0506\u00b7z1\u00b7z2\u00b7z3 -0.0223\u00b7z1\u00b7z2\u00b7z4 + 0.1140\u00b7z1\u00b7z3\u00b7z3 + 0.0337\u00b7z1\u00b7z3\u00b7z4 -0.0363\u00b7z1\u00b7z4\u00b7z4 -0.0771\u00b7z2\u00b7z2\u00b7z2 -0.0358\u00b7z2\u00b7z2\u00b7z3 -0.0876\u00b7z2\u00b7z2\u00b7z4 + 0.0105\u00b7z2\u00b7z3\u00b7z3 -0.0520\u00b7z2\u00b7z3\u00b7z4 -0.1019\u00b7z2\u00b7z4\u00b7z4 + 0.0560\u00b7z3\u00b7z3\u00b7z3 -0.0165\u00b7z3\u00b7z3\u00b7z4 -0.0745\u00b7z3\u00b7z4\u00b7z4 -0.1213\u00b7z4\u00b7z4\u00b7z4 -2.9733\u00b7sin(z1) + 0.1031\u00b7cos(z1) -2.4769\u00b7sin(z2) -0.7911\u00b7cos(z2) + 2.2472\u00b7sin(z3) + 1.0517\u00b7cos(z3) + 1.8188\u00b7sin(z4) + 1.3627\u00b7cos(z4)",
+      "variable": "latent_z",
+      "fit_error": 1.6731000611300726,
+      "complexity": 4,
+      "method": "sindy",
+      "timestamp": "2026-05-07 13:24:08"
+    },
+    {
+      "equation_str": "dz1/dt = 5.8488\u00b71 + 0.8996\u00b7z1 + 2.6534\u00b7z2 + 8.5986\u00b7z3 -1.4897\u00b7z4 + 0.1279\u00b7z1\u00b7z1 + 0.1241\u00b7z1\u00b7z2 + 0.1283\u00b7z1\u00b7z3 + 0.1523\u00b7z1\u00b7z4 + 0.1264\u00b7z2\u00b7z2 + 0.1791\u00b7z2\u00b7z3 + 0.1706\u00b7z2\u00b7z4 + 0.5226\u00b7z3\u00b7z3 + 0.2470\u00b7z3\u00b7z4 + 0.1407\u00b7z4\u00b7z4 + 0.0209\u00b7z1\u00b7z1\u00b7z1 + 0.0209\u00b7z1\u00b7z1\u00b7z2 + 0.0213\u00b7z1\u00b7z1\u00b7z3 + 0.0210\u00b7z1\u00b7z1\u00b7z4 + 0.0209\u00b7z1\u00b7z2\u00b7z2 + 0.0212\u00b7z1\u00b7z2\u00b7z3 + 0.0210\u00b7z1\u00b7z2\u00b7z4 + 0.0210\u00b7z1\u00b7z3\u00b7z3 + 0.0214\u00b7z1\u00b7z3\u00b7z4 + 0.0214\u00b7z1\u00b7z4\u00b7z4 + 0.0209\u00b7z2\u00b7z2\u00b7z2 + 0.0213\u00b7z2\u00b7z2\u00b7z3 + 0.0210\u00b7z2\u00b7z2\u00b7z4 + 0.0223\u00b7z2\u00b7z3\u00b7z3 + 0.0219\u00b7z2\u00b7z3\u00b7z4 + 0.0216\u00b7z2\u00b7z4\u00b7z4 + 0.0328\u00b7z3\u00b7z3\u00b7z3 + 0.0256\u00b7z3\u00b7z3\u00b7z4 + 0.0226\u00b7z3\u00b7z4\u00b7z4 + 0.0214\u00b7z4\u00b7z4\u00b7z4 + 3.8449\u00b7sin(z1) + 6.0509\u00b7cos(z1) + 72.4059\u00b7sin(z2) + 6.0854\u00b7cos(z2) + 91.6726\u00b7sin(z3) -0.3641\u00b7cos(z3) -50.7735\u00b7sin(z4) + 5.9739\u00b7cos(z4); dz2/dt = 5.8231\u00b71 + 0.8684\u00b7z1 + 2.5924\u00b7z2 + 8.5101\u00b7z3 -1.4091\u00b7z4 + 0.1252\u00b7z1\u00b7z1 + 0.1214\u00b7z1\u00b7z2 + 0.1252\u00b7z1\u00b7z3 + 0.1489\u00b7z1\u00b7z4 + 0.1237\u00b7z2\u00b7z2 + 0.1750\u00b7z2\u00b7z3 + 0.1668\u00b7z2\u00b7z4 + 0.5137\u00b7z3\u00b7z3 + 0.2435\u00b7z3\u00b7z4 + 0.1391\u00b7z4\u00b7z4 + 0.0205\u00b7z1\u00b7z1\u00b7z1 + 0.0205\u00b7z1\u00b7z1\u00b7z2 + 0.0209\u00b7z1\u00b7z1\u00b7z3 + 0.0206\u00b7z1\u00b7z1\u00b7z4 + 0.0205\u00b7z1\u00b7z2\u00b7z2 + 0.0208\u00b7z1\u00b7z2\u00b7z3 + 0.0205\u00b7z1\u00b7z2\u00b7z4 + 0.0206\u00b7z1\u00b7z3\u00b7z3 + 0.0210\u00b7z1\u00b7z3\u00b7z4 + 0.0210\u00b7z1\u00b7z4\u00b7z4 + 0.0205\u00b7z2\u00b7z2\u00b7z2 + 0.0208\u00b7z2\u00b7z2\u00b7z3 + 0.0206\u00b7z2\u00b7z2\u00b7z4 + 0.0218\u00b7z2\u00b7z3\u00b7z3 + 0.0215\u00b7z2\u00b7z3\u00b7z4 + 0.0211\u00b7z2\u00b7z4\u00b7z4 + 0.0321\u00b7z3\u00b7z3\u00b7z3 + 0.0251\u00b7z3\u00b7z3\u00b7z4 + 0.0222\u00b7z3\u00b7z4\u00b7z4 + 0.0209\u00b7z4\u00b7z4\u00b7z4 + 3.2845\u00b7sin(z1) + 6.0228\u00b7cos(z1) + 70.6932\u00b7sin(z2) + 6.0575\u00b7cos(z2) + 91.1663\u00b7sin(z3) -0.2920\u00b7cos(z3) -48.6345\u00b7sin(z4) + 5.9234\u00b7cos(z4); dz3/dt = 5.1515\u00b71 + 0.6128\u00b7z1 + 1.9421\u00b7z2 + 7.0129\u00b7z3 -0.4172\u00b7z4 + 0.1045\u00b7z1\u00b7z1 + 0.1016\u00b7z1\u00b7z2 + 0.1023\u00b7z1\u00b7z3 + 0.1198\u00b7z1\u00b7z4 + 0.1033\u00b7z2\u00b7z2 + 0.1403\u00b7z2\u00b7z3 + 0.1336\u00b7z2\u00b7z4 + 0.4026\u00b7z3\u00b7z3 + 0.1968\u00b7z3\u00b7z4 + 0.1176\u00b7z4\u00b7z4 + 0.0170\u00b7z1\u00b7z1\u00b7z1 + 0.0170\u00b7z1\u00b7z1\u00b7z2 + 0.0173\u00b7z1\u00b7z1\u00b7z3 + 0.0171\u00b7z1\u00b7z1\u00b7z4 + 0.0170\u00b7z1\u00b7z2\u00b7z2 + 0.0173\u00b7z1\u00b7z2\u00b7z3 + 0.0171\u00b7z1\u00b7z2\u00b7z4 + 0.0171\u00b7z1\u00b7z3\u00b7z3 + 0.0174\u00b7z1\u00b7z3\u00b7z4 + 0.0174\u00b7z1\u00b7z4\u00b7z4 + 0.0170\u00b7z2\u00b7z2\u00b7z2 + 0.0173\u00b7z2\u00b7z2\u00b7z3 + 0.0171\u00b7z2\u00b7z2\u00b7z4 + 0.0181\u00b7z2\u00b7z3\u00b7z3 + 0.0178\u00b7z2\u00b7z3\u00b7z4 + 0.0175\u00b7z2\u00b7z4\u00b7z4 + 0.0260\u00b7z3\u00b7z3\u00b7z3 + 0.0206\u00b7z3\u00b7z3\u00b7z4 + 0.0184\u00b7z3\u00b7z4\u00b7z4 + 0.0174\u00b7z4\u00b7z4\u00b7z4 -1.6003\u00b7sin(z1) + 5.3144\u00b7cos(z1) + 50.4734\u00b7sin(z2) + 5.3441\u00b7cos(z2) + 77.0881\u00b7sin(z3) + 0.5019\u00b7cos(z3) -23.5734\u00b7sin(z4) + 5.2095\u00b7cos(z4); dz4/dt = 5.2805\u00b71 + 0.7847\u00b7z1 + 2.2718\u00b7z2 + 7.4538\u00b7z3 -0.8266\u00b7z4 + 0.1195\u00b7z1\u00b7z1 + 0.1163\u00b7z1\u00b7z2 + 0.1196\u00b7z1\u00b7z3 + 0.1385\u00b7z1\u00b7z4 + 0.1184\u00b7z2\u00b7z2 + 0.1628\u00b7z2\u00b7z3 + 0.1538\u00b7z2\u00b7z4 + 0.4483\u00b7z3\u00b7z3 + 0.2128\u00b7z3\u00b7z4 + 0.1234\u00b7z4\u00b7z4 + 0.0195\u00b7z1\u00b7z1\u00b7z1 + 0.0195\u00b7z1\u00b7z1\u00b7z2 + 0.0199\u00b7z1\u00b7z1\u00b7z3 + 0.0196\u00b7z1\u00b7z1\u00b7z4 + 0.0195\u00b7z1\u00b7z2\u00b7z2 + 0.0198\u00b7z1\u00b7z2\u00b7z3 + 0.0196\u00b7z1\u00b7z2\u00b7z4 + 0.0197\u00b7z1\u00b7z3\u00b7z3 + 0.0200\u00b7z1\u00b7z3\u00b7z4 + 0.0200\u00b7z1\u00b7z4\u00b7z4 + 0.0195\u00b7z2\u00b7z2\u00b7z2 + 0.0198\u00b7z2\u00b7z2\u00b7z3 + 0.0196\u00b7z2\u00b7z2\u00b7z4 + 0.0208\u00b7z2\u00b7z3\u00b7z3 + 0.0204\u00b7z2\u00b7z3\u00b7z4 + 0.0201\u00b7z2\u00b7z4\u00b7z4 + 0.0297\u00b7z3\u00b7z3\u00b7z3 + 0.0235\u00b7z3\u00b7z3\u00b7z4 + 0.0210\u00b7z3\u00b7z4\u00b7z4 + 0.0199\u00b7z4\u00b7z4\u00b7z4 + 1.4754\u00b7sin(z1) + 5.4565\u00b7cos(z1) + 59.6608\u00b7sin(z2) + 5.4838\u00b7cos(z2) + 79.1383\u00b7sin(z3) + 0.1518\u00b7cos(z3) -34.5157\u00b7sin(z4) + 5.5334\u00b7cos(z4)",
+      "variable": "latent_z",
+      "fit_error": 72.1218930526816,
+      "complexity": 4,
+      "method": "sindy",
+      "timestamp": "2026-05-07 13:24:08"
+    },
+    {
+      "equation_str": "dz1/dt = 5.6397\u00b71 + 3.1874\u00b7z1 + 3.6503\u00b7z2 + 5.3667\u00b7z3 + 3.9490\u00b7z4 + 0.1172\u00b7z1\u00b7z1 + 0.1422\u00b7z1\u00b7z2 + 0.4820\u00b7z1\u00b7z3 + 0.2578\u00b7z1\u00b7z4 + 0.1684\u00b7z2\u00b7z2 + 0.5223\u00b7z2\u00b7z3 + 0.2883\u00b7z2\u00b7z4 + 1.0377\u00b7z3\u00b7z3 + 0.6935\u00b7z3\u00b7z4 + 0.4303\u00b7z4\u00b7z4 -0.0562\u00b7z1\u00b7z1\u00b7z1 -0.0544\u00b7z1\u00b7z1\u00b7z2 -0.0338\u00b7z1\u00b7z1\u00b7z3 -0.0465\u00b7z1\u00b7z1\u00b7z4 -0.0525\u00b7z1\u00b7z2\u00b7z2 -0.0302\u00b7z1\u00b7z2\u00b7z3 -0.0441\u00b7z1\u00b7z2\u00b7z4 + 0.0125\u00b7z1\u00b7z3\u00b7z3 -0.0155\u00b7z1\u00b7z3\u00b7z4 -0.0339\u00b7z1\u00b7z4\u00b7z4 -0.0505\u00b7z2\u00b7z2\u00b7z2 -0.0265\u00b7z2\u00b7z2\u00b7z3 -0.0416\u00b7z2\u00b7z2\u00b7z4 + 0.0188\u00b7z2\u00b7z3\u00b7z3 -0.0110\u00b7z2\u00b7z3\u00b7z4 -0.0307\u00b7z2\u00b7z4\u00b7z4 + 0.0955\u00b7z3\u00b7z3\u00b7z3 + 0.0440\u00b7z3\u00b7z3\u00b7z4 + 0.0075\u00b7z3\u00b7z4\u00b7z4 -0.0177\u00b7z4\u00b7z4\u00b7z4 + 8.1817\u00b7sin(z1) + 0.4072\u00b7cos(z1) + 8.7403\u00b7sin(z2) + 0.3984\u00b7cos(z2) -1.9187\u00b7sin(z3) + 0.5808\u00b7cos(z3) -4.0862\u00b7sin(z4) -0.0693\u00b7cos(z4); dz2/dt = 5.5567\u00b71 + 3.0895\u00b7z1 + 3.5525\u00b7z2 + 5.2619\u00b7z3 + 3.8201\u00b7z4 + 0.1127\u00b7z1\u00b7z1 + 0.1368\u00b7z1\u00b7z2 + 0.4669\u00b7z1\u00b7z3 + 0.2487\u00b7z1\u00b7z4 + 0.1621\u00b7z2\u00b7z2 + 0.5060\u00b7z2\u00b7z3 + 0.2781\u00b7z2\u00b7z4 + 1.0096\u00b7z3\u00b7z3 + 0.6715\u00b7z3\u00b7z4 + 0.4155\u00b7z4\u00b7z4 -0.0546\u00b7z1\u00b7z1\u00b7z1 -0.0529\u00b7z1\u00b7z1\u00b7z2 -0.0329\u00b7z1\u00b7z1\u00b7z3 -0.0452\u00b7z1\u00b7z1\u00b7z4 -0.0510\u00b7z1\u00b7z2\u00b7z2 -0.0295\u00b7z1\u00b7z2\u00b7z3 -0.0429\u00b7z1\u00b7z2\u00b7z4 + 0.0118\u00b7z1\u00b7z3\u00b7z3 -0.0153\u00b7z1\u00b7z3\u00b7z4 -0.0331\u00b7z1\u00b7z4\u00b7z4 -0.0490\u00b7z2\u00b7z2\u00b7z2 -0.0259\u00b7z2\u00b7z2\u00b7z3 -0.0405\u00b7z2\u00b7z2\u00b7z4 + 0.0179\u00b7z2\u00b7z3\u00b7z3 -0.0110\u00b7z2\u00b7z3\u00b7z4 -0.0300\u00b7z2\u00b7z4\u00b7z4 + 0.0923\u00b7z3\u00b7z3\u00b7z3 + 0.0423\u00b7z3\u00b7z3\u00b7z4 + 0.0069\u00b7z3\u00b7z4\u00b7z4 -0.0175\u00b7z4\u00b7z4\u00b7z4 + 8.1222\u00b7sin(z1) + 0.5001\u00b7cos(z1) + 8.7921\u00b7sin(z2) + 0.4918\u00b7cos(z2) -1.4970\u00b7sin(z3) + 0.6196\u00b7cos(z3) -3.7685\u00b7sin(z4) + 0.0320\u00b7cos(z4); dz3/dt = 4.1619\u00b71 + 1.9996\u00b7z1 + 2.6028\u00b7z2 + 4.7873\u00b7z3 + 1.7588\u00b7z4 + 0.0627\u00b7z1\u00b7z1 + 0.0747\u00b7z1\u00b7z2 + 0.2661\u00b7z1\u00b7z3 + 0.1508\u00b7z1\u00b7z4 + 0.0878\u00b7z2\u00b7z2 + 0.2890\u00b7z2\u00b7z3 + 0.1648\u00b7z2\u00b7z4 + 0.6032\u00b7z3\u00b7z3 + 0.3876\u00b7z3\u00b7z4 + 0.2631\u00b7z4\u00b7z4 -0.0340\u00b7z1\u00b7z1\u00b7z1 -0.0330\u00b7z1\u00b7z1\u00b7z2 -0.0208\u00b7z1\u00b7z1\u00b7z3 -0.0284\u00b7z1\u00b7z1\u00b7z4 -0.0318\u00b7z1\u00b7z2\u00b7z2 -0.0187\u00b7z1\u00b7z2\u00b7z3 -0.0270\u00b7z1\u00b7z2\u00b7z4 + 0.0065\u00b7z1\u00b7z3\u00b7z3 -0.0101\u00b7z1\u00b7z3\u00b7z4 -0.0211\u00b7z1\u00b7z4\u00b7z4 -0.0306\u00b7z2\u00b7z2\u00b7z2 -0.0165\u00b7z2\u00b7z2\u00b7z3 -0.0255\u00b7z2\u00b7z2\u00b7z4 + 0.0103\u00b7z2\u00b7z3\u00b7z3 -0.0075\u00b7z2\u00b7z3\u00b7z4 -0.0192\u00b7z2\u00b7z4\u00b7z4 + 0.0564\u00b7z3\u00b7z3\u00b7z3 + 0.0250\u00b7z3\u00b7z3\u00b7z4 + 0.0035\u00b7z3\u00b7z4\u00b7z4 -0.0118\u00b7z4\u00b7z4\u00b7z4 + 6.3121\u00b7sin(z1) + 1.1867\u00b7cos(z1) + 9.6367\u00b7sin(z2) + 1.2501\u00b7cos(z2) + 8.5636\u00b7sin(z3) + 1.3793\u00b7cos(z3) -7.5402\u00b7sin(z4) + 0.7015\u00b7cos(z4); dz4/dt = 5.5229\u00b71 + 2.7680\u00b7z1 + 3.2053\u00b7z2 + 4.7394\u00b7z3 + 3.6650\u00b7z4 + 0.1000\u00b7z1\u00b7z1 + 0.1211\u00b7z1\u00b7z2 + 0.4251\u00b7z1\u00b7z3 + 0.2014\u00b7z1\u00b7z4 + 0.1432\u00b7z2\u00b7z2 + 0.4608\u00b7z2\u00b7z3 + 0.2272\u00b7z2\u00b7z4 + 0.9676\u00b7z3\u00b7z3 + 0.5799\u00b7z3\u00b7z4 + 0.3240\u00b7z4\u00b7z4 -0.0448\u00b7z1\u00b7z1\u00b7z1 -0.0434\u00b7z1\u00b7z1\u00b7z2 -0.0275\u00b7z1\u00b7z1\u00b7z3 -0.0374\u00b7z1\u00b7z1\u00b7z4 -0.0419\u00b7z1\u00b7z2\u00b7z2 -0.0246\u00b7z1\u00b7z2\u00b7z3 -0.0356\u00b7z1\u00b7z2\u00b7z4 + 0.0095\u00b7z1\u00b7z3\u00b7z3 -0.0137\u00b7z1\u00b7z3\u00b7z4 -0.0277\u00b7z1\u00b7z4\u00b7z4 -0.0403\u00b7z2\u00b7z2\u00b7z2 -0.0216\u00b7z2\u00b7z2\u00b7z3 -0.0336\u00b7z2\u00b7z2\u00b7z4 + 0.0148\u00b7z2\u00b7z3\u00b7z3 -0.0102\u00b7z2\u00b7z3\u00b7z4 -0.0254\u00b7z2\u00b7z4\u00b7z4 + 0.0798\u00b7z3\u00b7z3\u00b7z3 + 0.0331\u00b7z3\u00b7z3\u00b7z4 + 0.0038\u00b7z3\u00b7z4\u00b7z4 -0.0153\u00b7z4\u00b7z4\u00b7z4 + 9.9176\u00b7sin(z1) + 1.3828\u00b7cos(z1) + 10.8423\u00b7sin(z2) + 1.3383\u00b7cos(z2) -0.0383\u00b7sin(z3) + 0.4069\u00b7cos(z3) + 3.4264\u00b7sin(z4) + 1.2301\u00b7cos(z4)",
+      "variable": "latent_z",
+      "fit_error": 1.68168551225603,
+      "complexity": 4,
+      "method": "sindy",
+      "timestamp": "2026-05-07 13:24:08"
+    },
+    {
+      "equation_str": "dz1/dt = 0; dz2/dt = 0; dz3/dt = 0; dz4/dt = 0",
+      "variable": "latent_z",
+      "fit_error": 410.25641025641005,
+      "complexity": 4,
+      "method": "sindy",
+      "timestamp": "2026-05-07 13:24:08"
+    },
+    {
+      "equation_str": "dz1/dt = 0; dz2/dt = 0; dz3/dt = 0; dz4/dt = 0",
+      "variable": "latent_z",
+      "fit_error": 820.5128205128203,
+      "complexity": 4,
+      "method": "sindy",
+      "timestamp": "2026-05-07 13:24:08"
+    },
+    {
+      "equation_str": "du/dt += -0.048853 * dp/dx",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:10"
+    },
+    {
+      "equation_str": "du/dt += -0.048853 * dp/dx",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:10"
+    },
+    {
+      "equation_str": "dv/dt += -0.049203 * dp/dy",
+      "variable": "dv/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:10"
+    },
+    {
+      "equation_str": "dv/dt += -0.049203 * dp/dy",
+      "variable": "dv/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:10"
+    },
+    {
+      "equation_str": "du/dt += -0.092673 * u*du/dx+v*du/dy",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:10"
+    },
+    {
+      "equation_str": "du/dt += -0.977098 * du/dx",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:11"
+    },
+    {
+      "equation_str": "du/dt += -0.180186 * dp/dx",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:11"
+    },
+    {
+      "equation_str": "du/dt += -0.180186 * dp/dx",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:11"
+    },
+    {
+      "equation_str": "dv/dt += -0.250077 * dp/dy",
+      "variable": "dv/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:11"
+    },
+    {
+      "equation_str": "dv/dt += -0.250077 * dp/dy",
+      "variable": "dv/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:11"
+    },
+    {
+      "equation_str": "du/dt += -0.021592 * dp/dx",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:11"
+    },
+    {
+      "equation_str": "du/dt += -0.021592 * dp/dx",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:11"
+    },
+    {
+      "equation_str": "du/dt += -0.042833 * u*du/dx+v*du/dy",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:11"
+    },
+    {
+      "equation_str": "du/dt += +452033965896119067017549350526618720007312377847723168930704705829679824286004857902467701841529933495265086532015357952.000000 * v",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:13"
+    },
+    {
+      "equation_str": "dv/dt += +165253252709472703737230648141448015422238895654285652759717293936745148854967734083692786726188562733477969293748469760.000000 * v",
+      "variable": "dv/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:13"
+    },
+    {
+      "equation_str": "du/dt += -142146232456033180265794025571601056771406461072818384950570047035713266778564840212378180589713558765622520571479719936.000000 * du/dx",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:13"
+    },
+    {
+      "equation_str": "dv/dt += -96792074975089355992535060435197920558640989227183111178235839200756707450861351064908171302181738710367295177966485504.000000 * du/dx",
+      "variable": "dv/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:13"
+    },
+    {
+      "equation_str": "du/dt += -77858845921376587409967318120446864024990939467126107603202979058347736614547856806394941894989160819518693553473585152.000000 * dv/dx",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:13"
+    },
+    {
+      "equation_str": "dv/dt += -6.176859 * v*v",
+      "variable": "dv/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:15"
+    },
+    {
+      "equation_str": "du/dt += -0.084514 * dp/dx",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:15"
+    },
+    {
+      "equation_str": "du/dt += -0.084514 * dp/dx",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:15"
+    },
+    {
+      "equation_str": "du/dt += -0.252072 * u*du/dx+v*du/dy",
+      "variable": "du/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:15"
+    },
+    {
+      "equation_str": "dv/dt += -0.353406 * dp/dy",
+      "variable": "dv/dt",
+      "fit_error": 0.0,
+      "complexity": 1,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:15"
+    },
+    {
+      "equation_str": "du/dt += -0.048853*dp/dx",
+      "variable": "u",
+      "fit_error": Infinity,
+      "complexity": 0,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:15"
+    },
+    {
+      "equation_str": "du/dt += -0.048853*dp/dx",
+      "variable": "u",
+      "fit_error": Infinity,
+      "complexity": 0,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:15"
+    },
+    {
+      "equation_str": "dv/dt += -0.049203*dp/dy",
+      "variable": "v",
+      "fit_error": Infinity,
+      "complexity": 0,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:15"
+    },
+    {
+      "equation_str": "dv/dt += -0.049203*dp/dy",
+      "variable": "v",
+      "fit_error": Infinity,
+      "complexity": 0,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:15"
+    },
+    {
+      "equation_str": "du/dt += -0.092673*u*du/dx+v*du/dy",
+      "variable": "u",
+      "fit_error": Infinity,
+      "complexity": 0,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:15"
+    },
+    {
+      "equation_str": "du/dt += -0.977098*du/dx",
+      "variable": "u",
+      "fit_error": Infinity,
+      "complexity": 0,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:15"
+    },
+    {
+      "equation_str": "du/dt += -0.180186*dp/dx",
+      "variable": "u",
+      "fit_error": Infinity,
+      "complexity": 0,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:15"
+    },
+    {
+      "equation_str": "du/dt += -0.180186*dp/dx",
+      "variable": "u",
+      "fit_error": Infinity,
+      "complexity": 0,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:15"
+    },
+    {
+      "equation_str": "dv/dt += -0.250077*dp/dy",
+      "variable": "v",
+      "fit_error": Infinity,
+      "complexity": 0,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:15"
+    },
+    {
+      "equation_str": "dv/dt += -0.250077*dp/dy",
+      "variable": "v",
+      "fit_error": Infinity,
+      "complexity": 0,
+      "method": "physics_sindy",
+      "timestamp": "2026-05-07 13:24:15"
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H0001",
+      "description": "Latent turbulence dynamics can be described by a sparse system with 4 equations. Fit error: 1.67e+00",
+      "status": "testing",
+      "confidence": 0.0,
+      "timestamp": "2026-05-07 13:24:08"
+    },
+    {
+      "id": "H0002",
+      "description": "Latent turbulence dynamics can be described by a sparse system with 4 equations. Fit error: 7.21e+01",
+      "status": "testing",
+      "confidence": 0.0,
+      "timestamp": "2026-05-07 13:24:08"
+    },
+    {
+      "id": "H0003",
+      "description": "Latent turbulence dynamics can be described by a sparse system with 4 equations. Fit error: 1.68e+00",
+      "status": "testing",
+      "confidence": 0.0,
+      "timestamp": "2026-05-07 13:24:08"
+    },
+    {
+      "id": "H0004",
+      "description": "Latent turbulence dynamics can be described by a sparse system with 4 equations. Fit error: 4.10e+02",
+      "status": "testing",
+      "confidence": 0.0,
+      "timestamp": "2026-05-07 13:24:08"
+    },
+    {
+      "id": "H0005",
+      "description": "Latent turbulence dynamics can be described by a sparse system with 4 equations. Fit error: 8.21e+02",
+      "status": "testing",
+      "confidence": 0.0,
+      "timestamp": "2026-05-07 13:24:08"
+    },
+    {
+      "id": "H0006",
+      "description": "The coefficient of dp/dx in du/dt deviates from expected (-1.0000) to discovered (-0.0489). Pressure gradient force (x)",
+      "status": "testing",
+      "confidence": 0.8,
+      "timestamp": "2026-05-07 13:24:10"
+    },
+    {
+      "id": "H0007",
+      "description": "The coefficient of dp/dx in du/dt deviates from expected (-1.0000) to discovered (-0.0489). Pressure gradient force (x)",
+      "status": "testing",
+      "confidence": 0.8,
+      "timestamp": "2026-05-07 13:24:10"
+    },
+    {
+      "id": "H0008",
+      "description": "The coefficient of dp/dy in dv/dt deviates from expected (-1.0000) to discovered (-0.0492). Pressure gradient force (y)",
+      "status": "testing",
+      "confidence": 0.8,
+      "timestamp": "2026-05-07 13:24:10"
+    },
+    {
+      "id": "H0009",
+      "description": "The coefficient of dp/dy in dv/dt deviates from expected (-1.0000) to discovered (-0.0492). Pressure gradient force (y)",
+      "status": "testing",
+      "confidence": 0.8,
+      "timestamp": "2026-05-07 13:24:10"
+    },
+    {
+      "id": "H0010",
+      "description": "The coefficient of u*du/dx+v*du/dy in du/dt deviates from expected (-1.0000) to discovered (-0.0927). Novel interaction: u*du/dx+v*du/dy",
+      "status": "testing",
+      "confidence": 0.8,
+      "timestamp": "2026-05-07 13:24:10"
+    },
+    {
+      "id": "H0011",
+      "description": "The equation for du/dt contains a previously unmodeled term: -0.977098*du/dx. Physical interpretation: Novel interaction: du/dx",
+      "status": "testing",
+      "confidence": 0.8,
+      "timestamp": "2026-05-07 13:24:11"
+    },
+    {
+      "id": "H0012",
+      "description": "The coefficient of dp/dx in du/dt deviates from expected (-1.0000) to discovered (-0.1802). Pressure gradient force (x)",
+      "status": "testing",
+      "confidence": 0.8,
+      "timestamp": "2026-05-07 13:24:11"
+    },
+    {
+      "id": "H0013",
+      "description": "The coefficient of dp/dx in du/dt deviates from expected (-1.0000) to discovered (-0.1802). Pressure gradient force (x)",
+      "status": "testing",
+      "confidence": 0.8,
+      "timestamp": "2026-05-07 13:24:11"
+    },
+    {
+      "id": "H0014",
+      "description": "The coefficient of dp/dy in dv/dt deviates from expected (-1.0000) to discovered (-0.2501). Pressure gradient force (y)",
+      "status": "testing",
+      "confidence": 0.8,
+      "timestamp": "2026-05-07 13:24:11"
+    },
+    {
+      "id": "H0015",
+      "description": "The coefficient of dp/dy in dv/dt deviates from expected (-1.0000) to discovered (-0.2501). Pressure gradient force (y)",
+      "status": "testing",
+      "confidence": 0.8,
+      "timestamp": "2026-05-07 13:24:11"
+    },
+    {
+      "id": "H0016",
+      "description": "The coefficient of dp/dx in du/dt deviates from expected (-1.0000) to discovered (-0.0216). Pressure gradient force (x)",
+      "status": "testing",
+      "confidence": 0.8,
+      "timestamp": "2026-05-07 13:24:11"
+    },
+    {
+      "id": "H0017",
+      "description": "The coefficient of dp/dx in du/dt deviates from expected (-1.0000) to discovered (-0.0216). Pressure gradient force (x)",
+      "status": "testing",
+      "confidence": 0.8,
+      "timestamp": "2026-05-07 13:24:11"
+    },
+    {
+      "id": "H0018",
+      "description": "The coefficient of u*du/dx+v*du/dy in du/dt deviates from expected (-1.0000) to discovered (-0.0428). Novel interaction: u*du/dx+v*du/dy",
+      "status": "testing",
+      "confidence": 0.8,
+      "timestamp": "2026-05-07 13:24:11"
+    },
+    {
+      "id": "H0019",
+      "description": "The equation for du/dt contains a previously unmodeled term: +452033965896119067017549350526618720007312377847723168930704705829679824286004857902467701841529933495265086532015357952.000000*v. Physical interpretation: Novel interaction: v",
+      "status": "testing",
+      "confidence": 0.8,
+      "timestamp": "2026-05-07 13:24:13"
+    },
+    {
+      "id": "H0020",
+      "description": "The equation for dv/dt contains a previously unmodeled term: +165253252709472703737230648141448015422238895654285652759717293936745148854967734083692786726188562733477969293748469760.000000*v. Physical interpretation: Novel interaction: v",
+      "status": "testing",
+      "confidence": 0.8,
+      "timestamp": "2026-05-07 13:24:13"
+    },
+    {
+      "id": "H0021",
+      "description": "The equation for du/dt contains a previously unmodeled term: -142146232456033180265794025571601056771406461072818384950570047035713266778564840212378180589713558765622520571479719936.000000*du/dx. Physical interpretation: Novel interaction: du/dx",
+      "status": "proposed",
+      "confidence": 1.0,
+      "timestamp": "2026-05-07 13:24:13"
+    },
+    {
+      "id": "H0022",
+      "description": "The equation for dv/dt contains a previously unmodeled term: -96792074975089355992535060435197920558640989227183111178235839200756707450861351064908171302181738710367295177966485504.000000*du/dx. Physical interpretation: Novel interaction: du/dx",
+      "status": "proposed",
+      "confidence": 1.0,
+      "timestamp": "2026-05-07 13:24:13"
+    },
+    {
+      "id": "H0023",
+      "description": "The equation for du/dt contains a previously unmodeled term: -77858845921376587409967318120446864024990939467126107603202979058347736614547856806394941894989160819518693553473585152.000000*dv/dx. Physical interpretation: Novel interaction: dv/dx",
+      "status": "proposed",
+      "confidence": 1.0,
+      "timestamp": "2026-05-07 13:24:13"
+    },
+    {
+      "id": "H0024",
+      "description": "The equation for dv/dt contains a previously unmodeled term: -6.176859*v*v. Physical interpretation: Transverse Reynolds stress",
+      "status": "proposed",
+      "confidence": 1.0,
+      "timestamp": "2026-05-07 13:24:15"
+    },
+    {
+      "id": "H0025",
+      "description": "The coefficient of dp/dx in du/dt deviates from expected (-1.0000) to discovered (-0.0845). Pressure gradient force (x)",
+      "status": "proposed",
+      "confidence": 1.0,
+      "timestamp": "2026-05-07 13:24:15"
+    },
+    {
+      "id": "H0026",
+      "description": "The coefficient of dp/dx in du/dt deviates from expected (-1.0000) to discovered (-0.0845). Pressure gradient force (x)",
+      "status": "proposed",
+      "confidence": 1.0,
+      "timestamp": "2026-05-07 13:24:15"
+    },
+    {
+      "id": "H0027",
+      "description": "The coefficient of u*du/dx+v*du/dy in du/dt deviates from expected (-1.0000) to discovered (-0.2521). Novel interaction: u*du/dx+v*du/dy",
+      "status": "proposed",
+      "confidence": 1.0,
+      "timestamp": "2026-05-07 13:24:15"
+    },
+    {
+      "id": "H0028",
+      "description": "The coefficient of dp/dy in dv/dt deviates from expected (-1.0000) to discovered (-0.3534). Pressure gradient force (y)",
+      "status": "proposed",
+      "confidence": 1.0,
+      "timestamp": "2026-05-07 13:24:15"
+    }
+  ],
+  "discoveries": [],
+  "n_experiments": 20
+}
