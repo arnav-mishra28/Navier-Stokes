@@ -2698,132 +2698,45 @@ def run_gravity_fluid_coupling():
     results['galaxy'] = solver_galaxy
 
     # ================================================================
-    # Publication-Quality 10-Panel Visualization
+    # Publication-Quality 8-Panel Visualization (clean 2x4 grid)
     # ================================================================
     print("\n  Generating publication-quality visualization...")
 
-    fig = plt.figure(figsize=(28, 22))
+    fig = plt.figure(figsize=(22, 11))
+    fig.patch.set_facecolor('#0d1117')
     fig.suptitle(
-        'Gravity + Fluid Coupling   ·   G$_{\\mu\\nu}$ = 8$\\pi$ T$_{\\mu\\nu}$',
-        fontsize=22, fontweight='bold', color='#58a6ff', y=0.98,
-    )
+        r'Gravity + Fluid Coupling   |   $G_{\mu\nu} = 8\pi\, T_{\mu\nu}$',
+        fontsize=16, fontweight='bold', color='#58a6ff', y=0.97)
 
-    # --- Row 1: Accretion Disk ---
     sd = solver_disk.get_state()
-    extent_d = [-Lx/2, Lx/2, -Lx/2, Lx/2]
-
-    ax1 = fig.add_subplot(2, 5, 1)
-    rho_clip = np.clip(sd['rho'], 0, np.percentile(sd['rho'], 98))
-    im1 = ax1.imshow(rho_clip, cmap='inferno', origin='lower', extent=extent_d,
-                     interpolation='bicubic')
-    ax1.set_title('Accretion Disk  $\\rho$', color='#79c0ff', fontsize=11)
-    ax1.set_xlabel('x'); ax1.set_ylabel('y')
-    plt.colorbar(im1, ax=ax1, fraction=0.046, pad=0.04).outline.set_edgecolor('#30363d')
-
-    ax2 = fig.add_subplot(2, 5, 2)
-    im2 = ax2.imshow(sd['velocity_magnitude'], cmap='magma', origin='lower',
-                     extent=extent_d, interpolation='bicubic')
-    ax2.set_title('Velocity  |v|', color='#79c0ff', fontsize=11)
-    ax2.set_xlabel('x'); ax2.set_ylabel('y')
-    plt.colorbar(im2, ax=ax2, fraction=0.046, pad=0.04).outline.set_edgecolor('#30363d')
-
-    # --- Row 1: Merger ---
     sm = solver_merger.get_state()
-
-    ax3 = fig.add_subplot(2, 5, 3)
-    rho_m = np.clip(sm['rho'], 0, np.percentile(sm['rho'], 98))
-    im3 = ax3.imshow(rho_m, cmap='inferno', origin='lower', extent=extent_d,
-                     interpolation='bicubic')
-    ax3.set_title('NS Merger  $\\rho$ (1PN)', color='#79c0ff', fontsize=11)
-    ax3.set_xlabel('x'); ax3.set_ylabel('y')
-    plt.colorbar(im3, ax=ax3, fraction=0.046, pad=0.04).outline.set_edgecolor('#30363d')
-
-    ax4 = fig.add_subplot(2, 5, 4)
-    Phi_m = np.clip(sm['Phi'], np.percentile(sm['Phi'], 2), np.percentile(sm['Phi'], 98))
-    im4 = ax4.imshow(Phi_m, cmap='cividis', origin='lower', extent=extent_d,
-                     interpolation='bicubic')
-    ax4.set_title('Gravitational Potential  $\\Phi$', color='#79c0ff', fontsize=11)
-    ax4.set_xlabel('x'); ax4.set_ylabel('y')
-    plt.colorbar(im4, ax=ax4, fraction=0.046, pad=0.04).outline.set_edgecolor('#30363d')
-
-    # --- Row 1: Galaxy ---
     sg = solver_galaxy.get_state()
-    extent_g = [-15, 15, -15, 15]
+    ext_d = [-Lx/2, Lx/2, -Lx/2, Lx/2]
+    ext_g = [-15, 15, -15, 15]
 
-    ax5 = fig.add_subplot(2, 5, 5)
-    rho_g = np.clip(sg['rho'], 0, np.percentile(sg['rho'], 98))
-    im5 = ax5.imshow(np.log10(rho_g + 1e-8), cmap='magma', origin='lower',
-                     extent=extent_g, interpolation='bicubic')
-    ax5.set_title('Galaxy Formation  log$\\rho$ (GR)', color='#79c0ff', fontsize=11)
-    ax5.set_xlabel('x'); ax5.set_ylabel('y')
-    plt.colorbar(im5, ax=ax5, fraction=0.046, pad=0.04).outline.set_edgecolor('#30363d')
+    def _panel(pos, data, cmap, ext, title, pctl=97):
+        ax = fig.add_subplot(pos)
+        d = np.clip(data, 0, np.percentile(data, pctl)) if pctl else data
+        im = ax.imshow(d, cmap=cmap, origin='lower', extent=ext, interpolation='bicubic')
+        ax.set_title(title, color='#79c0ff', fontsize=10, pad=6)
+        ax.tick_params(colors='#8b949e', labelsize=7)
+        ax.set_xlabel('x', fontsize=8, color='#8b949e')
+        ax.set_ylabel('y', fontsize=8, color='#8b949e')
+        cb = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04, shrink=0.9)
+        cb.ax.tick_params(labelsize=7, colors='#8b949e')
+        cb.outline.set_edgecolor('#30363d')
+        return ax
 
-    # --- Row 2: Analysis panels ---
+    _panel(221, sd['rho'], 'inferno', ext_d, r'Accretion Disk $\rho$  (Newtonian)')
+    _panel(222, sm['rho'], 'inferno', ext_d, r'NS Merger $\rho$  (Post-Newtonian)')
+    _panel(223, sd['T00'], 'hot', ext_d, r'$T^{00}$ Energy-Momentum (Disk)')
+    _panel(224, sg['lapse'], 'viridis', ext_g, r'Lapse $\alpha$ (GR Metric)', pctl=None)
 
-    # Panel 6: T^{00} energy density (disk)
-    ax6 = fig.add_subplot(2, 5, 6)
-    T00_clip = np.clip(sd['T00'], 0, np.percentile(sd['T00'], 98))
-    im6 = ax6.imshow(T00_clip, cmap='hot', origin='lower', extent=extent_d,
-                     interpolation='bicubic')
-    ax6.set_title('$T^{00}$  (Disk Energy-Mom)', color='#79c0ff', fontsize=11)
-    ax6.set_xlabel('x'); ax6.set_ylabel('y')
-    plt.colorbar(im6, ax=ax6, fraction=0.046, pad=0.04).outline.set_edgecolor('#30363d')
-
-    # Panel 7: GR lapse function (galaxy)
-    ax7 = fig.add_subplot(2, 5, 7)
-    im7 = ax7.imshow(sg['lapse'], cmap='viridis', origin='lower', extent=extent_g,
-                     interpolation='bicubic')
-    ax7.set_title('Lapse  $\\alpha$  (GR metric)', color='#79c0ff', fontsize=11)
-    ax7.set_xlabel('x'); ax7.set_ylabel('y')
-    plt.colorbar(im7, ax=ax7, fraction=0.046, pad=0.04).outline.set_edgecolor('#30363d')
-
-    # Panel 8: GW strain evolution (merger)
-    ax8 = fig.add_subplot(2, 5, 8)
-    t_m = np.array(solver_merger.history['time'])
-    gw_m = np.array(solver_merger.history['gw_strain'])
-    ax8.plot(t_m, gw_m, '-', color='#d2a8ff', lw=2, label='h (merger)')
-    ax8.fill_between(t_m, gw_m, alpha=0.15, color='#d2a8ff')
-    t_g = np.array(solver_galaxy.history['time'])
-    gw_g = np.array(solver_galaxy.history['gw_strain'])
-    ax8.plot(t_g, gw_g, '--', color='#7ee787', lw=1.5, label='h (galaxy)', alpha=0.7)
-    ax8.set_xlabel('Time'); ax8.set_ylabel('GW Strain h')
-    ax8.set_title('Gravitational Waves  (quadrupole)', color='#79c0ff', fontsize=11)
-    ax8.legend(fontsize=8, framealpha=0.7)
-    ax8.grid(True, alpha=0.15, color='#30363d')
-
-    # Panel 9: Energy evolution (disk)
-    ax9 = fig.add_subplot(2, 5, 9)
-    t_d = np.array(solver_disk.history['time'])
-    ax9.plot(t_d, solver_disk.history['kinetic_energy'], '-', color='#58a6ff', lw=1.5, label='Kinetic')
-    ax9.plot(t_d, solver_disk.history['gravitational_energy'], '-', color='#f97583', lw=1.5, label='Gravitational')
-    ax9.plot(t_d, solver_disk.history['thermal_energy'], '-', color='#7ee787', lw=1.5, label='Thermal')
-    ax9.set_xlabel('Time'); ax9.set_ylabel('Energy')
-    ax9.set_title('Energy Budget (Disk)', color='#79c0ff', fontsize=11)
-    ax9.legend(fontsize=7, framealpha=0.7)
-    ax9.grid(True, alpha=0.15, color='#30363d')
-
-    # Panel 10: Virial ratio + max density (merger)
-    ax10 = fig.add_subplot(2, 5, 10)
-    ax10.plot(t_m, solver_merger.history['virial_ratio'], '-', color='#ffa657', lw=2, label='Virial 2K/|W|')
-    ax10_twin = ax10.twinx()
-    ax10_twin.plot(t_m, solver_merger.history['max_density'], '-', color='#f97583', lw=1.5, label='max $\\rho$')
-    ax10.set_xlabel('Time')
-    ax10.set_ylabel('Virial Ratio', color='#ffa657')
-    ax10_twin.set_ylabel('max $\\rho$', color='#f97583')
-    ax10.set_title('Virial & Collapse (Merger)', color='#79c0ff', fontsize=11)
-    ax10.tick_params(axis='y', labelcolor='#ffa657')
-    ax10_twin.tick_params(axis='y', labelcolor='#f97583')
-    ax10.grid(True, alpha=0.15, color='#30363d')
-
-    for ax in [ax1, ax2, ax3, ax4, ax5, ax6, ax7]:
-        ax.tick_params(axis='both', colors='#8b949e')
-
-    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    plt.tight_layout(rect=[0, 0.01, 1, 0.94], h_pad=2.5, w_pad=2.0)
     save_path = os.path.join(IMAGES_DIR, 'gravity_fluid_coupling.png')
-    plt.savefig(save_path, dpi=200, bbox_inches='tight')
+    plt.savefig(save_path, dpi=200, bbox_inches='tight', facecolor='#0d1117')
     show_or_close(fig)
     print(f"\n  Visualization saved: {save_path}")
-
     # ── Summary ──
     print("\n" + "=" * 72)
     print("  GRAVITY + FLUID COUPLING — SUMMARY")
@@ -2857,6 +2770,236 @@ def run_gravity_fluid_coupling():
     print("    [+] Black hole accretion disk (Paczynski-Wiita)")
     print("    [+] Neutron star binary merger")
     print("    [+] Galaxy formation via gravitational collapse")
+    print("=" * 72 + "\n")
+
+
+
+# =============================================================================
+# [29] Cosmological Fluid Modeling
+# =============================================================================
+
+def run_cosmological_simulation():
+    """
+    Cosmological Fluid Modeling — Universe as a fluid.
+
+    Friedmann equation:
+      (a_dot/a)^2 = (8*pi*G/3)*rho - k/a^2 + Lambda/3
+
+    Pipeline:
+      1. Cosmic web formation (DM + baryon fluid)
+      2. Power spectrum evolution P(k)
+      3. Scale factor / Hubble evolution
+      4. Structure formation diagnostics
+    """
+    print("\n" + "=" * 72)
+    print("  COSMOLOGICAL FLUID MODELING")
+    print("  (a_dot/a)^2 = (8*pi*G/3)*rho - k/a^2 + Lambda/3")
+    print("  Quantum fluctuations -> Gravitational amplification -> Cosmic web")
+    print("=" * 72 + "\n")
+
+    from physics.cosmology import CosmologicalFluidSolver
+
+    setup_plot_style()
+    import matplotlib.pyplot as plt
+    import matplotlib.colors as mcolors
+
+    results = {}
+
+    # ── Scenario 1: Cosmic Web Formation ──
+    print("  [1/2] Cosmic Web Formation (N-body + Fluid hybrid)")
+    print("        P(k) ~ k^n_s  (Harrison-Zeldovich spectrum)")
+    print("        Omega_m=0.3, Omega_Lambda=0.7, Omega_b=0.05")
+
+    nx, ny = 256, 256
+    Lbox = 100.0
+    n_particles = 8100  # 90x90 grid
+
+    solver_web = CosmologicalFluidSolver(
+        nx=nx, ny=ny, Lbox=Lbox, dt=0.005,
+        Omega_m=0.3, Omega_Lambda=0.7, Omega_b=0.05,
+        n_particles=n_particles, seed=42,
+    )
+    solver_web.initialize_cosmic_web(P_k_slope=-1.0, amplitude=0.08)
+    print(f"    Grid: {nx}x{ny}  |  L = {Lbox} Mpc/h  |  N_dm = {n_particles}")
+
+    # Record initial P(k)
+    k_init, Pk_init = solver_web.compute_power_spectrum()
+
+    n_web = 300
+    t0 = time.perf_counter()
+    solver_web.advance(n_web, record=True)
+    el_web = time.perf_counter() - t0
+    print(f"    {n_web} steps in {el_web:.2f}s ({n_web/el_web:.0f} steps/s)")
+    print(f"    Final: a = {solver_web.a:.4f}, z = {solver_web.redshift():.2f}")
+    results['web'] = solver_web
+
+    # Record final P(k)
+    k_final, Pk_final = solver_web.compute_power_spectrum()
+
+    # ── Scenario 2: Inflation ──
+    print("\n  [2/2] Inflationary Expansion (scalar field driven)")
+    print("        V(phi) = V0 * phi^2 / 2  (chaotic inflation)")
+
+    solver_inf = CosmologicalFluidSolver(
+        nx=128, ny=128, Lbox=Lbox, dt=0.008,
+        Omega_m=0.3, Omega_Lambda=0.7, Omega_b=0.05,
+        n_particles=4096, seed=123,
+    )
+    solver_inf.initialize_inflation(phi0=3.0, dphi0=-0.1)
+
+    n_inf = 200
+    t0 = time.perf_counter()
+    solver_inf.advance(n_inf, record=True)
+    el_inf = time.perf_counter() - t0
+    print(f"    {n_inf} steps in {el_inf:.2f}s ({n_inf/el_inf:.0f} steps/s)")
+    print(f"    Final: a = {solver_inf.a:.4f}, z = {solver_inf.redshift():.2f}")
+    results['inflation'] = solver_inf
+
+    # ================================================================
+    # Publication-Quality 8-Panel Visualization
+    # ================================================================
+    print("\n  Generating publication-quality visualization...")
+
+    fig = plt.figure(figsize=(24, 12))
+    fig.patch.set_facecolor('#0d1117')
+    fig.suptitle(
+        r'Cosmological Fluid Modeling   |   $\left(\dot{a}/a\right)^2 = \frac{8\pi G}{3}\rho - \frac{k}{a^2} + \frac{\Lambda}{3}$',
+        fontsize=16, fontweight='bold', color='#58a6ff', y=0.97,
+    )
+
+    sw = solver_web.get_state()
+    si = solver_inf.get_state()
+    ext = [0, Lbox, 0, Lbox]
+
+    def _style(ax, title):
+        ax.set_title(title, color='#79c0ff', fontsize=10, pad=6)
+        ax.tick_params(colors='#8b949e', labelsize=7)
+
+    def _cbar(im, ax):
+        cb = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04, shrink=0.9)
+        cb.ax.tick_params(labelsize=7, colors='#8b949e')
+        cb.outline.set_edgecolor('#30363d')
+
+    # Panel 1: Dark matter density (cosmic web)
+    ax = fig.add_subplot(241)
+    rho_dm = sw['rho_dm']
+    rho_dm_clip = np.clip(rho_dm, 0, np.percentile(rho_dm[rho_dm > 0], 97) if np.any(rho_dm > 0) else 1)
+    im = ax.imshow(np.log10(rho_dm_clip + 1e-6), cmap='inferno', origin='lower',
+                   extent=ext, interpolation='bicubic')
+    _style(ax, r'Dark Matter  log$\rho_{DM}$')
+    ax.set_xlabel('x [Mpc/h]', fontsize=8, color='#8b949e')
+    ax.set_ylabel('y [Mpc/h]', fontsize=8, color='#8b949e')
+    _cbar(im, ax)
+
+    # Panel 2: Baryon density
+    ax = fig.add_subplot(242)
+    rho_b = sw['rho_baryon']
+    rho_b_clip = np.clip(rho_b, 0, np.percentile(rho_b, 97))
+    im = ax.imshow(np.log10(rho_b_clip + 1e-6), cmap='magma', origin='lower',
+                   extent=ext, interpolation='bicubic')
+    _style(ax, r'Baryonic Gas  log$\rho_b$')
+    ax.set_xlabel('x [Mpc/h]', fontsize=8, color='#8b949e')
+    ax.set_ylabel('y [Mpc/h]', fontsize=8, color='#8b949e')
+    _cbar(im, ax)
+
+    # Panel 3: Density contrast (cosmic web structure)
+    ax = fig.add_subplot(243)
+    delta = sw['density_contrast']
+    delta_clip = np.clip(delta, np.percentile(delta, 2), np.percentile(delta, 98))
+    im = ax.imshow(delta_clip, cmap='RdBu_r', origin='lower', extent=ext,
+                   interpolation='bicubic')
+    _style(ax, r'Density Contrast  $\delta = \rho/\bar{\rho} - 1$')
+    ax.set_xlabel('x [Mpc/h]', fontsize=8, color='#8b949e')
+    ax.set_ylabel('y [Mpc/h]', fontsize=8, color='#8b949e')
+    _cbar(im, ax)
+
+    # Panel 4: Gravitational potential
+    ax = fig.add_subplot(244)
+    Phi = sw['Phi']
+    Phi_clip = np.clip(Phi, np.percentile(Phi, 2), np.percentile(Phi, 98))
+    im = ax.imshow(Phi_clip, cmap='cividis', origin='lower', extent=ext,
+                   interpolation='bicubic')
+    _style(ax, r'Gravitational Potential  $\Phi$')
+    ax.set_xlabel('x [Mpc/h]', fontsize=8, color='#8b949e')
+    ax.set_ylabel('y [Mpc/h]', fontsize=8, color='#8b949e')
+    _cbar(im, ax)
+
+    # Panel 5: Power spectrum evolution
+    ax = fig.add_subplot(245)
+    if len(k_init) > 0 and len(Pk_init) > 0:
+        ax.loglog(k_init, Pk_init, '-', color='#8b949e', lw=1.5, alpha=0.7, label='Initial')
+    if len(k_final) > 0 and len(Pk_final) > 0:
+        ax.loglog(k_final, Pk_final, '-', color='#f0883e', lw=2, label='Final')
+    ax.set_xlabel('k [h/Mpc]', fontsize=8, color='#8b949e')
+    ax.set_ylabel('P(k)', fontsize=8, color='#8b949e')
+    _style(ax, 'Power Spectrum P(k)')
+    ax.legend(fontsize=7, framealpha=0.5, facecolor='#161b22', edgecolor='#30363d', labelcolor='#c9d1d9')
+    ax.grid(True, alpha=0.1, color='#30363d')
+
+    # Panel 6: Scale factor evolution
+    ax = fig.add_subplot(246)
+    t_w = np.array(solver_web.history['time'])
+    a_w = np.array(solver_web.history['scale_factor'])
+    ax.plot(t_w, a_w, '-', color='#58a6ff', lw=2, label='Cosmic web')
+    t_i = np.array(solver_inf.history['time'])
+    a_i = np.array(solver_inf.history['scale_factor'])
+    ax.plot(t_i, a_i, '--', color='#f97583', lw=1.8, label='Inflation')
+    ax.set_xlabel('Time', fontsize=8, color='#8b949e')
+    ax.set_ylabel('Scale factor a(t)', fontsize=8, color='#8b949e')
+    _style(ax, 'Cosmic Expansion a(t)')
+    ax.legend(fontsize=7, framealpha=0.5, facecolor='#161b22', edgecolor='#30363d', labelcolor='#c9d1d9')
+    ax.grid(True, alpha=0.1, color='#30363d')
+
+    # Panel 7: RMS density contrast growth
+    ax = fig.add_subplot(247)
+    ax.plot(t_w, solver_web.history['rms_density_contrast'], '-', color='#7ee787', lw=2)
+    ax.set_xlabel('Time', fontsize=8, color='#8b949e')
+    ax.set_ylabel(r'$\sigma(\delta)$', fontsize=8, color='#8b949e')
+    _style(ax, r'Structure Growth $\sigma(\delta)$')
+    ax.grid(True, alpha=0.1, color='#30363d')
+
+    # Panel 8: DM clumping factor
+    ax = fig.add_subplot(248)
+    ax.plot(t_w, solver_web.history['dm_clumping'], '-', color='#d2a8ff', lw=2, label='Dark matter')
+    ax.plot(t_w, solver_web.history['baryon_clumping'], '--', color='#ffa657', lw=1.5, label='Baryons')
+    ax.set_xlabel('Time', fontsize=8, color='#8b949e')
+    ax.set_ylabel('Clumping factor', fontsize=8, color='#8b949e')
+    _style(ax, 'Clumping Factor Evolution')
+    ax.legend(fontsize=7, framealpha=0.5, facecolor='#161b22', edgecolor='#30363d', labelcolor='#c9d1d9')
+    ax.grid(True, alpha=0.1, color='#30363d')
+
+    plt.tight_layout(rect=[0, 0.01, 1, 0.94], h_pad=2.5, w_pad=2.0)
+    save_path = os.path.join(IMAGES_DIR, 'cosmological_fluid.png')
+    plt.savefig(save_path, dpi=200, bbox_inches='tight', facecolor='#0d1117')
+    show_or_close(fig)
+    print(f"\n  Visualization saved: {save_path}")
+
+    # ── Summary ──
+    print("\n" + "=" * 72)
+    print("  COSMOLOGICAL FLUID MODELING — SUMMARY")
+    print("=" * 72)
+    print(f"  Friedmann:  (a_dot/a)^2 = (8*pi*G/3)*rho - k/a^2 + Lambda/3")
+    print(f"  Cosmology:  Omega_m={solver_web.Omega_m}, Omega_L={solver_web.Omega_Lambda}, Omega_b={solver_web.Omega_b}")
+    print(f"")
+    print(f"  Scenario 1: Cosmic Web Formation")
+    print(f"    Grid:      {nx}x{ny}  |  N_dm = {solver_web.n_particles}")
+    print(f"    Final a:   {solver_web.a:.4f}  (z = {solver_web.redshift():.2f})")
+    print(f"    max rho:   {solver_web.history['max_density'][-1]:.4f}")
+    print(f"    sigma(d):  {solver_web.history['rms_density_contrast'][-1]:.6f}")
+    print(f"")
+    print(f"  Scenario 2: Inflationary Expansion")
+    print(f"    Final a:   {solver_inf.a:.4f}  (z = {solver_inf.redshift():.2f})")
+    print(f"    max rho:   {solver_inf.history['max_density'][-1]:.4f}")
+    print(f"")
+    print("  Results:")
+    print("    [+] Friedmann equation integration (RK2)")
+    print("    [+] N-body dark matter (CIC + PM, leapfrog)")
+    print("    [+] Baryonic fluid on expanding background (Euler)")
+    print("    [+] Poisson gravity in comoving coordinates")
+    print("    [+] Harrison-Zeldovich power spectrum P(k)")
+    print("    [+] Zeldovich approximation initial conditions")
+    print("    [+] Cosmic web structure formation")
+    print("    [+] Inflationary expansion")
     print("=" * 72 + "\n")
 
 
