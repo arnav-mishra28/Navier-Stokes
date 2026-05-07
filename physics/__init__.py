@@ -5,8 +5,10 @@ from .biophysics import BiophysicsFlowSolver
 from .climate import ClimateFlowSolver
 from .quantum_fluids import QuantumFluidSolver
 from .relativistic import RelativisticNSSolver
+from .qft_lattice import LatticeQFTSolver
 
 __all__ = [
     'MHDSolver', 'AstrophysicalFlowSolver', 'BiophysicsFlowSolver',
-    'ClimateFlowSolver', 'QuantumFluidSolver', 'RelativisticNSSolver'
+    'ClimateFlowSolver', 'QuantumFluidSolver', 'RelativisticNSSolver',
+    'LatticeQFTSolver',
 ]

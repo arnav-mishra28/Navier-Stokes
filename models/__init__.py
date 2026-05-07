@@ -9,6 +9,7 @@ from .symbolic_discovery import SINDy, GeneticProgramming, SymbolicDiscoveryEngi
 from .regularity_analysis import BlowupDetector, StabilityAnalyzer, FlowDiagnostics, TurbulenceMetrics
 from .physics_discovery import PhysicsAwareSINDy, PhysicsAwareLibrary, ConservationValidator, CorrectionTermDiscovery
 from .hypothesis_engine import HypothesisGenerator, SymbolicReasoner, ExperimentValidator, KnowledgeBase
+from .qft_pinn import QFTPINN
 
 __all__ = [
     'PINN', 'FNO2d', 'DeepONet', 'UNetSurrogate', 'TurbulenceClosureNN',
@@ -17,4 +18,5 @@ __all__ = [
     'BlowupDetector', 'StabilityAnalyzer', 'FlowDiagnostics', 'TurbulenceMetrics',
     'PhysicsAwareSINDy', 'PhysicsAwareLibrary', 'ConservationValidator', 'CorrectionTermDiscovery',
     'HypothesisGenerator', 'SymbolicReasoner', 'ExperimentValidator', 'KnowledgeBase',
+    'QFTPINN',
 ]

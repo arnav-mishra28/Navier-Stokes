@@ -458,6 +458,10 @@ def run_physics_demo(domain: str):
         title = "Quantum Turbulence (Bose-Einstein Condensate)"
         n_steps = 200
 
+    elif domain == "qft":
+        run_qft_simulation()
+        return
+
     elif domain == "relativistic":
         from physics.relativistic import RelativisticNSSolver
         solver = RelativisticNSSolver(nx=128, ny=128, eta_s=0.2, tau_pi=0.5, dt=0.005)
@@ -730,6 +734,7 @@ def interactive_menu():
     print("  ─────────────────────────────────────────")
     print("  [25] 🤖 AGI Scientific Discovery System (Full Pipeline)")
     print("  [26] 🔬 Physics-Aware Equation Discovery")
+    print("  [27] ⚛ Quantum Field Theory (Lattice QFT + PINN)")
     print("  [0]  ❌ Exit")
     print()
     
@@ -766,6 +771,7 @@ def interactive_menu():
         "24": lambda: run_relativistic_ns(),
         "25": lambda: run_agi_discovery(),
         "26": lambda: run_physics_aware_discovery(),
+        "27": lambda: run_qft_simulation(),
         "0": lambda: print("  Goodbye!"),
     }
     
@@ -2161,6 +2167,431 @@ def run_relativistic_ns():
 
 
 # =============================================================================
+# Quantum Field Theory (QFT) Simulation
+# =============================================================================
+
+def run_qft_simulation():
+    """
+    Quantum Field Theory (QFT) Simulation on a Spacetime Lattice.
+
+    Transition from classical fluids to fundamental fields:
+        Classical:  velocity field u(x,t)
+        Quantum:    field operator phi(x,t)
+
+    Governing equation (Klein-Gordon + phi^4 interaction):
+
+        []phi + m^2 phi + lambda phi^3 = 0
+
+        where [] = d'Alembertian = -d^2/dt^2 + nabla^2
+
+    This simulates:
+        - Vacuum fluctuations (quantum zero-point energy)
+        - Scalar field interactions (phi^4 theory)
+        - Early universe inflation dynamics
+        - Higgs-like spontaneous symmetry breaking
+        - Bubble nucleation (first-order phase transitions)
+        - Domain wall formation and dynamics
+
+    AI Integration:
+        PINN learns field evolution: (x,y,t) -> phi
+        Embeds Klein-Gordon equation directly into loss function.
+
+    Pipeline:
+        1. Initialize scalar field on lattice (spacetime discretization)
+        2. Evolve via leapfrog (symplectic integrator)
+        3. Compute energy-momentum tensor T^{mu nu}
+        4. Train PINN on lattice data (physics-informed)
+        5. Analyze: field spectrum, correlation function, domain walls
+        6. Publication-quality 10-panel visualization
+    """
+    print("\n" + "=" * 72)
+    print("  QUANTUM FIELD THEORY SIMULATION")
+    print("  Lattice Scalar Field + phi^4 Interaction + PINN")
+    print("  []phi + m^2 phi + lambda phi^3 = 0")
+    print("=" * 72 + "\n")
+
+    from physics.qft_lattice import LatticeQFTSolver
+
+    setup_plot_style()
+    import matplotlib.pyplot as plt
+    import matplotlib.colors as mcolors
+
+    # ====================================================================
+    # Scenario 1: Higgs-like Symmetry Breaking (Mexican Hat Potential)
+    # ====================================================================
+    print("  [1/6] Scenario: Higgs-like Spontaneous Symmetry Breaking")
+    print("         V(phi) = lambda/4 * (phi^2 - v^2)^2  (Mexican hat)")
+
+    nx, ny = 192, 192
+    Lx, Ly = 20.0, 20.0
+    mass_h = 1.0
+    lam_h = 1.0
+    dt_h = 0.02
+
+    solver_higgs = LatticeQFTSolver(
+        nx=nx, ny=ny, Lx=Lx, Ly=Ly,
+        mass=mass_h, lam=lam_h, dt=dt_h,
+        potential_type="mexican_hat",
+    )
+    solver_higgs.initialize_higgs_quench(noise=0.15, seed=42)
+
+    print(f"    Grid: {nx}x{ny}  |  L = {Lx}")
+    print(f"    m = {mass_h}, lambda = {lam_h}")
+    print(f"    VEV: v = {solver_higgs.v_vev:.4f}")
+    print(f"    dt = {dt_h}")
+
+    n_steps_h = 300
+    print(f"    Evolving {n_steps_h} steps (leapfrog)...")
+
+    t0 = time.perf_counter()
+    solver_higgs.advance(n_steps_h, record=True)
+    elapsed_h = time.perf_counter() - t0
+    print(f"    Done in {elapsed_h:.2f}s ({n_steps_h/elapsed_h:.0f} steps/s)")
+
+    E_higgs = solver_higgs.compute_total_energy()
+    print(f"    Energy: K={E_higgs['kinetic']:.2f}  G={E_higgs['gradient']:.2f}  "
+          f"V={E_higgs['potential']:.2f}  Total={E_higgs['total']:.2f}")
+
+    # ====================================================================
+    # Scenario 2: Vacuum Fluctuations (Standard phi^4)
+    # ====================================================================
+    print("\n  [2/6] Scenario: Vacuum Fluctuations (phi^4 theory)")
+    print("         V(phi) = 1/2 m^2 phi^2 + 1/4 lambda phi^4")
+
+    mass_v = 1.0
+    lam_v = 0.5
+    dt_v = 0.01
+
+    solver_vacuum = LatticeQFTSolver(
+        nx=nx, ny=ny, Lx=Lx, Ly=Ly,
+        mass=mass_v, lam=lam_v, dt=dt_v,
+        potential_type="standard",
+    )
+    solver_vacuum.initialize_vacuum_fluctuations(amplitude=0.05, seed=123)
+
+    n_steps_v = 400
+    print(f"    Evolving {n_steps_v} steps...")
+    t0 = time.perf_counter()
+    solver_vacuum.advance(n_steps_v, record=True)
+    elapsed_v = time.perf_counter() - t0
+    print(f"    Done in {elapsed_v:.2f}s ({n_steps_v/elapsed_v:.0f} steps/s)")
+
+    # ====================================================================
+    # Scenario 3: Bubble Nucleation (Cosmological Phase Transition)
+    # ====================================================================
+    print("\n  [3/6] Scenario: Bubble Nucleation (first-order phase transition)")
+
+    solver_bubble = LatticeQFTSolver(
+        nx=nx, ny=ny, Lx=Lx, Ly=Ly,
+        mass=mass_h, lam=lam_h, dt=dt_h,
+        potential_type="mexican_hat",
+    )
+    solver_bubble.initialize_bubble_nucleation(R=3.0)
+
+    n_steps_b = 250
+    print(f"    Evolving {n_steps_b} steps...")
+    t0 = time.perf_counter()
+    solver_bubble.advance(n_steps_b, record=True)
+    elapsed_b = time.perf_counter() - t0
+    print(f"    Done in {elapsed_b:.2f}s ({n_steps_b/elapsed_b:.0f} steps/s)")
+
+    # ====================================================================
+    # Phase 4: PINN Training on Lattice Data
+    # ====================================================================
+    print("\n  [4/6] Training QFT-PINN: (x,y,t) -> phi")
+    print("         Loss = L_KG([]phi + m^2 phi + lambda phi^3) + L_data")
+
+    pinn_trained = False
+    pinn_history = None
+    pinn_model = None
+
+    try:
+        import torch
+        from models.qft_pinn import QFTPINN
+
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        print(f"    Device: {device}")
+
+        pinn_model = QFTPINN(
+            hidden_width=96, n_blocks=3,
+            fourier_features=48, fourier_sigma=2.0,
+            mass=mass_v, lam=lam_v,
+        )
+
+        pinn_history = pinn_model.train_on_lattice_data(
+            solver_vacuum,
+            n_collocation=3000,
+            n_data_points=1500,
+            epochs=1000,
+            lr=1e-3,
+            device=device,
+            verbose=True,
+        )
+        pinn_trained = True
+        print("    PINN training complete!")
+
+    except ImportError:
+        print("    PyTorch not available — skipping PINN training.")
+    except Exception as e:
+        print(f"    PINN training error: {e}")
+
+    # ====================================================================
+    # Phase 5: Analysis (spectrum, correlation, domain walls)
+    # ====================================================================
+    print("\n  [5/6] Computing field spectrum and correlations...")
+
+    # Vacuum fluctuation spectrum
+    k_spec, E_spec = solver_vacuum.compute_field_spectrum()
+    valid_k = k_spec > 0
+    k_v = k_spec[valid_k]
+    E_v = np.maximum(E_spec[valid_k], 1e-30)
+
+    # Free-field reference: P(k) ~ 1/(2*omega_k)
+    omega_ref = np.sqrt(k_v**2 + mass_v**2)
+    P_free = 0.05**2 / (2 * omega_ref)
+    # Normalize to match data
+    if len(E_v) > 2 and E_v[1] > 0:
+        P_free *= E_v[1] / P_free[1]
+
+    # Correlation function
+    r_corr, G_corr = solver_vacuum.compute_correlation_function()
+    valid_r = r_corr > 0
+
+    # Domain walls from Higgs
+    domain_walls = solver_higgs.compute_domain_walls()
+
+    # Higgs field spectrum
+    k_h, E_h = solver_higgs.compute_field_spectrum()
+    valid_kh = k_h > 0
+
+    print(f"    Vacuum spectrum: {len(k_v)} bins")
+    print(f"    Correlation length ~ 1/m = {1.0/mass_v:.2f}")
+
+    # ====================================================================
+    # Phase 6: Publication-Quality 10-Panel Visualization
+    # ====================================================================
+    print("\n  [6/6] Generating publication-quality visualization...")
+
+    fig = plt.figure(figsize=(28, 22))
+    fig.suptitle(
+        'Quantum Field Theory Simulation   ·   Lattice Scalar Field + PINN',
+        fontsize=22, fontweight='bold', color='#58a6ff', y=0.98,
+    )
+
+    extent = [-Lx / 2, Lx / 2, -Ly / 2, Ly / 2]
+
+    # ── Panel 1: Higgs field phi (symmetry breaking) ──
+    ax1 = fig.add_subplot(2, 5, 1)
+    state_h = solver_higgs.get_state()
+    phi_h = state_h['phi']
+    vabs = max(np.max(np.abs(phi_h)), 1e-6)
+    im1 = ax1.imshow(
+        phi_h, cmap='RdBu_r', origin='lower', extent=extent,
+        interpolation='bicubic',
+        norm=mcolors.TwoSlopeNorm(vcenter=0, vmin=-vabs, vmax=vabs),
+    )
+    ax1.set_title('Field  phi  (Higgs SSB)', color='#79c0ff', fontsize=11)
+    ax1.set_xlabel('x'); ax1.set_ylabel('y')
+    cb1 = plt.colorbar(im1, ax=ax1, fraction=0.046, pad=0.04)
+    cb1.outline.set_edgecolor('#30363d')
+
+    # ── Panel 2: Domain walls |nabla phi| ──
+    ax2 = fig.add_subplot(2, 5, 2)
+    dw_clip = np.clip(domain_walls, 0, np.percentile(domain_walls, 98))
+    im2 = ax2.imshow(
+        dw_clip, cmap='hot', origin='lower', extent=extent,
+        interpolation='bicubic',
+    )
+    ax2.set_title('Domain Walls  |nabla phi|', color='#79c0ff', fontsize=11)
+    ax2.set_xlabel('x'); ax2.set_ylabel('y')
+    cb2 = plt.colorbar(im2, ax=ax2, fraction=0.046, pad=0.04)
+    cb2.outline.set_edgecolor('#30363d')
+
+    # ── Panel 3: Energy density T^{00} (Higgs) ──
+    ax3 = fig.add_subplot(2, 5, 3)
+    E_dens = state_h['energy_density']
+    E_clip = np.clip(E_dens, 0, np.percentile(E_dens, 99))
+    im3 = ax3.imshow(
+        E_clip, cmap='inferno', origin='lower', extent=extent,
+        interpolation='bicubic',
+    )
+    ax3.set_title('Energy Density  T^{00}', color='#79c0ff', fontsize=11)
+    ax3.set_xlabel('x'); ax3.set_ylabel('y')
+    cb3 = plt.colorbar(im3, ax=ax3, fraction=0.046, pad=0.04)
+    cb3.outline.set_edgecolor('#30363d')
+
+    # ── Panel 4: Vacuum fluctuations phi ──
+    ax4 = fig.add_subplot(2, 5, 4)
+    state_v = solver_vacuum.get_state()
+    phi_v = state_v['phi']
+    vabs_v = max(np.max(np.abs(phi_v)), 1e-6)
+    im4 = ax4.imshow(
+        phi_v, cmap='coolwarm', origin='lower', extent=extent,
+        interpolation='bicubic',
+        norm=mcolors.TwoSlopeNorm(vcenter=0, vmin=-vabs_v, vmax=vabs_v),
+    )
+    ax4.set_title('Vacuum Fluctuations  phi', color='#79c0ff', fontsize=11)
+    ax4.set_xlabel('x'); ax4.set_ylabel('y')
+    cb4 = plt.colorbar(im4, ax=ax4, fraction=0.046, pad=0.04)
+    cb4.outline.set_edgecolor('#30363d')
+
+    # ── Panel 5: Bubble nucleation phi ──
+    ax5 = fig.add_subplot(2, 5, 5)
+    state_b = solver_bubble.get_state()
+    phi_b = state_b['phi']
+    vabs_b = max(np.max(np.abs(phi_b)), 1e-6)
+    im5 = ax5.imshow(
+        phi_b, cmap='PiYG', origin='lower', extent=extent,
+        interpolation='bicubic',
+        norm=mcolors.TwoSlopeNorm(vcenter=0, vmin=-vabs_b, vmax=vabs_b),
+    )
+    ax5.set_title('Bubble Nucleation  phi', color='#79c0ff', fontsize=11)
+    ax5.set_xlabel('x'); ax5.set_ylabel('y')
+    cb5 = plt.colorbar(im5, ax=ax5, fraction=0.046, pad=0.04)
+    cb5.outline.set_edgecolor('#30363d')
+
+    # ── Panel 6: Field power spectrum ──
+    ax6 = fig.add_subplot(2, 5, 6)
+    if len(k_v) > 2:
+        ax6.loglog(k_v, E_v, '-', color='#58a6ff', lw=2.2, label='phi^4 theory', zorder=3)
+        ax6.loglog(k_v, P_free, '--', color='#8b949e', lw=1.5, label='Free field 1/(2w_k)', zorder=2)
+        ax6.fill_between(k_v, E_v, alpha=0.08, color='#58a6ff')
+    if len(k_h[valid_kh]) > 2:
+        ax6.loglog(k_h[valid_kh], np.maximum(E_h[valid_kh], 1e-30),
+                   '-', color='#f97583', lw=1.5, label='Higgs SSB', alpha=0.7)
+    ax6.set_xlabel('Wavenumber k')
+    ax6.set_ylabel('P(k)')
+    ax6.set_title('Field Power Spectrum', color='#79c0ff', fontsize=11)
+    ax6.legend(fontsize=8, framealpha=0.7)
+    ax6.grid(True, alpha=0.15, color='#30363d')
+
+    # ── Panel 7: Correlation function ──
+    ax7 = fig.add_subplot(2, 5, 7)
+    if np.any(valid_r):
+        r_v = r_corr[valid_r]
+        G_v = G_corr[valid_r]
+        ax7.plot(r_v, G_v, '-', color='#7ee787', lw=2.2, label='G(r) measured')
+        # Yukawa reference: G(r) ~ exp(-m*r) / sqrt(r)
+        G_yukawa = np.exp(-mass_v * r_v) / np.sqrt(r_v + 0.1)
+        G_yukawa /= G_yukawa[0]
+        ax7.plot(r_v, G_yukawa, '--', color='#8b949e', lw=1.5, label='Yukawa e^{-mr}/sqrt(r)')
+        ax7.fill_between(r_v, G_v, alpha=0.08, color='#7ee787')
+    ax7.set_xlabel('Distance r')
+    ax7.set_ylabel('G(r) / G(0)')
+    ax7.set_title('Two-Point Correlation', color='#79c0ff', fontsize=11)
+    ax7.legend(fontsize=8, framealpha=0.7)
+    ax7.grid(True, alpha=0.15, color='#30363d')
+    ax7.set_ylim(-0.3, 1.1)
+
+    # ── Panel 8: Energy evolution (Higgs) ──
+    ax8 = fig.add_subplot(2, 5, 8)
+    t_arr_h = np.array(solver_higgs.history['time'])
+    ax8.plot(t_arr_h, solver_higgs.history['kinetic_energy'], '-', color='#58a6ff', lw=1.5, label='Kinetic')
+    ax8.plot(t_arr_h, solver_higgs.history['gradient_energy'], '-', color='#f97583', lw=1.5, label='Gradient')
+    ax8.plot(t_arr_h, solver_higgs.history['potential_energy'], '-', color='#7ee787', lw=1.5, label='Potential')
+    ax8.plot(t_arr_h, solver_higgs.history['total_energy'], '-', color='#ffa657', lw=2.2, label='Total')
+    ax8.set_xlabel('Time')
+    ax8.set_ylabel('Energy')
+    ax8.set_title('Energy Evolution (Higgs)', color='#79c0ff', fontsize=11)
+    ax8.legend(fontsize=7, framealpha=0.7)
+    ax8.grid(True, alpha=0.15, color='#30363d')
+
+    # ── Panel 9: Field histogram (Higgs — double-well) ──
+    ax9 = fig.add_subplot(2, 5, 9)
+    phi_flat = phi_h.flatten()
+    ax9.hist(phi_flat, bins=80, density=True, color='#d2a8ff', alpha=0.7, edgecolor='#30363d', lw=0.5)
+    # Overlay potential
+    phi_range = np.linspace(-2 * solver_higgs.v_vev, 2 * solver_higgs.v_vev, 200)
+    V_range = solver_higgs.potential(phi_range)
+    V_norm = V_range / np.max(V_range) * np.max(np.histogram(phi_flat, bins=80, density=True)[0]) * 0.8
+    ax9.plot(phi_range, V_norm, '--', color='#ffa657', lw=2, label='V(phi) (scaled)')
+    ax9.axvline(solver_higgs.v_vev, color='#7ee787', ls=':', lw=1.5, label=f'+v = {solver_higgs.v_vev:.2f}')
+    ax9.axvline(-solver_higgs.v_vev, color='#f97583', ls=':', lw=1.5, label=f'-v = {-solver_higgs.v_vev:.2f}')
+    ax9.set_xlabel('phi')
+    ax9.set_ylabel('P(phi)')
+    ax9.set_title('Field Distribution (SSB)', color='#79c0ff', fontsize=11)
+    ax9.legend(fontsize=7, framealpha=0.7)
+    ax9.grid(True, alpha=0.15, color='#30363d')
+
+    # ── Panel 10: PINN training loss or field RMS evolution ──
+    ax10 = fig.add_subplot(2, 5, 10)
+    if pinn_trained and pinn_history:
+        epochs_arr = np.arange(1, len(pinn_history['total']) + 1)
+        ax10.semilogy(epochs_arr, pinn_history['pde'], '-', color='#58a6ff', lw=1.5, label='PDE (Klein-Gordon)')
+        ax10.semilogy(epochs_arr, pinn_history['data'], '-', color='#f97583', lw=1.5, label='Data')
+        ax10.semilogy(epochs_arr, pinn_history['total'], '-', color='#ffa657', lw=2, label='Total')
+        ax10.set_xlabel('Epoch')
+        ax10.set_ylabel('Loss')
+        ax10.set_title('PINN Training Loss', color='#79c0ff', fontsize=11)
+        ax10.legend(fontsize=8, framealpha=0.7)
+    else:
+        t_arr_v = np.array(solver_vacuum.history['time'])
+        ax10.plot(t_arr_v, solver_vacuum.history['field_rms'], '-', color='#d2a8ff', lw=2, label='RMS(phi)')
+        ax10.plot(t_arr_v, solver_vacuum.history['total_energy'], '-', color='#ffa657', lw=2, label='Total Energy')
+        ax10.set_xlabel('Time')
+        ax10.set_ylabel('Value')
+        ax10.set_title('Vacuum Field Evolution', color='#79c0ff', fontsize=11)
+        ax10.legend(fontsize=8, framealpha=0.7)
+    ax10.grid(True, alpha=0.15, color='#30363d')
+
+    # Style all spatial panels
+    for ax in [ax1, ax2, ax3, ax4, ax5]:
+        ax.tick_params(axis='both', colors='#8b949e')
+
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    save_path = os.path.join(IMAGES_DIR, 'qft_simulation.png')
+    plt.savefig(save_path, dpi=200, bbox_inches='tight')
+    show_or_close(fig)
+    print(f"\n  Visualization saved: {save_path}")
+
+    # ── Summary ──
+    print("\n" + "=" * 72)
+    print("  QUANTUM FIELD THEORY SIMULATION -- SUMMARY")
+    print("=" * 72)
+    print(f"  Governing eq:    []phi + m^2 phi + lambda phi^3 = 0")
+    print(f"  d'Alembertian:   [] = -d^2/dt^2 + nabla^2  (Minkowski)")
+    print(f"  Method:          Leapfrog (Stormer-Verlet, symplectic)")
+    print(f"  Lattice:         {nx}x{ny},  L = {Lx}")
+    print(f"")
+    print(f"  Scenario 1: Higgs Symmetry Breaking")
+    print(f"    Potential:     V = lambda/4 * (phi^2 - v^2)^2  (Mexican hat)")
+    print(f"    VEV:           v = {solver_higgs.v_vev:.4f}")
+    print(f"    Energy:        {E_higgs['total']:.2f}  (K={E_higgs['kinetic']:.2f} G={E_higgs['gradient']:.2f} V={E_higgs['potential']:.2f})")
+    print(f"")
+    E_vac = solver_vacuum.compute_total_energy()
+    print(f"  Scenario 2: Vacuum Fluctuations")
+    print(f"    Potential:     V = 1/2 m^2 phi^2 + 1/4 lambda phi^4")
+    print(f"    Energy:        {E_vac['total']:.4f}")
+    print(f"    Correlation:   xi ~ 1/m = {1.0/mass_v:.2f}")
+    print(f"")
+    E_bub = solver_bubble.compute_total_energy()
+    print(f"  Scenario 3: Bubble Nucleation")
+    print(f"    Energy:        {E_bub['total']:.2f}")
+    print(f"")
+    if pinn_trained:
+        print(f"  PINN Integration:")
+        print(f"    Architecture:  Fourier + ResNet")
+        print(f"    Loss:          L_KG + L_data + L_energy")
+        print(f"    Final PDE loss: {pinn_history['pde'][-1]:.6f}")
+        print(f"    Final data loss: {pinn_history['data'][-1]:.6f}")
+    else:
+        print(f"  PINN: Skipped (PyTorch unavailable)")
+    print()
+    print("  Physics Modeled:")
+    print("    [+] Vacuum fluctuations (quantum zero-point energy)")
+    print("    [+] Scalar field interactions (phi^4 theory)")
+    print("    [+] Higgs-like spontaneous symmetry breaking")
+    print("    [+] Domain wall formation and dynamics")
+    print("    [+] Bubble nucleation (cosmological phase transition)")
+    print("    [+] Energy-momentum tensor T^{mu nu}")
+    print("    [+] Field power spectrum P(k)")
+    print("    [+] Two-point correlation function G(r)")
+    if pinn_trained:
+        print("    [+] PINN: (x,y,t) -> phi (Klein-Gordon embedded)")
+    print("=" * 72 + "\n")
+
+
+# =============================================================================
 # Main Entry Point
 # =============================================================================
 
@@ -2203,7 +2634,7 @@ Examples:
     parser.add_argument('--train', type=str, choices=['pinn', 'fno', 'deeponet', 'surrogate'],
                        help='Train ML model')
     parser.add_argument('--physics', type=str,
-                       choices=['mhd', 'astro', 'bio', 'climate', 'quantum', 'relativistic'],
+                       choices=['mhd', 'astro', 'bio', 'climate', 'quantum', 'relativistic', 'qft'],
                        help='Run physics domain simulation')
     parser.add_argument('--benchmark', action='store_true', help='Run performance benchmarks')
     parser.add_argument('--hybrid', action='store_true', help='Run hybrid CFD->PINN demo')
@@ -2234,6 +2665,9 @@ Examples:
                        help='Full AGI scientific discovery system')
     parser.add_argument('--physics-discover', action='store_true', dest='physics_discover',
                        help='Physics-aware equation discovery')
+    # Quantum Field Theory
+    parser.add_argument('--qft', action='store_true',
+                       help='Quantum Field Theory simulation (Lattice QFT + PINN)')
     
     args = parser.parse_args()
     
@@ -2283,6 +2717,8 @@ Examples:
         run_agi_discovery()
     elif args.physics_discover:
         run_physics_aware_discovery()
+    elif args.qft:
+        run_qft_simulation()
     else:
         interactive_menu()
 
