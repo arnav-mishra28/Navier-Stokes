@@ -9,7 +9,7 @@
   ║     ML:   PINN / FNO / DeepONet / U-Net / Autoencoder / NeuralODE  ║
   ║     AI:   SINDy / Genetic Programming / Blow-up Detection           ║
   ║     AGI:  Physics Discovery / Hypothesis Engine / Knowledge Base    ║
-  ║     Physics: Fluid · MHD · Astro · Bio · Climate · Quantum · Rel   ║
+  ║     Physics: Fluid · MHD · Astro · Bio · Climate · Quantum · Rel · Gravity ║
   ║     Viz:  Real-time 2D (Pygame) + 3D (PyVista/Matplotlib)          ║
   ╚═══════════════════════════════════════════════════════════════════════╝
 
@@ -468,6 +468,11 @@ def run_physics_demo(domain: str):
         solver.initialize_bjorken_flow(e0=10.0, sigma=1.5)
         title = "Relativistic NS — QGP Fireball (Israel-Stewart)"
         n_steps = 300
+
+    elif domain == "gravity":
+        run_gravity_fluid_coupling()
+        return
+
     else:
         print(f"  Unknown domain: {domain}")
         return
@@ -735,6 +740,7 @@ def interactive_menu():
     print("  [25] 🤖 AGI Scientific Discovery System (Full Pipeline)")
     print("  [26] 🔬 Physics-Aware Equation Discovery")
     print("  [27] ⚛ Quantum Field Theory (Lattice QFT + PINN)")
+    print("  [28] 🌌 Gravity + Fluid Coupling (Einstein Equations)")
     print("  [0]  ❌ Exit")
     print()
     
@@ -772,6 +778,7 @@ def interactive_menu():
         "25": lambda: run_agi_discovery(),
         "26": lambda: run_physics_aware_discovery(),
         "27": lambda: run_qft_simulation(),
+        "28": lambda: run_gravity_fluid_coupling(),
         "0": lambda: print("  Goodbye!"),
     }
     
@@ -2592,6 +2599,268 @@ def run_qft_simulation():
 
 
 # =============================================================================
+# Gravity + Fluid Coupling (Einstein Equations + Fluid Dynamics)
+# =============================================================================
+
+def run_gravity_fluid_coupling():
+    """
+    Gravity + Fluid Coupling Engine.
+
+    Fluids curve spacetime. Spacetime tells fluids how to move.
+
+    Core Einstein Equation:
+        G_uv = 8 pi T_uv
+
+    Fluid Energy-Momentum Tensor:
+        T_uv = (rho + p) u_u u_v + p g_uv
+
+    Runs three astrophysical scenarios at increasing gravity levels:
+      1. Black Hole Accretion Disk   (Newtonian + Paczynski-Wiita)
+      2. Neutron Star Merger         (Post-Newtonian, GW extraction)
+      3. Galaxy Formation            (Numerical GR lite, BSSN-CFC)
+    """
+    print("\n" + "=" * 72)
+    print("  GRAVITY + FLUID COUPLING ENGINE")
+    print("  G_uv = 8 pi T_uv   |   T_uv = (rho+p) u_u u_v + p g_uv")
+    print("  Matter tells spacetime how to curve.")
+    print("  Spacetime tells matter how to move.")
+    print("=" * 72 + "\n")
+
+    from physics.gravity_fluid_coupling import GravityFluidSolver
+
+    setup_plot_style()
+    import matplotlib.pyplot as plt
+    import matplotlib.colors as mcolors
+
+    results = {}
+
+    # ================================================================
+    # Scenario 1: Black Hole Accretion Disk (Newtonian)
+    # ================================================================
+    print("  [1/3] Black Hole Accretion Disk (Newtonian + Paczynski-Wiita)")
+    print("        Phi_PW = -GM / (r - r_s),  v_phi = sqrt(GM*r / (r-r_s)^2)")
+
+    nx, ny = 192, 192
+    Lx = 20.0
+
+    solver_disk = GravityFluidSolver(
+        nx=nx, ny=ny, Lx=Lx, Ly=Lx, dt=0.002,
+        gravity_level="newtonian", gamma_eos=5.0/3.0,
+    )
+    solver_disk.initialize_accretion_disk(M_bh=3.0, rho0=0.5, r_in=2.0, r_out=8.0, T0=0.5)
+    print(f"    Grid: {nx}x{ny}  |  L = {Lx}")
+
+    n_disk = 200
+    t0 = time.perf_counter()
+    solver_disk.advance(n_disk, record=True)
+    el_disk = time.perf_counter() - t0
+    print(f"    {n_disk} steps in {el_disk:.2f}s ({n_disk/el_disk:.0f} steps/s)")
+    results['disk'] = solver_disk
+
+    # ================================================================
+    # Scenario 2: Neutron Star Merger (Post-Newtonian)
+    # ================================================================
+    print("\n  [2/3] Neutron Star Merger (Post-Newtonian, GW extraction)")
+    print("        Phi = Phi_N + (1/c^2)[2 Phi^2 + Psi]")
+
+    solver_merger = GravityFluidSolver(
+        nx=nx, ny=ny, Lx=Lx, Ly=Lx, dt=0.002,
+        gravity_level="post_newtonian", gamma_eos=2.0,
+    )
+    solver_merger.initialize_neutron_star_merger(
+        M_star=2.0, separation=5.0, v_orbit=0.08, sigma=1.2,
+    )
+
+    n_merger = 250
+    t0 = time.perf_counter()
+    solver_merger.advance(n_merger, record=True)
+    el_merger = time.perf_counter() - t0
+    print(f"    {n_merger} steps in {el_merger:.2f}s ({n_merger/el_merger:.0f} steps/s)")
+    results['merger'] = solver_merger
+
+    # ================================================================
+    # Scenario 3: Galaxy Formation (Numerical GR lite)
+    # ================================================================
+    print("\n  [3/3] Galaxy Formation (Numerical GR — BSSN/CFC lite)")
+    print("        ds^2 = -alpha^2 dt^2 + psi^4 (dx^2 + dy^2)")
+
+    solver_galaxy = GravityFluidSolver(
+        nx=nx, ny=ny, Lx=30.0, Ly=30.0, dt=0.003,
+        gravity_level="numerical_gr", gamma_eos=5.0/3.0,
+    )
+    solver_galaxy.initialize_galaxy_formation(n_clumps=6, rho_bg=0.02, perturbation=0.1, seed=42)
+
+    n_galaxy = 200
+    t0 = time.perf_counter()
+    solver_galaxy.advance(n_galaxy, record=True)
+    el_galaxy = time.perf_counter() - t0
+    print(f"    {n_galaxy} steps in {el_galaxy:.2f}s ({n_galaxy/el_galaxy:.0f} steps/s)")
+    results['galaxy'] = solver_galaxy
+
+    # ================================================================
+    # Publication-Quality 10-Panel Visualization
+    # ================================================================
+    print("\n  Generating publication-quality visualization...")
+
+    fig = plt.figure(figsize=(28, 22))
+    fig.suptitle(
+        'Gravity + Fluid Coupling   ·   G$_{\\mu\\nu}$ = 8$\\pi$ T$_{\\mu\\nu}$',
+        fontsize=22, fontweight='bold', color='#58a6ff', y=0.98,
+    )
+
+    # --- Row 1: Accretion Disk ---
+    sd = solver_disk.get_state()
+    extent_d = [-Lx/2, Lx/2, -Lx/2, Lx/2]
+
+    ax1 = fig.add_subplot(2, 5, 1)
+    rho_clip = np.clip(sd['rho'], 0, np.percentile(sd['rho'], 98))
+    im1 = ax1.imshow(rho_clip, cmap='inferno', origin='lower', extent=extent_d,
+                     interpolation='bicubic')
+    ax1.set_title('Accretion Disk  $\\rho$', color='#79c0ff', fontsize=11)
+    ax1.set_xlabel('x'); ax1.set_ylabel('y')
+    plt.colorbar(im1, ax=ax1, fraction=0.046, pad=0.04).outline.set_edgecolor('#30363d')
+
+    ax2 = fig.add_subplot(2, 5, 2)
+    im2 = ax2.imshow(sd['velocity_magnitude'], cmap='magma', origin='lower',
+                     extent=extent_d, interpolation='bicubic')
+    ax2.set_title('Velocity  |v|', color='#79c0ff', fontsize=11)
+    ax2.set_xlabel('x'); ax2.set_ylabel('y')
+    plt.colorbar(im2, ax=ax2, fraction=0.046, pad=0.04).outline.set_edgecolor('#30363d')
+
+    # --- Row 1: Merger ---
+    sm = solver_merger.get_state()
+
+    ax3 = fig.add_subplot(2, 5, 3)
+    rho_m = np.clip(sm['rho'], 0, np.percentile(sm['rho'], 98))
+    im3 = ax3.imshow(rho_m, cmap='inferno', origin='lower', extent=extent_d,
+                     interpolation='bicubic')
+    ax3.set_title('NS Merger  $\\rho$ (1PN)', color='#79c0ff', fontsize=11)
+    ax3.set_xlabel('x'); ax3.set_ylabel('y')
+    plt.colorbar(im3, ax=ax3, fraction=0.046, pad=0.04).outline.set_edgecolor('#30363d')
+
+    ax4 = fig.add_subplot(2, 5, 4)
+    Phi_m = np.clip(sm['Phi'], np.percentile(sm['Phi'], 2), np.percentile(sm['Phi'], 98))
+    im4 = ax4.imshow(Phi_m, cmap='cividis', origin='lower', extent=extent_d,
+                     interpolation='bicubic')
+    ax4.set_title('Gravitational Potential  $\\Phi$', color='#79c0ff', fontsize=11)
+    ax4.set_xlabel('x'); ax4.set_ylabel('y')
+    plt.colorbar(im4, ax=ax4, fraction=0.046, pad=0.04).outline.set_edgecolor('#30363d')
+
+    # --- Row 1: Galaxy ---
+    sg = solver_galaxy.get_state()
+    extent_g = [-15, 15, -15, 15]
+
+    ax5 = fig.add_subplot(2, 5, 5)
+    rho_g = np.clip(sg['rho'], 0, np.percentile(sg['rho'], 98))
+    im5 = ax5.imshow(np.log10(rho_g + 1e-8), cmap='magma', origin='lower',
+                     extent=extent_g, interpolation='bicubic')
+    ax5.set_title('Galaxy Formation  log$\\rho$ (GR)', color='#79c0ff', fontsize=11)
+    ax5.set_xlabel('x'); ax5.set_ylabel('y')
+    plt.colorbar(im5, ax=ax5, fraction=0.046, pad=0.04).outline.set_edgecolor('#30363d')
+
+    # --- Row 2: Analysis panels ---
+
+    # Panel 6: T^{00} energy density (disk)
+    ax6 = fig.add_subplot(2, 5, 6)
+    T00_clip = np.clip(sd['T00'], 0, np.percentile(sd['T00'], 98))
+    im6 = ax6.imshow(T00_clip, cmap='hot', origin='lower', extent=extent_d,
+                     interpolation='bicubic')
+    ax6.set_title('$T^{00}$  (Disk Energy-Mom)', color='#79c0ff', fontsize=11)
+    ax6.set_xlabel('x'); ax6.set_ylabel('y')
+    plt.colorbar(im6, ax=ax6, fraction=0.046, pad=0.04).outline.set_edgecolor('#30363d')
+
+    # Panel 7: GR lapse function (galaxy)
+    ax7 = fig.add_subplot(2, 5, 7)
+    im7 = ax7.imshow(sg['lapse'], cmap='viridis', origin='lower', extent=extent_g,
+                     interpolation='bicubic')
+    ax7.set_title('Lapse  $\\alpha$  (GR metric)', color='#79c0ff', fontsize=11)
+    ax7.set_xlabel('x'); ax7.set_ylabel('y')
+    plt.colorbar(im7, ax=ax7, fraction=0.046, pad=0.04).outline.set_edgecolor('#30363d')
+
+    # Panel 8: GW strain evolution (merger)
+    ax8 = fig.add_subplot(2, 5, 8)
+    t_m = np.array(solver_merger.history['time'])
+    gw_m = np.array(solver_merger.history['gw_strain'])
+    ax8.plot(t_m, gw_m, '-', color='#d2a8ff', lw=2, label='h (merger)')
+    ax8.fill_between(t_m, gw_m, alpha=0.15, color='#d2a8ff')
+    t_g = np.array(solver_galaxy.history['time'])
+    gw_g = np.array(solver_galaxy.history['gw_strain'])
+    ax8.plot(t_g, gw_g, '--', color='#7ee787', lw=1.5, label='h (galaxy)', alpha=0.7)
+    ax8.set_xlabel('Time'); ax8.set_ylabel('GW Strain h')
+    ax8.set_title('Gravitational Waves  (quadrupole)', color='#79c0ff', fontsize=11)
+    ax8.legend(fontsize=8, framealpha=0.7)
+    ax8.grid(True, alpha=0.15, color='#30363d')
+
+    # Panel 9: Energy evolution (disk)
+    ax9 = fig.add_subplot(2, 5, 9)
+    t_d = np.array(solver_disk.history['time'])
+    ax9.plot(t_d, solver_disk.history['kinetic_energy'], '-', color='#58a6ff', lw=1.5, label='Kinetic')
+    ax9.plot(t_d, solver_disk.history['gravitational_energy'], '-', color='#f97583', lw=1.5, label='Gravitational')
+    ax9.plot(t_d, solver_disk.history['thermal_energy'], '-', color='#7ee787', lw=1.5, label='Thermal')
+    ax9.set_xlabel('Time'); ax9.set_ylabel('Energy')
+    ax9.set_title('Energy Budget (Disk)', color='#79c0ff', fontsize=11)
+    ax9.legend(fontsize=7, framealpha=0.7)
+    ax9.grid(True, alpha=0.15, color='#30363d')
+
+    # Panel 10: Virial ratio + max density (merger)
+    ax10 = fig.add_subplot(2, 5, 10)
+    ax10.plot(t_m, solver_merger.history['virial_ratio'], '-', color='#ffa657', lw=2, label='Virial 2K/|W|')
+    ax10_twin = ax10.twinx()
+    ax10_twin.plot(t_m, solver_merger.history['max_density'], '-', color='#f97583', lw=1.5, label='max $\\rho$')
+    ax10.set_xlabel('Time')
+    ax10.set_ylabel('Virial Ratio', color='#ffa657')
+    ax10_twin.set_ylabel('max $\\rho$', color='#f97583')
+    ax10.set_title('Virial & Collapse (Merger)', color='#79c0ff', fontsize=11)
+    ax10.tick_params(axis='y', labelcolor='#ffa657')
+    ax10_twin.tick_params(axis='y', labelcolor='#f97583')
+    ax10.grid(True, alpha=0.15, color='#30363d')
+
+    for ax in [ax1, ax2, ax3, ax4, ax5, ax6, ax7]:
+        ax.tick_params(axis='both', colors='#8b949e')
+
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    save_path = os.path.join(IMAGES_DIR, 'gravity_fluid_coupling.png')
+    plt.savefig(save_path, dpi=200, bbox_inches='tight')
+    show_or_close(fig)
+    print(f"\n  Visualization saved: {save_path}")
+
+    # ── Summary ──
+    print("\n" + "=" * 72)
+    print("  GRAVITY + FLUID COUPLING — SUMMARY")
+    print("=" * 72)
+    print(f"  Core equation:   G_uv = 8 pi T_uv")
+    print(f"  Fluid T_uv:      (rho+p) u_u u_v + p g_uv")
+    print(f"")
+    print(f"  Scenario 1: Black Hole Accretion Disk")
+    print(f"    Level:         Newtonian (Paczynski-Wiita pseudo-potential)")
+    print(f"    max rho:       {solver_disk.history['max_density'][-1]:.4f}")
+    print(f"    max |v|:       {solver_disk.history['max_velocity'][-1]:.4f}")
+    print(f"")
+    print(f"  Scenario 2: Neutron Star Merger")
+    print(f"    Level:         Post-Newtonian (1PN corrections)")
+    print(f"    max rho:       {solver_merger.history['max_density'][-1]:.4f}")
+    print(f"    GW strain:     {solver_merger.history['gw_strain'][-1]:.6f}")
+    print(f"    Virial:        {solver_merger.history['virial_ratio'][-1]:.4f}")
+    print(f"")
+    print(f"  Scenario 3: Galaxy Formation")
+    print(f"    Level:         Numerical GR (BSSN/CFC lite)")
+    print(f"    max rho:       {solver_galaxy.history['max_density'][-1]:.4f}")
+    print(f"    Lapse range:   [{np.min(sg['lapse']):.4f}, {np.max(sg['lapse']):.4f}]")
+    print(f"    Conf. factor:  [{np.min(sg['conformal_factor']):.4f}, {np.max(sg['conformal_factor']):.4f}]")
+    print(f"")
+    print("  Results:")
+    print("    [+] Newtonian gravity (Poisson solver via FFT)")
+    print("    [+] Post-Newtonian 1PN corrections (v^2/c^2, Phi/c^2)")
+    print("    [+] Numerical GR lite (lapse, shift, conformal factor)")
+    print("    [+] Energy-momentum tensor T^{mu nu} computation")
+    print("    [+] Gravitational wave extraction (quadrupole formula)")
+    print("    [+] Black hole accretion disk (Paczynski-Wiita)")
+    print("    [+] Neutron star binary merger")
+    print("    [+] Galaxy formation via gravitational collapse")
+    print("=" * 72 + "\n")
+
+
+# =============================================================================
 # Main Entry Point
 # =============================================================================
 
@@ -2634,7 +2903,7 @@ Examples:
     parser.add_argument('--train', type=str, choices=['pinn', 'fno', 'deeponet', 'surrogate'],
                        help='Train ML model')
     parser.add_argument('--physics', type=str,
-                       choices=['mhd', 'astro', 'bio', 'climate', 'quantum', 'relativistic', 'qft'],
+                       choices=['mhd', 'astro', 'bio', 'climate', 'quantum', 'relativistic', 'qft', 'gravity'],
                        help='Run physics domain simulation')
     parser.add_argument('--benchmark', action='store_true', help='Run performance benchmarks')
     parser.add_argument('--hybrid', action='store_true', help='Run hybrid CFD->PINN demo')
@@ -2668,6 +2937,9 @@ Examples:
     # Quantum Field Theory
     parser.add_argument('--qft', action='store_true',
                        help='Quantum Field Theory simulation (Lattice QFT + PINN)')
+    # Gravity + Fluid Coupling
+    parser.add_argument('--gravity-coupling', action='store_true', dest='gravity_coupling',
+                       help='Gravity + Fluid Coupling (Einstein equations + fluid dynamics)')
     
     args = parser.parse_args()
     
@@ -2719,6 +2991,8 @@ Examples:
         run_physics_aware_discovery()
     elif args.qft:
         run_qft_simulation()
+    elif args.gravity_coupling:
+        run_gravity_fluid_coupling()
     else:
         interactive_menu()
 
