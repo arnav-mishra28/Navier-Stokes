@@ -9,7 +9,7 @@
   ║     ML:   PINN / FNO / DeepONet / U-Net / Autoencoder / NeuralODE  ║
   ║     AI:   SINDy / Genetic Programming / Blow-up Detection           ║
   ║     AGI:  Physics Discovery / Hypothesis Engine / Knowledge Base    ║
-  ║     Physics: Fluid · MHD · Astro · Bio · Climate · Quantum · Rel · Gravity ║
+  ║     Physics: Fluid · MHD · Astro · Bio · Climate · Quantum · Rel · Grav · Cosmo ║
   ║     Viz:  Real-time 2D (Pygame) + 3D (PyVista/Matplotlib)          ║
   ╚═══════════════════════════════════════════════════════════════════════╝
 
@@ -473,6 +473,10 @@ def run_physics_demo(domain: str):
         run_gravity_fluid_coupling()
         return
 
+    elif domain == "cosmology":
+        run_cosmological_simulation()
+        return
+
     else:
         print(f"  Unknown domain: {domain}")
         return
@@ -741,6 +745,7 @@ def interactive_menu():
     print("  [26] 🔬 Physics-Aware Equation Discovery")
     print("  [27] ⚛ Quantum Field Theory (Lattice QFT + PINN)")
     print("  [28] 🌌 Gravity + Fluid Coupling (Einstein Equations)")
+    print("  [29] 🌌 Cosmological Fluid Modeling (Friedmann + N-body)")
     print("  [0]  ❌ Exit")
     print()
     
@@ -779,6 +784,7 @@ def interactive_menu():
         "26": lambda: run_physics_aware_discovery(),
         "27": lambda: run_qft_simulation(),
         "28": lambda: run_gravity_fluid_coupling(),
+        "29": lambda: run_cosmological_simulation(),
         "0": lambda: print("  Goodbye!"),
     }
     
@@ -2627,6 +2633,7 @@ def run_gravity_fluid_coupling():
     print("=" * 72 + "\n")
 
     from physics.gravity_fluid_coupling import GravityFluidSolver
+    import gc
 
     setup_plot_style()
     import matplotlib.pyplot as plt
@@ -2640,7 +2647,7 @@ def run_gravity_fluid_coupling():
     print("  [1/3] Black Hole Accretion Disk (Newtonian + Paczynski-Wiita)")
     print("        Phi_PW = -GM / (r - r_s),  v_phi = sqrt(GM*r / (r-r_s)^2)")
 
-    nx, ny = 192, 192
+    nx, ny = 96, 96
     Lx = 20.0
 
     solver_disk = GravityFluidSolver(
@@ -2650,7 +2657,7 @@ def run_gravity_fluid_coupling():
     solver_disk.initialize_accretion_disk(M_bh=3.0, rho0=0.5, r_in=2.0, r_out=8.0, T0=0.5)
     print(f"    Grid: {nx}x{ny}  |  L = {Lx}")
 
-    n_disk = 200
+    n_disk = 100
     t0 = time.perf_counter()
     solver_disk.advance(n_disk, record=True)
     el_disk = time.perf_counter() - t0
@@ -2671,7 +2678,7 @@ def run_gravity_fluid_coupling():
         M_star=2.0, separation=5.0, v_orbit=0.08, sigma=1.2,
     )
 
-    n_merger = 250
+    n_merger = 100
     t0 = time.perf_counter()
     solver_merger.advance(n_merger, record=True)
     el_merger = time.perf_counter() - t0
@@ -2684,13 +2691,14 @@ def run_gravity_fluid_coupling():
     print("\n  [3/3] Galaxy Formation (Numerical GR — BSSN/CFC lite)")
     print("        ds^2 = -alpha^2 dt^2 + psi^4 (dx^2 + dy^2)")
 
+    import gc; gc.collect()
     solver_galaxy = GravityFluidSolver(
-        nx=nx, ny=ny, Lx=30.0, Ly=30.0, dt=0.003,
+        nx=64, ny=64, Lx=30.0, Ly=30.0, dt=0.003,
         gravity_level="numerical_gr", gamma_eos=5.0/3.0,
     )
-    solver_galaxy.initialize_galaxy_formation(n_clumps=6, rho_bg=0.02, perturbation=0.1, seed=42)
+    solver_galaxy.initialize_galaxy_formation(n_clumps=4, rho_bg=0.02, perturbation=0.1, seed=42)
 
-    n_galaxy = 200
+    n_galaxy = 100
     t0 = time.perf_counter()
     solver_galaxy.advance(n_galaxy, record=True)
     el_galaxy = time.perf_counter() - t0
@@ -2702,15 +2710,24 @@ def run_gravity_fluid_coupling():
     # ================================================================
     print("\n  Generating publication-quality visualization...")
 
-    fig = plt.figure(figsize=(22, 11))
+    gc.collect()
+    plt.rcParams['figure.dpi'] = 72
+    fig = plt.figure(figsize=(12, 6))
     fig.patch.set_facecolor('#0d1117')
     fig.suptitle(
         r'Gravity + Fluid Coupling   |   $G_{\mu\nu} = 8\pi\, T_{\mu\nu}$',
-        fontsize=16, fontweight='bold', color='#58a6ff', y=0.97)
+        fontsize=14, fontweight='bold', color='#58a6ff', y=0.97)
 
     sd = solver_disk.get_state()
+    hist_disk = dict(solver_disk.history)
+    del solver_disk
     sm = solver_merger.get_state()
+    hist_merger = dict(solver_merger.history)
+    del solver_merger
     sg = solver_galaxy.get_state()
+    hist_galaxy = dict(solver_galaxy.history)
+    del solver_galaxy
+    gc.collect()
     ext_d = [-Lx/2, Lx/2, -Lx/2, Lx/2]
     ext_g = [-15, 15, -15, 15]
 
@@ -2734,7 +2751,7 @@ def run_gravity_fluid_coupling():
 
     plt.tight_layout(rect=[0, 0.01, 1, 0.94], h_pad=2.5, w_pad=2.0)
     save_path = os.path.join(IMAGES_DIR, 'gravity_fluid_coupling.png')
-    plt.savefig(save_path, dpi=200, bbox_inches='tight', facecolor='#0d1117')
+    plt.savefig(save_path, dpi=100, bbox_inches='tight', facecolor='#0d1117')
     show_or_close(fig)
     print(f"\n  Visualization saved: {save_path}")
     # ── Summary ──
@@ -2746,18 +2763,18 @@ def run_gravity_fluid_coupling():
     print(f"")
     print(f"  Scenario 1: Black Hole Accretion Disk")
     print(f"    Level:         Newtonian (Paczynski-Wiita pseudo-potential)")
-    print(f"    max rho:       {solver_disk.history['max_density'][-1]:.4f}")
-    print(f"    max |v|:       {solver_disk.history['max_velocity'][-1]:.4f}")
+    print(f"    max rho:       {hist_disk['max_density'][-1]:.4f}")
+    print(f"    max |v|:       {hist_disk['max_velocity'][-1]:.4f}")
     print(f"")
     print(f"  Scenario 2: Neutron Star Merger")
     print(f"    Level:         Post-Newtonian (1PN corrections)")
-    print(f"    max rho:       {solver_merger.history['max_density'][-1]:.4f}")
-    print(f"    GW strain:     {solver_merger.history['gw_strain'][-1]:.6f}")
-    print(f"    Virial:        {solver_merger.history['virial_ratio'][-1]:.4f}")
+    print(f"    max rho:       {hist_merger['max_density'][-1]:.4f}")
+    print(f"    GW strain:     {hist_merger['gw_strain'][-1]:.6f}")
+    print(f"    Virial:        {hist_merger['virial_ratio'][-1]:.4f}")
     print(f"")
     print(f"  Scenario 3: Galaxy Formation")
     print(f"    Level:         Numerical GR (BSSN/CFC lite)")
-    print(f"    max rho:       {solver_galaxy.history['max_density'][-1]:.4f}")
+    print(f"    max rho:       {hist_galaxy['max_density'][-1]:.4f}")
     print(f"    Lapse range:   [{np.min(sg['lapse']):.4f}, {np.max(sg['lapse']):.4f}]")
     print(f"    Conf. factor:  [{np.min(sg['conformal_factor']):.4f}, {np.max(sg['conformal_factor']):.4f}]")
     print(f"")
@@ -2805,14 +2822,17 @@ def run_cosmological_simulation():
 
     results = {}
 
+    import gc
+    gc.collect()
+
     # ── Scenario 1: Cosmic Web Formation ──
     print("  [1/2] Cosmic Web Formation (N-body + Fluid hybrid)")
     print("        P(k) ~ k^n_s  (Harrison-Zeldovich spectrum)")
     print("        Omega_m=0.3, Omega_Lambda=0.7, Omega_b=0.05")
 
-    nx, ny = 256, 256
+    nx, ny = 64, 64
     Lbox = 100.0
-    n_particles = 8100  # 90x90 grid
+    n_particles = 1024  # 32x32 grid
 
     solver_web = CosmologicalFluidSolver(
         nx=nx, ny=ny, Lbox=Lbox, dt=0.005,
@@ -2825,7 +2845,7 @@ def run_cosmological_simulation():
     # Record initial P(k)
     k_init, Pk_init = solver_web.compute_power_spectrum()
 
-    n_web = 300
+    n_web = 150
     t0 = time.perf_counter()
     solver_web.advance(n_web, record=True)
     el_web = time.perf_counter() - t0
@@ -2840,14 +2860,15 @@ def run_cosmological_simulation():
     print("\n  [2/2] Inflationary Expansion (scalar field driven)")
     print("        V(phi) = V0 * phi^2 / 2  (chaotic inflation)")
 
+    gc.collect()
     solver_inf = CosmologicalFluidSolver(
-        nx=128, ny=128, Lbox=Lbox, dt=0.008,
+        nx=64, ny=64, Lbox=Lbox, dt=0.008,
         Omega_m=0.3, Omega_Lambda=0.7, Omega_b=0.05,
-        n_particles=4096, seed=123,
+        n_particles=2025, seed=123,
     )
     solver_inf.initialize_inflation(phi0=3.0, dphi0=-0.1)
 
-    n_inf = 200
+    n_inf = 100
     t0 = time.perf_counter()
     solver_inf.advance(n_inf, record=True)
     el_inf = time.perf_counter() - t0
@@ -2860,7 +2881,9 @@ def run_cosmological_simulation():
     # ================================================================
     print("\n  Generating publication-quality visualization...")
 
-    fig = plt.figure(figsize=(24, 12))
+    gc.collect()
+    plt.rcParams['figure.dpi'] = 72
+    fig = plt.figure(figsize=(14, 7))
     fig.patch.set_facecolor('#0d1117')
     fig.suptitle(
         r'Cosmological Fluid Modeling   |   $\left(\dot{a}/a\right)^2 = \frac{8\pi G}{3}\rho - \frac{k}{a^2} + \frac{\Lambda}{3}$',
@@ -2970,7 +2993,7 @@ def run_cosmological_simulation():
 
     plt.tight_layout(rect=[0, 0.01, 1, 0.94], h_pad=2.5, w_pad=2.0)
     save_path = os.path.join(IMAGES_DIR, 'cosmological_fluid.png')
-    plt.savefig(save_path, dpi=200, bbox_inches='tight', facecolor='#0d1117')
+    plt.savefig(save_path, dpi=100, bbox_inches='tight', facecolor='#0d1117')
     show_or_close(fig)
     print(f"\n  Visualization saved: {save_path}")
 
@@ -3046,7 +3069,7 @@ Examples:
     parser.add_argument('--train', type=str, choices=['pinn', 'fno', 'deeponet', 'surrogate'],
                        help='Train ML model')
     parser.add_argument('--physics', type=str,
-                       choices=['mhd', 'astro', 'bio', 'climate', 'quantum', 'relativistic', 'qft', 'gravity'],
+                       choices=['mhd', 'astro', 'bio', 'climate', 'quantum', 'relativistic', 'qft', 'gravity', 'cosmology'],
                        help='Run physics domain simulation')
     parser.add_argument('--benchmark', action='store_true', help='Run performance benchmarks')
     parser.add_argument('--hybrid', action='store_true', help='Run hybrid CFD->PINN demo')
@@ -3083,6 +3106,9 @@ Examples:
     # Gravity + Fluid Coupling
     parser.add_argument('--gravity-coupling', action='store_true', dest='gravity_coupling',
                        help='Gravity + Fluid Coupling (Einstein equations + fluid dynamics)')
+    # Cosmological Fluid Modeling
+    parser.add_argument('--cosmology', action='store_true',
+                        help='Cosmological Fluid Modeling (Friedmann + N-body + cosmic web)')
     
     args = parser.parse_args()
     
@@ -3136,6 +3162,8 @@ Examples:
         run_qft_simulation()
     elif args.gravity_coupling:
         run_gravity_fluid_coupling()
+    elif args.cosmology:
+        run_cosmological_simulation()
     else:
         interactive_menu()
 
