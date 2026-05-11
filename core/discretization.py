@@ -1,10 +1,4 @@
-"""
-=============================================================================
-Discretization Schemes
-Finite Difference Methods for spatial derivatives in the Navier-Stokes equations.
-Includes: upwind, central, WENO-5, and compact schemes.
-=============================================================================
-"""
+"""Discretization Schemes"""
 
 import numpy as np
 from typing import Optional

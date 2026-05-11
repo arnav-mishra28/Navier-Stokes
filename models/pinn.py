@@ -1,20 +1,4 @@
-"""
-=============================================================================
-Physics-Informed Neural Network (PINN) for Navier-Stokes
-Embeds PDE constraints directly into the loss function.
-
-Key innovation: No labeled data needed — learns from physics itself.
-
-Loss = λ_data * L_data + λ_pde * L_NS + λ_bc * L_BC + λ_ic * L_IC
-
-where L_NS enforces:
-    ∂u/∂t + u∂u/∂x + v∂u/∂y = -∂p/∂x + ν(∂²u/∂x² + ∂²u/∂y²)
-    ∂v/∂t + u∂v/∂x + v∂v/∂y = -∂p/∂y + ν(∂²v/∂x² + ∂²v/∂y²)
-    ∂u/∂x + ∂v/∂y = 0
-
-Uses automatic differentiation for exact derivative computation.
-=============================================================================
-"""
+"""Physics-Informed Neural Network (PINN) for Navier-Stokes"""
 
 import torch
 import torch.nn as nn
@@ -86,14 +70,6 @@ class PINN(nn.Module):
     
     Architecture:
         Input: (x, y, t) → [Fourier Features] → [MLP with residual connections] → (u, v, p)
-    
-    Features:
-        - Random Fourier feature embedding for multi-scale learning
-        - Residual connections for stable deep training
-        - Adaptive activation functions
-        - Grad-norm based adaptive loss weighting
-        - NTK-aware learning rate scheduling
-        - Causal training (time-progressive)
     """
     
     def __init__(

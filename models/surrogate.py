@@ -1,19 +1,4 @@
-"""
-=============================================================================
-U-Net Surrogate Model for Instant Flow Field Prediction
-
-Encoder-decoder architecture with skip connections for
-image-to-image translation: conditions → flow fields.
-
-Used as Tier-1 fast predictor in the hybrid system.
-Speed: ~1000x faster than CFD, ~10ms per prediction.
-
-Architecture:
-    Encoder: Conv → BatchNorm → ReLU → MaxPool (×4)
-    Bottleneck: Conv → BatchNorm → ReLU
-    Decoder: UpConv → Concat(skip) → Conv → BatchNorm → ReLU (×4)
-=============================================================================
-"""
+"""U-Net Surrogate Model for Instant Flow Field Prediction"""
 
 import torch
 import torch.nn as nn
@@ -76,12 +61,6 @@ class UNetSurrogate(nn.Module):
     
     Input: Condition channels (e.g., obstacle mask, Reynolds number, BCs)
     Output: Flow fields (u, v, p)
-    
-    Features:
-        - Attention-gated skip connections
-        - Residual convolution blocks
-        - Multi-scale feature extraction
-        - Condition embedding (physical parameters)
     """
     
     def __init__(

@@ -1,39 +1,4 @@
-"""
-=============================================================================
-Lattice Quantum Field Theory (QFT) Simulator
-
-Simulates scalar field dynamics on a discretized spacetime lattice.
-
-Governing Equation (Klein-Gordon + phi^4 interaction):
-
-    □φ + m²φ + λφ³ = 0
-
-    where □ = d'Alembertian = -∂²/∂t² + ∇²  (Minkowski signature -,+,+)
-
-Expanded in 2+1D:
-
-    ∂²φ/∂t² = ∇²φ - m²φ - λφ³
-
-This models:
-    - Vacuum fluctuations (quantum zero-point energy)
-    - Scalar field interactions (φ⁴ theory)
-    - Early universe inflation (slow-roll scalar field)
-    - Higgs-like symmetry breaking (Mexican hat potential)
-    - Kink/anti-kink solitons
-    - Bubble nucleation (first-order phase transitions)
-
-Numerical Method:
-    - Leapfrog (Störmer-Verlet) time integration
-    - 2nd-order finite differences on spatial lattice
-    - Periodic boundary conditions
-    - Symplectic integrator preserves phase-space volume
-
-References:
-    Peskin & Schroeder, "An Introduction to Quantum Field Theory"
-    Montvay & Münster, "Quantum Fields on a Lattice"
-    Rajaraman, "Solitons and Instantons"
-=============================================================================
-"""
+"""Lattice Quantum Field Theory (QFT) Simulator"""
 
 import numpy as np
 from typing import Dict, List, Tuple, Optional
@@ -122,7 +87,7 @@ class LatticeQFTSolver:
             'field_mean': [], 'field_rms': [], 'field_max': [],
         }
 
-    # ─── Potential and Force ─────────────────────────────────────────
+    # Potential and Force
 
     def potential(self, phi: np.ndarray) -> np.ndarray:
         """Compute V(φ) at each lattice site."""
@@ -142,7 +107,7 @@ class LatticeQFTSolver:
             # dV/dφ = m²φ + λφ³
             return self.mass**2 * phi + self.lam * phi**3
 
-    # ─── Spatial Operators ───────────────────────────────────────────
+    # Spatial Operators
 
     def _laplacian(self, f: np.ndarray) -> np.ndarray:
         """Discrete Laplacian with periodic BC."""
@@ -157,7 +122,7 @@ class LatticeQFTSolver:
         dfdy = (np.roll(f, -1, axis=0) - np.roll(f, 1, axis=0)) / (2 * self.dy)
         return dfdx**2 + dfdy**2
 
-    # ─── Initial Conditions ──────────────────────────────────────────
+    # Initial Conditions
 
     def initialize_vacuum_fluctuations(self, amplitude: float = 0.01, seed: int = 42):
         """
@@ -274,7 +239,7 @@ class LatticeQFTSolver:
         self.pi_field = -amplitude * omega * np.sin(k * self.X)
         self.phi_prev = self.phi - self.dt * self.pi_field
 
-    # ─── Time Evolution ──────────────────────────────────────────────
+    # Time Evolution
 
     def step(self):
         """
@@ -314,7 +279,7 @@ class LatticeQFTSolver:
             if record:
                 self._record_diagnostics()
 
-    # ─── Energy Computation ──────────────────────────────────────────
+    # Energy Computation
 
     def compute_energy_density(self) -> Dict[str, np.ndarray]:
         """
@@ -351,7 +316,7 @@ class LatticeQFTSolver:
             'total': float(np.sum(E['total']) * dA),
         }
 
-    # ─── Field Spectrum ──────────────────────────────────────────────
+    # Field Spectrum
 
     def compute_field_spectrum(self) -> Tuple[np.ndarray, np.ndarray]:
         """
@@ -421,7 +386,7 @@ class LatticeQFTSolver:
 
         return r_centers, corr_r
 
-    # ─── Topological Charge ──────────────────────────────────────────
+    # Topological Charge
 
     def compute_domain_walls(self) -> np.ndarray:
         """
@@ -433,7 +398,7 @@ class LatticeQFTSolver:
         grad_sq = self._gradient_sq(self.phi)
         return np.sqrt(grad_sq)
 
-    # ─── Diagnostics ─────────────────────────────────────────────────
+    # Diagnostics
 
     def _record_diagnostics(self):
         E = self.compute_total_energy()

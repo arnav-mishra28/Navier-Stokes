@@ -1,27 +1,4 @@
-"""
-=============================================================================
-Biophysics Flow Solver
-Fluid dynamics in biological systems.
-
-Applications:
-    1. Blood flow in arteries (hemodynamics)
-       - Pulsatile flow with Womersley profiles
-       - Non-Newtonian rheology (shear-thinning blood)
-       - Vessel compliance and elasticity
-    
-    2. Airflow in lungs
-       - Branching airways (Weibel model)
-       - Particle deposition
-    
-    3. Cerebrospinal fluid dynamics
-    4. Cell swimming (low Reynolds number)
-
-Key models:
-    - Carreau-Yasuda for blood viscosity: η(γ̇) = η∞ + (η₀-η∞)[1+(λγ̇)²]^((n-1)/2)
-    - Womersley number: α = R√(ω/ν) (pulsatile flow parameter)
-    - Murray's law: r³_parent = r³_child1 + r³_child2 (optimal branching)
-=============================================================================
-"""
+"""Biophysics Flow Solver"""
 
 import numpy as np
 from typing import Dict, List, Tuple, Optional

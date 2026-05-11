@@ -1,24 +1,4 @@
-"""
-=============================================================================
-Physics-Informed Neural Network (PINN) for Quantum Field Theory
-
-Learns scalar field evolution φ(x,y,t) by embedding the
-Klein-Gordon + φ⁴ equation directly into the loss function:
-
-    □φ + m²φ + λφ³ = 0
-    => ∂²φ/∂t² - ∇²φ + m²φ + λφ³ = 0
-
-Loss = λ_pde * L_KG + λ_data * L_data + λ_energy * L_energy
-
-Uses automatic differentiation for exact 2nd-order derivatives.
-
-Key innovation over classical lattice QFT:
-    - Continuous spacetime representation (mesh-free)
-    - Learns field dynamics from sparse data + physics constraints
-    - Generalizes across initial conditions
-    - Differentiable energy-momentum tensor
-=============================================================================
-"""
+"""Physics-Informed Neural Network (PINN) for Quantum Field Theory"""
 
 import torch
 import torch.nn as nn

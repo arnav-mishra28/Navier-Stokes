@@ -1,29 +1,4 @@
-"""
-=============================================================================
-Magnetohydrodynamics (MHD) Solver
-Navier-Stokes + Maxwell's equations coupling.
-
-Governing equations (incompressible MHD):
-    ∂u/∂t + (u·∇)u = -∇p + ν∇²u + (1/μ₀ρ)(B·∇)B + f
-    ∂B/∂t = ∇×(u×B) + η∇²B
-    ∇·u = 0
-    ∇·B = 0
-
-where:
-    B = magnetic field vector
-    η = magnetic diffusivity (resistivity)
-    μ₀ = permeability of free space
-    J = ∇×B / μ₀ = current density
-    Lorentz force = J × B = (1/μ₀)(B·∇)B - ∇(B²/2μ₀)
-
-Applications:
-    - Plasma confinement (fusion reactors, tokamaks)
-    - Solar physics (coronal mass ejections, sunspots)
-    - Astrophysical jets and accretion disks
-    - Liquid metal flows (steel casting, cooling)
-    - Geodynamo (Earth's magnetic field generation)
-=============================================================================
-"""
+"""Magnetohydrodynamics (MHD) Solver"""
 
 import numpy as np
 from typing import Dict, Tuple, Optional, List
@@ -192,7 +167,7 @@ class MHDSolver:
         # Lorentz force
         FLx, FLy = self._compute_lorentz_force()
         
-        # ---- Velocity prediction ----
+        # Velocity prediction
         # Advection: -(u·∇)u
         adv_u = self.u * self._ddx(self.u) + self.v * self._ddy(self.u)
         adv_v = self.u * self._ddx(self.v) + self.v * self._ddy(self.v)
@@ -204,14 +179,14 @@ class MHDSolver:
         u_star = self.u + self.dt * (-adv_u + diff_u + FLx)
         v_star = self.v + self.dt * (-adv_v + diff_v + FLy)
         
-        # ---- Pressure projection ----
+        # Pressure projection
         div_ustar = self._ddx(u_star) + self._ddy(v_star)
         self.p = self._solve_poisson(div_ustar / self.dt)
         
         self.u = u_star - self.dt * self._ddx(self.p)
         self.v = v_star - self.dt * self._ddy(self.p)
         
-        # ---- Magnetic field update (induction equation) ----
+        # Magnetic field update (induction equation)
         # ∂B/∂t = ∇×(u×B) + η∇²B
         # In 2D: ∂Bx/∂t = ∂(uBx - vBx... actually:
         # ∂Bx/∂t = -u∂Bx/∂x - v∂Bx/∂y + Bx∂u/∂x + By∂u/∂y + η∇²Bx
@@ -232,7 +207,7 @@ class MHDSolver:
         self.Bx += self.dt * (-adv_Bx + stretch_Bx + diff_Bx)
         self.By += self.dt * (-adv_By + stretch_By + diff_By)
         
-        # ---- Divergence cleaning for B (projection) ----
+        # Divergence cleaning for B (projection)
         div_B = self._ddx(self.Bx) + self._ddy(self.By)
         phi = self._solve_poisson(div_B)
         self.Bx -= self._ddx(phi)

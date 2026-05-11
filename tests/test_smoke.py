@@ -1,9 +1,4 @@
-"""
-=============================================================================
-Smoke Test Suite for Navier-Stokes ML/DL Hybrid System
-Run: python -m pytest tests/test_smoke.py -v
-=============================================================================
-"""
+"""Smoke Test Suite for Navier-Stokes ML/DL Hybrid System"""
 
 import sys
 import os
@@ -19,9 +14,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 
-# =============================================================================
 # Core Solver Tests
-# =============================================================================
 
 class TestCoreSolver2D:
     """Test 2D incompressible NS solver."""
@@ -126,9 +119,7 @@ class TestCoreSolver3D:
         assert len(k) > 0 and len(E) > 0
 
 
-# =============================================================================
 # Physics Domain Tests
-# =============================================================================
 
 class TestPhysicsDomains:
     """Test all cross-physics solvers."""
@@ -172,9 +163,7 @@ class TestPhysicsDomains:
         assert np.isfinite(solver.get_density()).all()
 
 
-# =============================================================================
 # ML Model Tests
-# =============================================================================
 
 class TestMLModels:
     """Test all neural network model architectures."""
@@ -229,9 +218,7 @@ class TestMLModels:
         assert y.shape[0] == 4
 
 
-# =============================================================================
 # Training Pipeline Tests
-# =============================================================================
 
 class TestTrainingPipeline:
     """Test training infrastructure."""
@@ -290,9 +277,7 @@ class TestTrainingPipeline:
         assert result['total'].item() > 0
 
 
-# =============================================================================
 # Utility Tests
-# =============================================================================
 
 class TestUtilities:
     """Test helper functions."""
@@ -331,9 +316,7 @@ class TestUtilities:
         assert t.elapsed > 0
 
 
-# =============================================================================
 # Visualization Tests
-# =============================================================================
 
 class TestVisualization:
     """Test rendering utilities."""

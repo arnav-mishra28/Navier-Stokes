@@ -1,12 +1,4 @@
-"""
-=============================================================================
-3D Incompressible Navier-Stokes Solver
-Extension of 2D projection method to three dimensions.
-
-Includes vortex stretching term unique to 3D turbulence:
-    ∂ω/∂t + (u·∇)ω = (ω·∇)u + ν∇²ω
-=============================================================================
-"""
+"""3D Incompressible Navier-Stokes Solver"""
 
 import numpy as np
 from typing import Optional, Dict, List, Tuple

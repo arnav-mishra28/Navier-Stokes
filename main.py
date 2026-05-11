@@ -1,45 +1,4 @@
-"""
-=============================================================================
-  ╔═══════════════════════════════════════════════════════════════════════╗
-  ║     NAVIER-STOKES ML/DL HYBRID SIMULATION SYSTEM                    ║
-  ║     + TURBULENCE DISCOVERY AI                                        ║
-  ║     Research-Grade CFD + Deep Learning Platform                      ║
-  ║                                                                     ║
-  ║     Core: Incompressible Navier-Stokes (Projection Method)          ║
-  ║     ML:   PINN / FNO / DeepONet / U-Net / Autoencoder / NeuralODE  ║
-  ║     AI:   SINDy / Genetic Programming / Blow-up Detection           ║
-  ║     AGI:  Physics Discovery / Hypothesis Engine / Knowledge Base    ║
-  ║     Physics: Fluid · MHD · Astro · Bio · Climate · Quantum · Rel · Grav · Cosmo ║
-  ║     Viz:  Real-time 2D (Pygame) + 3D (PyVista/Matplotlib)          ║
-  ╚═══════════════════════════════════════════════════════════════════════╝
-
-  Master entry point — orchestrates the entire system.
-  
-  Usage:
-      python main.py                     → Interactive mode selector
-      python main.py --demo              → Run Taylor-Green vortex demo
-      python main.py --viz2d             → Launch 2D real-time visualizer
-      python main.py --viz3d             → Launch 3D visualizer
-      python main.py --dashboard         → Launch Streamlit dashboard
-      python main.py --train pinn        → Train PINN model
-      python main.py --train fno         → Train FNO model
-      python main.py --train deeponet    → Train DeepONet model
-      python main.py --train surrogate   → Train U-Net surrogate model
-      python main.py --benchmark         → Run CFD benchmarks
-      python main.py --physics mhd       → Run MHD simulation
-      python main.py --physics astro     → Run astrophysics simulation
-      python main.py --physics bio       → Run biophysics simulation
-      python main.py --physics climate   → Run climate simulation
-      python main.py --physics quantum   → Run quantum fluid simulation
-      python main.py --physics relativistic → Run relativistic NS (Israel-Stewart)
-      python main.py --hybrid            → Run hybrid CFD→PINN demo
-      python main.py --gpu               → Use GPU-accelerated solver
-      python main.py --vort-conf 5.0     → Enable vorticity confinement
-      python main.py --agi               → Full AGI scientific discovery system
-      python main.py --physics-discover  → Physics-aware equation discovery
-      python main.py --no-gui            → Headless mode (no plt.show())
-=============================================================================
-"""
+"""Navier-Stokes Research Platform — Master CLI entry point."""
 
 import sys
 import os
@@ -57,12 +16,10 @@ sys.path.insert(0, PROJECT_ROOT)
 HEADLESS = False
 
 
-# =============================================================================
-# Publication-quality plot styling
-# =============================================================================
+# plot styling
 
 def setup_plot_style():
-    """Configure matplotlib for publication-quality dark-themed plots."""
+    """Configure matplotlib for dark-themed plots."""
     import matplotlib.pyplot as plt
     import matplotlib as mpl
 
@@ -113,9 +70,7 @@ def show_or_close(fig):
         plt.close(fig)
 
 
-# =============================================================================
 # Banner
-# =============================================================================
 
 def print_banner():
     """Print the system banner."""
@@ -173,12 +128,10 @@ def check_dependencies():
     return deps
 
 
-# =============================================================================
 # Taylor-Green Vortex Demo
-# =============================================================================
 
 def run_demo():
-    """Run the Taylor-Green vortex decay demo with publication-quality plots."""
+    """Run the Taylor-Green vortex decay demo with plots."""
     print("\n" + "="*60)
     print("  DEMO: Taylor-Green Vortex Decay")
     print("  Analytical benchmark for NS solver validation")
@@ -237,7 +190,7 @@ def run_demo():
     print(f"\n  Simulation complete: {n_steps} steps in {elapsed:.2f}s")
     print(f"  Performance: {n_steps/elapsed:.0f} steps/sec")
     
-    # ---- Publication-quality visualization ----
+    # Visualization
     try:
         import matplotlib.pyplot as plt
         import matplotlib.colors as mcolors
@@ -249,7 +202,7 @@ def run_demo():
             fontsize=18, fontweight='bold', color='#58a6ff', y=0.97
         )
         
-        # — Vorticity field —
+        # Vorticity field
         ax1 = fig.add_subplot(2, 3, 1)
         omega = compute_vorticity(solver.u, solver.v, solver.dx, solver.dy)
         vmax = np.max(np.abs(omega))
@@ -265,7 +218,7 @@ def run_demo():
         cb1.ax.yaxis.set_tick_params(color='#8b949e')
         cb1.outline.set_edgecolor('#30363d')
         
-        # — Velocity magnitude —
+        # Velocity magnitude
         ax2 = fig.add_subplot(2, 3, 2)
         speed = solver.get_velocity_magnitude()
         im2 = ax2.imshow(
@@ -279,7 +232,7 @@ def run_demo():
         cb2.ax.yaxis.set_tick_params(color='#8b949e')
         cb2.outline.set_edgecolor('#30363d')
         
-        # — Pressure —
+        # Pressure
         ax3 = fig.add_subplot(2, 3, 3)
         im3 = ax3.imshow(
             solver.p, cmap='cividis', origin='lower',
@@ -292,7 +245,7 @@ def run_demo():
         cb3.ax.yaxis.set_tick_params(color='#8b949e')
         cb3.outline.set_edgecolor('#30363d')
         
-        # — Streamlines —
+        # Streamlines
         ax4 = fig.add_subplot(2, 3, 4)
         X, Y = np.meshgrid(
             np.linspace(0, 2*np.pi, nx),
@@ -311,7 +264,7 @@ def run_demo():
         ax4.set_xlabel('x'); ax4.set_ylabel('y')
         ax4.set_xlim(0, 2*np.pi); ax4.set_ylim(0, 2*np.pi)
         
-        # — KE Decay —
+        # KE Decay
         ax5 = fig.add_subplot(2, 3, 5)
         ax5.plot(times, ke_numerical, color='#58a6ff', lw=2.2, label='Numerical', zorder=3)
         ax5.plot(times, ke_analytical, color='#f97583', lw=2.2, ls='--', label='Analytical', zorder=2)
@@ -322,7 +275,7 @@ def run_demo():
         ax5.legend(framealpha=0.8)
         ax5.grid(True, alpha=0.15, color='#30363d')
         
-        # — Error —
+        # Error
         ax6 = fig.add_subplot(2, 3, 6)
         errors = [abs(n - a) / max(a, 1e-10) for n, a in zip(ke_numerical, ke_analytical)]
         ax6.semilogy(times, errors, color='#7ee787', lw=2.2)
@@ -342,9 +295,7 @@ def run_demo():
         print("  (matplotlib not available, skipping plots)")
 
 
-# =============================================================================
 # Benchmarks
-# =============================================================================
 
 def run_benchmark():
     """Run CFD solver benchmarks."""
@@ -413,12 +364,10 @@ def run_benchmark():
             print(f"    {method:>10s}: Failed ({e})")
 
 
-# =============================================================================
 # Physics Domain Demos
-# =============================================================================
 
 def run_physics_demo(domain: str):
-    """Run a physics domain-specific demo with publication-quality visuals."""
+    """Run a physics domain-specific demo with visuals."""
     print(f"\n{'='*60}")
     print(f"  PHYSICS DEMO: {domain.upper()}")
     print(f"{'='*60}\n")
@@ -490,7 +439,7 @@ def run_physics_demo(domain: str):
     
     print(f"  Completed in {elapsed:.2f}s ({n_steps/elapsed:.1f} steps/s)")
     
-    # ---- Publication-quality visualization ----
+    # Visualization
     try:
         import matplotlib.pyplot as plt
         import matplotlib.colors as mcolors
@@ -504,14 +453,14 @@ def run_physics_demo(domain: str):
             fontsize=16, fontweight='bold', color='#58a6ff', y=0.98
         )
         
-        # — Field 1: Velocity magnitude —
+        # Field 1: Velocity magnitude
         vel = state.get('velocity_magnitude', np.sqrt(state['u']**2 + state['v']**2))
         im1 = axes[0].imshow(vel, cmap='magma', origin='lower', interpolation='bicubic')
         axes[0].set_title('Velocity Magnitude', color='#79c0ff')
         cb1 = plt.colorbar(im1, ax=axes[0], fraction=0.046, pad=0.04)
         cb1.outline.set_edgecolor('#30363d')
         
-        # — Field 2: Domain-specific —
+        # Field 2: Domain-specific
         if 'Jz' in state:
             field2, cmap2, t2 = state['Jz'], 'RdBu_r', 'Current Density  Jz'
             vabs = np.max(np.abs(field2))
@@ -538,7 +487,7 @@ def run_physics_demo(domain: str):
         cb2 = plt.colorbar(im2, ax=axes[1], fraction=0.046, pad=0.04)
         cb2.outline.set_edgecolor('#30363d')
         
-        # — Field 3: Pressure / phase / temperature —
+        # Field 3: Pressure / phase / temperature
         if 'phase' in state:
             im3 = axes[2].imshow(state['phase'], cmap='twilight_shifted', origin='lower',
                                  interpolation='bicubic')
@@ -577,9 +526,7 @@ def run_physics_demo(domain: str):
         print("  (matplotlib not available)")
 
 
-# =============================================================================
 # ML Training
-# =============================================================================
 
 def run_training(model_type: str):
     """Run ML model training."""
@@ -704,9 +651,7 @@ def run_training(model_type: str):
         print(f"  Available: pinn, fno, deeponet, surrogate")
 
 
-# =============================================================================
 # Interactive Menu
-# =============================================================================
 
 def interactive_menu():
     """Interactive mode selector."""
@@ -807,9 +752,7 @@ def _launch_viz3d():
     viz.run()
 
 
-# =============================================================================
 # New Feature Demos
-# =============================================================================
 
 def run_vorticity_confinement_demo():
     """Side-by-side comparison: with vs without vorticity confinement."""
@@ -927,7 +870,7 @@ def run_hybrid_demo():
     setup_plot_style()
     import matplotlib.pyplot as plt
     
-    # Step 1: Generate CFD truth data
+    # Generate CFD truth data
     print("  [1/3] Generating CFD truth data...")
     solver = FluidSolver2D(nx=64, ny=64, Lx=2*np.pi, Ly=2*np.pi,
                            nu=0.01, dt=0.01, pressure_solver="fft")
@@ -956,7 +899,7 @@ def run_hybrid_demo():
     v_t = torch.tensor(np.concatenate(v_data), dtype=torch.float32).unsqueeze(1)
     print(f"    Collected {len(x_t)} data points")
     
-    # Step 2: Train PINN on CFD data
+    # Train PINN on CFD data
     print("  [2/3] Training PINN on CFD data (quick demo)...")
     model = PINN(input_dim=3, output_dim=3, hidden_layers=[64, 64, 64],
                  use_fourier_features=True, fourier_features=64)
@@ -974,7 +917,7 @@ def run_hybrid_demo():
         if (epoch + 1) % 50 == 0:
             print(f"    Epoch {epoch+1}/200  Loss: {loss.item():.6f}")
     
-    # Step 3: Compare CFD vs PINN prediction
+    # Compare CFD vs PINN prediction
     print("  [3/3] Comparing CFD vs PINN predictions...")
     nx_test = 64
     xg = np.linspace(0, 2*np.pi, nx_test)
@@ -1013,9 +956,7 @@ def run_hybrid_demo():
     show_or_close(fig)
 
 
-# =============================================================================
 # Turbulence Discovery AI
-# =============================================================================
 
 def run_turbulence_discovery():
     """Run the full Turbulence Discovery AI pipeline."""
@@ -1401,9 +1342,7 @@ def run_symbolic_discovery_standalone():
     show_or_close(fig)
 
 
-# =============================================================================
 # Quantum Fluid Extensions (GPE + Madelung Transform)
-# =============================================================================
 
 def run_quantum_extensions():
     """
@@ -1427,7 +1366,7 @@ def run_quantum_extensions():
       3. Madelung decomposition -> density + velocity
       4. Detect quantized vortices
       5. Compute incompressible energy spectrum
-      6. Publication-quality 8-panel visualization
+      6. 8-panel visualization
 
     Results:
       - Classical + quantum fluid simulator
@@ -1449,7 +1388,7 @@ def run_quantum_extensions():
     from matplotlib.patches import Circle
     from matplotlib.collections import PatchCollection
 
-    # ── Phase 1: Initialize complex wavefunction field ──────────────────
+    # Initialize complex wavefunction field
     print("  [1/6] Initializing complex wavefunction field...")
     nx, ny = 256, 256
     Lx, Ly = 20.0, 20.0
@@ -1485,7 +1424,7 @@ def run_quantum_extensions():
         symbol = "+" if charge > 0 else "-"
         print(f"    Vortex {i+1:2d}: ({x0:+6.2f}, {y0:+6.2f}) charge={symbol}1")
 
-    # ── Phase 2: Time evolution via split-step Fourier ──────────────────
+    # Time evolution via split-step Fourier
     n_steps = 400
     record_interval = 10
     print(f"\n  [3/6] Time evolution (split-step Fourier) — {n_steps} steps...")
@@ -1519,7 +1458,7 @@ def run_quantum_extensions():
     print(f"\n    Completed: {n_steps} steps in {elapsed:.2f}s "
           f"({n_steps/elapsed:.0f} steps/s)")
 
-    # ── Phase 3: Madelung decomposition ─────────────────────────────────
+    # Madelung decomposition
     print("\n  [4/6] Madelung transform: psi = sqrt(rho) * exp(i*theta)...")
     density = solver.get_density()       # rho = |psi|^2
     phase = solver.get_phase()           # theta = arg(psi)
@@ -1540,7 +1479,7 @@ def run_quantum_extensions():
     print(f"    |v|:     min={speed.min():.4f}  max={speed.max():.4f}")
     print(f"    Quantum pressure |Q|: max={np.max(np.abs(Q_bohm)):.4f}")
 
-    # ── Phase 4: Vortex detection ───────────────────────────────────────
+    # Vortex detection
     print("\n  [5/6] Detecting quantized vortices...")
     vortices = solver.detect_vortices()
     n_pos = sum(1 for _, _, c in vortices if c > 0)
@@ -1548,7 +1487,7 @@ def run_quantum_extensions():
     print(f"    Found {len(vortices)} vortices  (+{n_pos} / -{n_neg})")
     print(f"    Circulation quantization: Gamma = n * h/m = n * {2*np.pi*solver.hbar/solver.m:.4f}")
 
-    # ── Phase 5: Energy spectrum ────────────────────────────────────────
+    # Energy spectrum
     print("\n  [6/6] Computing incompressible energy spectrum...")
     k_spectrum, E_spectrum = solver.compute_incompressible_spectrum()
     valid_k = k_spectrum > 0
@@ -1561,8 +1500,8 @@ def run_quantum_extensions():
         k_ref = k_valid
         E_ref = E_valid[len(E_valid)//4] * (k_ref / k_ref[len(k_ref)//4])**(-5.0/3.0)
 
-    # ── Publication-quality 8-panel visualization ────────────────────────
-    print("\n  Generating publication-quality visualization...")
+    # 8-panel visualization
+    print("\n  Generating visualization...")
 
     fig = plt.figure(figsize=(24, 20))
     fig.suptitle(
@@ -1572,7 +1511,7 @@ def run_quantum_extensions():
 
     extent = [-Lx/2, Lx/2, -Ly/2, Ly/2]
 
-    # ── Panel 1: Superfluid density |psi|^2 ──
+    # Panel 1: Superfluid density |psi|^2
     ax1 = fig.add_subplot(2, 4, 1)
     im1 = ax1.imshow(density, cmap='inferno', origin='lower', extent=extent,
                      interpolation='bicubic')
@@ -1581,7 +1520,7 @@ def run_quantum_extensions():
     cb1 = plt.colorbar(im1, ax=ax1, fraction=0.046, pad=0.04)
     cb1.outline.set_edgecolor('#30363d')
 
-    # ── Panel 2: Phase arg(psi) ──
+    # Panel 2: Phase arg(psi)
     ax2 = fig.add_subplot(2, 4, 2)
     im2 = ax2.imshow(phase, cmap='twilight_shifted', origin='lower', extent=extent,
                      interpolation='bicubic', vmin=-np.pi, vmax=np.pi)
@@ -1590,7 +1529,7 @@ def run_quantum_extensions():
     cb2 = plt.colorbar(im2, ax=ax2, fraction=0.046, pad=0.04)
     cb2.outline.set_edgecolor('#30363d')
 
-    # ── Panel 3: Velocity magnitude (Madelung) ──
+    # Panel 3: Velocity magnitude (Madelung)
     ax3 = fig.add_subplot(2, 4, 3)
     speed_clipped = np.clip(speed, 0, np.percentile(speed, 99))
     im3 = ax3.imshow(speed_clipped, cmap='magma', origin='lower', extent=extent,
@@ -1600,7 +1539,7 @@ def run_quantum_extensions():
     cb3 = plt.colorbar(im3, ax=ax3, fraction=0.046, pad=0.04)
     cb3.outline.set_edgecolor('#30363d')
 
-    # ── Panel 4: Vortex positions overlaid on density ──
+    # Panel 4: Vortex positions overlaid on density
     ax4 = fig.add_subplot(2, 4, 4)
     ax4.imshow(density, cmap='inferno', origin='lower', extent=extent,
               interpolation='bicubic', alpha=0.6)
@@ -1615,7 +1554,7 @@ def run_quantum_extensions():
     ax4.plot([], [], 'v', color='#f97583', ms=8, label='-1 vortex')
     ax4.legend(loc='upper right', fontsize=8, framealpha=0.7)
 
-    # ── Panel 5: Quantum pressure (Bohm potential) ──
+    # Panel 5: Quantum pressure (Bohm potential)
     ax5 = fig.add_subplot(2, 4, 5)
     Q_clipped = np.clip(Q_bohm, np.percentile(Q_bohm, 1), np.percentile(Q_bohm, 99))
     vabs = max(np.max(np.abs(Q_clipped)), 1e-6)
@@ -1627,7 +1566,7 @@ def run_quantum_extensions():
     cb5 = plt.colorbar(im5, ax=ax5, fraction=0.046, pad=0.04)
     cb5.outline.set_edgecolor('#30363d')
 
-    # ── Panel 6: Energy spectrum ──
+    # Panel 6: Energy spectrum
     ax6 = fig.add_subplot(2, 4, 6)
     if len(k_valid) > 2:
         ax6.loglog(k_valid, E_valid, '-', color='#58a6ff', lw=2.2, label='E(k)', zorder=3)
@@ -1640,7 +1579,7 @@ def run_quantum_extensions():
     ax6.legend(fontsize=9, framealpha=0.7)
     ax6.grid(True, alpha=0.15, color='#30363d')
 
-    # ── Panel 7: Diagnostics time series ──
+    # Panel 7: Diagnostics time series
     ax7 = fig.add_subplot(2, 4, 7)
     t_arr = np.array(time_history)
     ax7_twin = ax7.twinx()
@@ -1654,7 +1593,7 @@ def run_quantum_extensions():
     ax7_twin.tick_params(axis='y', labelcolor='#f97583')
     ax7.grid(True, alpha=0.15, color='#30363d')
 
-    # ── Panel 8: Particle number conservation check ──
+    # Panel 8: Particle number conservation check
     ax8 = fig.add_subplot(2, 4, 8)
     N_arr = np.array(particle_history)
     N_deviation = (N_arr - N_arr[0]) / N_arr[0] * 100
@@ -1675,7 +1614,7 @@ def run_quantum_extensions():
     show_or_close(fig)
     print(f"\n  Visualization saved: {save_path}")
 
-    # ── Summary ──
+    # Summary
     energy_final = solver.compute_energy()
     print("\n" + "="*72)
     print("  QUANTUM FLUID EXTENSIONS — SUMMARY")
@@ -1704,9 +1643,7 @@ def run_quantum_extensions():
     print("="*72 + "\n")
 
 
-# =============================================================================
 # AGI Scientific Discovery System
-# =============================================================================
 
 def run_agi_discovery():
     """Run the full AGI-style scientific discovery pipeline."""
@@ -1824,7 +1761,7 @@ def run_physics_aware_discovery():
         kb.add_equation(hyp.equation)
     kb.save()
 
-    # ---- Visualization ----
+    # Visualization
     fig = plt.figure(figsize=(20, 12))
     fig.suptitle('Physics-Aware Equation Discovery',
                 fontsize=18, fontweight='bold', color='#58a6ff', y=0.97)
@@ -1939,9 +1876,7 @@ def run_physics_aware_discovery():
     print("="*60 + "\n")
 
 
-# =============================================================================
 # Relativistic Navier-Stokes (Israel-Stewart Causal Theory)
-# =============================================================================
 
 def run_relativistic_ns():
     """
@@ -1961,7 +1896,7 @@ def run_relativistic_ns():
       2. Solve conservation laws for energy + momentum
       3. Evolve pi^{mu nu} via IS relaxation
       4. Recover primitives (e, v) from conserved variables
-      5. Publication-quality 8-panel visualization
+      5. 8-panel visualization
     """
     print("\n" + "=" * 72)
     print("  RELATIVISTIC NAVIER-STOKES")
@@ -1975,7 +1910,7 @@ def run_relativistic_ns():
     import matplotlib.pyplot as plt
     import matplotlib.colors as mcolors
 
-    # ── Phase 1: QGP Fireball (Bjorken-like) ─────────────────────────
+    # QGP Fireball (Bjorken-like)
     print("  [1/5] Initializing QGP fireball (Bjorken-like)...")
     nx, ny = 192, 192
     Lx, Ly = 12.0, 12.0
@@ -1995,7 +1930,7 @@ def run_relativistic_ns():
     print(f"    EOS: ultrarelativistic  (p = e/3)")
     print(f"    dt = {dt}")
 
-    # ── Phase 2: Time evolution ───────────────────────────────────────
+    # Time evolution
     n_steps = 500
     record_interval = 5
     print(f"\n  [2/5] Evolving d_mu T^{{mu nu}} = 0  ({n_steps} steps)...")
@@ -2029,7 +1964,7 @@ def run_relativistic_ns():
     print(f"\n    Completed: {n_steps} steps in {elapsed:.2f}s "
           f"({n_steps/elapsed:.0f} steps/s)")
 
-    # ── Phase 3: Compute final state ─────────────────────────────────
+    # Compute final state
     print("\n  [3/5] Computing final state diagnostics...")
     state = solver.get_state()
     gamma_final = state['lorentz_factor']
@@ -2044,7 +1979,7 @@ def run_relativistic_ns():
     print(f"    |v|/c:          max={speed_final.max():.6f}")
     print(f"    |pi^{{ij}}|:      max={pi_mag_final.max():.4f}")
 
-    # ── Phase 4: T^{mu nu} analysis ──────────────────────────────────
+    # T^{mu nu} analysis
     print("\n  [4/5] Analyzing energy-momentum tensor...")
     T00 = state['T00']
     T0x = state['T0x']
@@ -2053,8 +1988,8 @@ def run_relativistic_ns():
     print(f"    T^0x (x-momentum):   max|={np.max(np.abs(T0x)):.4f}")
     print(f"    T^0y (y-momentum):   max|={np.max(np.abs(T0y)):.4f}")
 
-    # ── Phase 5: 8-panel visualization ───────────────────────────────
-    print("\n  [5/5] Generating publication-quality visualization...")
+    # 8-panel visualization
+    print("\n  [5/5] Generating visualization...")
 
     extent = [-Lx/2, Lx/2, -Ly/2, Ly/2]
     fig = plt.figure(figsize=(24, 20))
@@ -2153,7 +2088,7 @@ def run_relativistic_ns():
     show_or_close(fig)
     print(f"\n  Visualization saved: {save_path}")
 
-    # ── Summary ──
+    # Summary
     print("\n" + "=" * 72)
     print("  RELATIVISTIC NAVIER-STOKES — SUMMARY")
     print("=" * 72)
@@ -2179,9 +2114,7 @@ def run_relativistic_ns():
     print("=" * 72 + "\n")
 
 
-# =============================================================================
 # Quantum Field Theory (QFT) Simulation
-# =============================================================================
 
 def run_qft_simulation():
     """
@@ -2215,7 +2148,7 @@ def run_qft_simulation():
         3. Compute energy-momentum tensor T^{mu nu}
         4. Train PINN on lattice data (physics-informed)
         5. Analyze: field spectrum, correlation function, domain walls
-        6. Publication-quality 10-panel visualization
+        6. 10-panel visualization
     """
     print("\n" + "=" * 72)
     print("  QUANTUM FIELD THEORY SIMULATION")
@@ -2229,9 +2162,7 @@ def run_qft_simulation():
     import matplotlib.pyplot as plt
     import matplotlib.colors as mcolors
 
-    # ====================================================================
     # Scenario 1: Higgs-like Symmetry Breaking (Mexican Hat Potential)
-    # ====================================================================
     print("  [1/6] Scenario: Higgs-like Spontaneous Symmetry Breaking")
     print("         V(phi) = lambda/4 * (phi^2 - v^2)^2  (Mexican hat)")
 
@@ -2265,9 +2196,7 @@ def run_qft_simulation():
     print(f"    Energy: K={E_higgs['kinetic']:.2f}  G={E_higgs['gradient']:.2f}  "
           f"V={E_higgs['potential']:.2f}  Total={E_higgs['total']:.2f}")
 
-    # ====================================================================
     # Scenario 2: Vacuum Fluctuations (Standard phi^4)
-    # ====================================================================
     print("\n  [2/6] Scenario: Vacuum Fluctuations (phi^4 theory)")
     print("         V(phi) = 1/2 m^2 phi^2 + 1/4 lambda phi^4")
 
@@ -2289,9 +2218,7 @@ def run_qft_simulation():
     elapsed_v = time.perf_counter() - t0
     print(f"    Done in {elapsed_v:.2f}s ({n_steps_v/elapsed_v:.0f} steps/s)")
 
-    # ====================================================================
     # Scenario 3: Bubble Nucleation (Cosmological Phase Transition)
-    # ====================================================================
     print("\n  [3/6] Scenario: Bubble Nucleation (first-order phase transition)")
 
     solver_bubble = LatticeQFTSolver(
@@ -2308,9 +2235,7 @@ def run_qft_simulation():
     elapsed_b = time.perf_counter() - t0
     print(f"    Done in {elapsed_b:.2f}s ({n_steps_b/elapsed_b:.0f} steps/s)")
 
-    # ====================================================================
-    # Phase 4: PINN Training on Lattice Data
-    # ====================================================================
+    # PINN Training on Lattice Data
     print("\n  [4/6] Training QFT-PINN: (x,y,t) -> phi")
     print("         Loss = L_KG([]phi + m^2 phi + lambda phi^3) + L_data")
 
@@ -2348,9 +2273,7 @@ def run_qft_simulation():
     except Exception as e:
         print(f"    PINN training error: {e}")
 
-    # ====================================================================
-    # Phase 5: Analysis (spectrum, correlation, domain walls)
-    # ====================================================================
+    # Analysis (spectrum, correlation, domain walls)
     print("\n  [5/6] Computing field spectrum and correlations...")
 
     # Vacuum fluctuation spectrum
@@ -2380,10 +2303,8 @@ def run_qft_simulation():
     print(f"    Vacuum spectrum: {len(k_v)} bins")
     print(f"    Correlation length ~ 1/m = {1.0/mass_v:.2f}")
 
-    # ====================================================================
-    # Phase 6: Publication-Quality 10-Panel Visualization
-    # ====================================================================
-    print("\n  [6/6] Generating publication-quality visualization...")
+    # 10-panel visualization
+    print("\n  [6/6] Generating visualization...")
 
     fig = plt.figure(figsize=(28, 22))
     fig.suptitle(
@@ -2393,7 +2314,7 @@ def run_qft_simulation():
 
     extent = [-Lx / 2, Lx / 2, -Ly / 2, Ly / 2]
 
-    # ── Panel 1: Higgs field phi (symmetry breaking) ──
+    # Panel 1: Higgs field phi (symmetry breaking)
     ax1 = fig.add_subplot(2, 5, 1)
     state_h = solver_higgs.get_state()
     phi_h = state_h['phi']
@@ -2408,7 +2329,7 @@ def run_qft_simulation():
     cb1 = plt.colorbar(im1, ax=ax1, fraction=0.046, pad=0.04)
     cb1.outline.set_edgecolor('#30363d')
 
-    # ── Panel 2: Domain walls |nabla phi| ──
+    # Panel 2: Domain walls |nabla phi|
     ax2 = fig.add_subplot(2, 5, 2)
     dw_clip = np.clip(domain_walls, 0, np.percentile(domain_walls, 98))
     im2 = ax2.imshow(
@@ -2420,7 +2341,7 @@ def run_qft_simulation():
     cb2 = plt.colorbar(im2, ax=ax2, fraction=0.046, pad=0.04)
     cb2.outline.set_edgecolor('#30363d')
 
-    # ── Panel 3: Energy density T^{00} (Higgs) ──
+    # Panel 3: Energy density T^{00} (Higgs)
     ax3 = fig.add_subplot(2, 5, 3)
     E_dens = state_h['energy_density']
     E_clip = np.clip(E_dens, 0, np.percentile(E_dens, 99))
@@ -2433,7 +2354,7 @@ def run_qft_simulation():
     cb3 = plt.colorbar(im3, ax=ax3, fraction=0.046, pad=0.04)
     cb3.outline.set_edgecolor('#30363d')
 
-    # ── Panel 4: Vacuum fluctuations phi ──
+    # Panel 4: Vacuum fluctuations phi
     ax4 = fig.add_subplot(2, 5, 4)
     state_v = solver_vacuum.get_state()
     phi_v = state_v['phi']
@@ -2448,7 +2369,7 @@ def run_qft_simulation():
     cb4 = plt.colorbar(im4, ax=ax4, fraction=0.046, pad=0.04)
     cb4.outline.set_edgecolor('#30363d')
 
-    # ── Panel 5: Bubble nucleation phi ──
+    # Panel 5: Bubble nucleation phi
     ax5 = fig.add_subplot(2, 5, 5)
     state_b = solver_bubble.get_state()
     phi_b = state_b['phi']
@@ -2463,7 +2384,7 @@ def run_qft_simulation():
     cb5 = plt.colorbar(im5, ax=ax5, fraction=0.046, pad=0.04)
     cb5.outline.set_edgecolor('#30363d')
 
-    # ── Panel 6: Field power spectrum ──
+    # Panel 6: Field power spectrum
     ax6 = fig.add_subplot(2, 5, 6)
     if len(k_v) > 2:
         ax6.loglog(k_v, E_v, '-', color='#58a6ff', lw=2.2, label='phi^4 theory', zorder=3)
@@ -2478,7 +2399,7 @@ def run_qft_simulation():
     ax6.legend(fontsize=8, framealpha=0.7)
     ax6.grid(True, alpha=0.15, color='#30363d')
 
-    # ── Panel 7: Correlation function ──
+    # Panel 7: Correlation function
     ax7 = fig.add_subplot(2, 5, 7)
     if np.any(valid_r):
         r_v = r_corr[valid_r]
@@ -2496,7 +2417,7 @@ def run_qft_simulation():
     ax7.grid(True, alpha=0.15, color='#30363d')
     ax7.set_ylim(-0.3, 1.1)
 
-    # ── Panel 8: Energy evolution (Higgs) ──
+    # Panel 8: Energy evolution (Higgs)
     ax8 = fig.add_subplot(2, 5, 8)
     t_arr_h = np.array(solver_higgs.history['time'])
     ax8.plot(t_arr_h, solver_higgs.history['kinetic_energy'], '-', color='#58a6ff', lw=1.5, label='Kinetic')
@@ -2509,7 +2430,7 @@ def run_qft_simulation():
     ax8.legend(fontsize=7, framealpha=0.7)
     ax8.grid(True, alpha=0.15, color='#30363d')
 
-    # ── Panel 9: Field histogram (Higgs — double-well) ──
+    # Panel 9: Field histogram (Higgs — double-well)
     ax9 = fig.add_subplot(2, 5, 9)
     phi_flat = phi_h.flatten()
     ax9.hist(phi_flat, bins=80, density=True, color='#d2a8ff', alpha=0.7, edgecolor='#30363d', lw=0.5)
@@ -2526,7 +2447,7 @@ def run_qft_simulation():
     ax9.legend(fontsize=7, framealpha=0.7)
     ax9.grid(True, alpha=0.15, color='#30363d')
 
-    # ── Panel 10: PINN training loss or field RMS evolution ──
+    # Panel 10: PINN training loss or field RMS evolution
     ax10 = fig.add_subplot(2, 5, 10)
     if pinn_trained and pinn_history:
         epochs_arr = np.arange(1, len(pinn_history['total']) + 1)
@@ -2557,7 +2478,7 @@ def run_qft_simulation():
     show_or_close(fig)
     print(f"\n  Visualization saved: {save_path}")
 
-    # ── Summary ──
+    # Summary
     print("\n" + "=" * 72)
     print("  QUANTUM FIELD THEORY SIMULATION -- SUMMARY")
     print("=" * 72)
@@ -2604,9 +2525,7 @@ def run_qft_simulation():
     print("=" * 72 + "\n")
 
 
-# =============================================================================
 # Gravity + Fluid Coupling (Einstein Equations + Fluid Dynamics)
-# =============================================================================
 
 def run_gravity_fluid_coupling():
     """
@@ -2641,9 +2560,7 @@ def run_gravity_fluid_coupling():
 
     results = {}
 
-    # ================================================================
     # Scenario 1: Black Hole Accretion Disk (Newtonian)
-    # ================================================================
     print("  [1/3] Black Hole Accretion Disk (Newtonian + Paczynski-Wiita)")
     print("        Phi_PW = -GM / (r - r_s),  v_phi = sqrt(GM*r / (r-r_s)^2)")
 
@@ -2664,9 +2581,7 @@ def run_gravity_fluid_coupling():
     print(f"    {n_disk} steps in {el_disk:.2f}s ({n_disk/el_disk:.0f} steps/s)")
     results['disk'] = solver_disk
 
-    # ================================================================
     # Scenario 2: Neutron Star Merger (Post-Newtonian)
-    # ================================================================
     print("\n  [2/3] Neutron Star Merger (Post-Newtonian, GW extraction)")
     print("        Phi = Phi_N + (1/c^2)[2 Phi^2 + Psi]")
 
@@ -2685,9 +2600,7 @@ def run_gravity_fluid_coupling():
     print(f"    {n_merger} steps in {el_merger:.2f}s ({n_merger/el_merger:.0f} steps/s)")
     results['merger'] = solver_merger
 
-    # ================================================================
     # Scenario 3: Galaxy Formation (Numerical GR lite)
-    # ================================================================
     print("\n  [3/3] Galaxy Formation (Numerical GR — BSSN/CFC lite)")
     print("        ds^2 = -alpha^2 dt^2 + psi^4 (dx^2 + dy^2)")
 
@@ -2705,10 +2618,8 @@ def run_gravity_fluid_coupling():
     print(f"    {n_galaxy} steps in {el_galaxy:.2f}s ({n_galaxy/el_galaxy:.0f} steps/s)")
     results['galaxy'] = solver_galaxy
 
-    # ================================================================
-    # Publication-Quality 8-Panel Visualization (clean 2x4 grid)
-    # ================================================================
-    print("\n  Generating publication-quality visualization...")
+    # 8-panel visualization
+    print("\n  Generating visualization...")
 
     gc.collect()
     plt.rcParams['figure.dpi'] = 72
@@ -2754,7 +2665,7 @@ def run_gravity_fluid_coupling():
     plt.savefig(save_path, dpi=100, bbox_inches='tight', facecolor='#0d1117')
     show_or_close(fig)
     print(f"\n  Visualization saved: {save_path}")
-    # ── Summary ──
+    # Summary
     print("\n" + "=" * 72)
     print("  GRAVITY + FLUID COUPLING — SUMMARY")
     print("=" * 72)
@@ -2791,9 +2702,7 @@ def run_gravity_fluid_coupling():
 
 
 
-# =============================================================================
 # [29] Cosmological Fluid Modeling
-# =============================================================================
 
 def run_cosmological_simulation():
     """
@@ -2825,7 +2734,7 @@ def run_cosmological_simulation():
     import gc
     gc.collect()
 
-    # ── Scenario 1: Cosmic Web Formation ──
+    # Scenario 1: Cosmic Web Formation
     print("  [1/2] Cosmic Web Formation (N-body + Fluid hybrid)")
     print("        P(k) ~ k^n_s  (Harrison-Zeldovich spectrum)")
     print("        Omega_m=0.3, Omega_Lambda=0.7, Omega_b=0.05")
@@ -2856,7 +2765,7 @@ def run_cosmological_simulation():
     # Record final P(k)
     k_final, Pk_final = solver_web.compute_power_spectrum()
 
-    # ── Scenario 2: Inflation ──
+    # Scenario 2: Inflation
     print("\n  [2/2] Inflationary Expansion (scalar field driven)")
     print("        V(phi) = V0 * phi^2 / 2  (chaotic inflation)")
 
@@ -2876,10 +2785,8 @@ def run_cosmological_simulation():
     print(f"    Final: a = {solver_inf.a:.4f}, z = {solver_inf.redshift():.2f}")
     results['inflation'] = solver_inf
 
-    # ================================================================
-    # Publication-Quality 8-Panel Visualization
-    # ================================================================
-    print("\n  Generating publication-quality visualization...")
+    # 8-panel visualization
+    print("\n  Generating visualization...")
 
     gc.collect()
     plt.rcParams['figure.dpi'] = 72
@@ -2997,7 +2904,7 @@ def run_cosmological_simulation():
     show_or_close(fig)
     print(f"\n  Visualization saved: {save_path}")
 
-    # ── Summary ──
+    # Summary
     print("\n" + "=" * 72)
     print("  COSMOLOGICAL FLUID MODELING — SUMMARY")
     print("=" * 72)
@@ -3026,9 +2933,7 @@ def run_cosmological_simulation():
     print("=" * 72 + "\n")
 
 
-# =============================================================================
 # Main Entry Point
-# =============================================================================
 
 def main():
     """Main entry point with CLI argument parsing."""

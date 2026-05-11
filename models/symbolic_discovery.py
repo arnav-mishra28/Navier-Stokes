@@ -1,27 +1,4 @@
-"""
-=============================================================================
-  Symbolic Discovery Engine — SINDy-style + Genetic Programming
-  
-  THE BIG MOVE: Extract interpretable equations from turbulence data.
-  
-  Methods:
-      1. SINDy (Sparse Identification of Nonlinear Dynamics)
-         - Build library of candidate functions (polynomials, trig, etc.)
-         - Sparse regression (LASSO/STRidge) to find parsimonious equations
-         - dz/dt = Θ(z) · ξ  where ξ is sparse
-      
-      2. Genetic Programming (Symbolic Regression)
-         - Evolve mathematical expressions via tournament selection
-         - Mutation + crossover on expression trees
-         - Fitness = accuracy + parsimony pressure
-  
-  Input:  Latent trajectories z(t) from autoencoder
-  Output: Symbolic equations governing latent dynamics
-  
-  This is an attempt to discover NEW reduced representations of turbulence,
-  not to "solve" Navier-Stokes in the Millennium Prize sense.
-=============================================================================
-"""
+"""Symbolic Discovery Engine — SINDy-style + Genetic Programming"""
 
 import numpy as np
 from typing import List, Tuple, Dict, Optional, Callable
@@ -30,9 +7,7 @@ import copy
 import random
 
 
-# =============================================================================
 # SINDy — Sparse Identification of Nonlinear Dynamics
-# =============================================================================
 
 class SINDyLibrary:
     """
@@ -362,9 +337,7 @@ class SINDy:
         return float(np.mean((dZdt - dZdt_pred) ** 2))
 
 
-# =============================================================================
 # Genetic Programming — Symbolic Regression
-# =============================================================================
 
 class ExprNode:
     """Node in a symbolic expression tree."""

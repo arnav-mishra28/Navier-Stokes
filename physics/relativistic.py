@@ -1,42 +1,4 @@
-"""
-=============================================================================
-Relativistic Navier-Stokes Solver (Israel-Stewart Formulation)
-
-Naive relativistic Navier-Stokes is acausal and unstable.
-This module implements the Israel-Stewart (IS) second-order theory,
-which restores causality by promoting dissipative fluxes to
-dynamical variables with finite relaxation times.
-
-Governing Equations:
-    d_mu T^{mu nu} = 0          (energy-momentum conservation)
-
-    T^{mu nu} = (e + p) u^mu u^nu + p g^{mu nu} + pi^{mu nu}
-
-    tau_pi * D(pi^{mu nu}) + pi^{mu nu} = 2 eta sigma^{mu nu}
-        - tau_pi * pi^{mu nu} * theta / 3  (IS relaxation)
-
-Where:
-    u^mu    = Lorentz factor * (1, v)   (4-velocity)
-    e       = energy density
-    p       = pressure (EOS: p = e/3 for ultrarelativistic)
-    pi^{mu nu} = viscous stress tensor (dissipative correction)
-    eta     = shear viscosity
-    tau_pi  = relaxation time (causality parameter)
-    sigma^{mu nu} = velocity shear tensor
-    theta   = expansion scalar (d_mu u^mu)
-    D       = u^mu d_mu  (comoving derivative)
-
-Applications:
-    - Quark-gluon plasma (RHIC/LHC heavy-ion collisions)
-    - Neutron star mergers
-    - Relativistic astrophysical jets
-    - Gamma-ray burst afterglows
-
-References:
-    Israel & Stewart, Ann. Phys. 118, 341 (1979)
-    Romatschke, Int. J. Mod. Phys. E19, 1 (2010)
-=============================================================================
-"""
+"""Relativistic Navier-Stokes Solver (Israel-Stewart Formulation)"""
 
 import numpy as np
 from typing import Dict, List, Tuple, Optional
@@ -111,7 +73,7 @@ class RelativisticNSSolver:
         # Apply EOS to set initial pressure
         self._apply_eos()
 
-    # ─── Equation of State ───────────────────────────────────────────
+    # Equation of State
 
     def _apply_eos(self):
         """Apply equation of state: p = p(e)."""
@@ -134,7 +96,7 @@ class RelativisticNSSolver:
         else:
             return np.full_like(self.energy_density, 1.0 / 3.0)
 
-    # ─── Lorentz Factor ──────────────────────────────────────────────
+    # Lorentz Factor
 
     def lorentz_factor(self) -> np.ndarray:
         """Lorentz factor: gamma = 1 / sqrt(1 - v^2/c^2)."""
@@ -147,7 +109,7 @@ class RelativisticNSSolver:
         gamma = self.lorentz_factor()
         return gamma, gamma * self.vx, gamma * self.vy
 
-    # ─── Finite Difference Operators ─────────────────────────────────
+    # Finite Difference Operators
 
     def _ddx(self, f):
         return (np.roll(f, -1, 1) - np.roll(f, 1, 1)) / (2 * self.dx)
@@ -161,7 +123,7 @@ class RelativisticNSSolver:
             + (np.roll(f, -1, 0) - 2 * f + np.roll(f, 1, 0)) / self.dy**2
         )
 
-    # ─── Energy-Momentum Tensor ──────────────────────────────────────
+    # Energy-Momentum Tensor
 
     def compute_Tmunu(self) -> Dict[str, np.ndarray]:
         """
@@ -193,7 +155,7 @@ class RelativisticNSSolver:
             'Txx': Txx, 'Txy': Txy, 'Tyy': Tyy,
         }
 
-    # ─── Velocity Shear Tensor ───────────────────────────────────────
+    # Velocity Shear Tensor
 
     def _compute_shear_expansion(self):
         """
@@ -223,7 +185,7 @@ class RelativisticNSSolver:
 
         return sigma_xx, sigma_xy, sigma_yy, theta
 
-    # ─── Israel-Stewart Relaxation Step ──────────────────────────────
+    # Israel-Stewart Relaxation Step
 
     def _israel_stewart_step(self):
         """
@@ -283,7 +245,7 @@ class RelativisticNSSolver:
             self.pi_xy = np.where(mask, self.pi_xy * scale, self.pi_xy)
             self.pi_yy = np.where(mask, self.pi_yy * scale, self.pi_yy)
 
-    # ─── Conservation Law Step ───────────────────────────────────────
+    # Conservation Law Step
 
     def step(self):
         """
@@ -374,7 +336,7 @@ class RelativisticNSSolver:
             if record:
                 self._record_diagnostics()
 
-    # ─── Initial Conditions ──────────────────────────────────────────
+    # Initial Conditions
 
     def initialize_bjorken_flow(self, e0: float = 10.0, sigma: float = 1.0):
         """
@@ -473,7 +435,7 @@ class RelativisticNSSolver:
         self.pi_yy[:] = 0.0
         self._apply_eos()
 
-    # ─── Diagnostics ─────────────────────────────────────────────────
+    # Diagnostics
 
     def _record_diagnostics(self):
         gamma = self.lorentz_factor()

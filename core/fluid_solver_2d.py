@@ -1,19 +1,4 @@
-"""
-=============================================================================
-2D Incompressible Navier-Stokes Solver
-Chorin's Projection Method (Fractional Step)
-
-Governing equations:
-    ∂u/∂t + (u·∇)u = -∇p/ρ + ν∇²u + f    (Momentum)
-    ∇·u = 0                                 (Continuity)
-
-Algorithm:
-    1. Predict velocity (ignore pressure): u* = u^n + Δt[-（u·∇)u + ν∇²u + f]
-    2. Solve pressure Poisson: ∇²p = (ρ/Δt)∇·u*
-    3. Correct velocity: u^{n+1} = u* - (Δt/ρ)∇p
-    4. Apply boundary conditions
-=============================================================================
-"""
+"""2D Incompressible Navier-Stokes Solver"""
 
 import numpy as np
 from typing import Optional, Tuple, List, Dict
@@ -26,15 +11,6 @@ from .discretization import AdvectionSchemes, DiffusionSchemes, GradientOperator
 class FluidSolver2D:
     """
     2D incompressible Navier-Stokes solver using Chorin's projection method.
-    
-    Features:
-        - Multiple advection schemes (upwind, central, WENO-5)
-        - Multiple pressure solvers (FFT, Jacobi, SOR, CG, multigrid)
-        - Turbulence models (Smagorinsky LES, k-ε, k-ω)
-        - Obstacle support (immersed boundary)
-        - Adaptive time stepping
-        - External force injection
-        - Diagnostics (KE, enstrophy, divergence, CFL)
     """
     
     def __init__(
@@ -269,8 +245,6 @@ class FluidSolver2D:
             2. Compute |ω| gradient: η = ∇|ω|
             3. Normalize: N = η / |η|
             4. Confinement force: f_conf = ε_vc * (N × ω) * h
-        
-        Reference: Fedkiw, Stam, Jensen (2001) "Visual Simulation of Smoke"
         """
         omega = self.get_vorticity()
         abs_omega = np.abs(omega)
@@ -524,7 +498,7 @@ class SIMPLESolver2D:
             u_old = self.u.copy()
             v_old = self.v.copy()
             
-            # Step 1: Solve momentum equations with current pressure
+            # Solve momentum equations with current pressure
             lap_u = DiffusionSchemes.laplacian_2nd(self.u, self.dx, self.dy)
             lap_v = DiffusionSchemes.laplacian_2nd(self.v, self.dx, self.dy)
             
@@ -543,16 +517,16 @@ class SIMPLESolver2D:
                 dpdy / self.density
             )
             
-            # Step 2: Pressure correction
+            # Pressure correction
             div = GradientOperators.divergence(u_star, v_star, self.dx, self.dy)
             p_prime = self.psolver.solve(-self.density * div, p_init=np.zeros_like(self.p))
             
-            # Step 3: Correct velocity
+            # Correct velocity
             dp_dx, dp_dy = GradientOperators.gradient(p_prime, self.dx, self.dy)
             self.u = u_star - dp_dx / self.density
             self.v = v_star - dp_dy / self.density
             
-            # Step 4: Correct pressure
+            # Correct pressure
             self.p += self.alpha_p * p_prime
             
             # Check convergence

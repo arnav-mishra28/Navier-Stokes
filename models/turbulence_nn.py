@@ -1,18 +1,4 @@
-"""
-=============================================================================
-Neural Turbulence Closure Model
-Replaces traditional subgrid-scale models (Smagorinsky, etc.) with a
-learned neural network that predicts subgrid stress tensor.
-
-Learns: τ_ij^{sgs} = f(S_ij, Ω_ij, k, ε, ...)
-
-Advantages over classic models:
-    - Data-driven: captures physics that analytical models miss
-    - Can learn from DNS data
-    - Adapts to specific flow configurations
-    - Preserves tensor invariance (optional)
-=============================================================================
-"""
+"""Neural Turbulence Closure Model"""
 
 import torch
 import torch.nn as nn

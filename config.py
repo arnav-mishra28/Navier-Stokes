@@ -1,9 +1,4 @@
-"""
-=============================================================================
-Global Configuration & Hyperparameters
-Navier-Stokes ML/DL Hybrid Simulation System
-=============================================================================
-"""
+"""Global Configuration & Hyperparameters"""
 
 import numpy as np
 from dataclasses import dataclass, field
@@ -319,9 +314,7 @@ class MasterConfig:
     physics_domain: PhysicsDomain = PhysicsDomain.FLUID
 
 
-# =============================================================================
 # Preset Configurations
-# =============================================================================
 
 def lid_driven_cavity(re: float = 100) -> MasterConfig:
     """Lid-driven cavity flow benchmark."""

@@ -1,20 +1,4 @@
-"""
-=============================================================================
-  Turbulence Discovery Data Generator
-  
-  Generates training data for:
-      1. Autoencoder:       flow field snapshots at various Re
-      2. Latent ODE:        consecutive frame pairs (z_t, z_{t+dt})
-      3. Blow-up detector:  ICs labeled by long-term stability
-      4. Symbolic discovery: latent trajectories from autoencoder
-  
-  Data includes multiple flow regimes:
-      - Laminar (Re < 100)
-      - Transitional (Re ~ 100-1000)
-      - Turbulent (Re > 1000)
-      - Near-singular (very high Re, coarse grid)
-=============================================================================
-"""
+"""Turbulence Discovery Data Generator"""
 
 import numpy as np
 import torch

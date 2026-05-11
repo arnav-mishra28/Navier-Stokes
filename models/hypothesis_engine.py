@@ -1,27 +1,4 @@
-"""
-=============================================================================
-  AGI-Style Scientific Discovery System
-
-  Architecture:
-      [Simulation Engine]  →  [Neural Models]  →  [Hypothesis Generator]
-              ↓                                           ↓
-      [Experiment Validator]  ←  [Symbolic Reasoner]  ←──┘
-              ↓
-      [Knowledge Base]
-
-  Components:
-      1. HypothesisGenerator — Proposes new physical laws from latent space
-      2. SymbolicReasoner — Simplifies, validates, and refines equations
-      3. ExperimentValidator — Tests hypotheses against simulation data
-      4. KnowledgeBase — Persistent store of equations, experiments, findings
-
-  Behavior:
-      - Generates new physical laws
-      - Tests them against conservation principles
-      - Refines them iteratively
-      - Stores and ranks discoveries
-=============================================================================
-"""
+"""AGI-Style Scientific Discovery System"""
 
 import numpy as np
 import json
@@ -33,9 +10,7 @@ from pathlib import Path
 import copy
 
 
-# =============================================================================
 # Data Classes for Structured Knowledge
-# =============================================================================
 
 @dataclass
 class DiscoveredEquation:
@@ -79,9 +54,7 @@ class Experiment:
     timestamp: str = ''
 
 
-# =============================================================================
 # Hypothesis Generator
-# =============================================================================
 
 class HypothesisGenerator:
     """
@@ -251,9 +224,7 @@ class HypothesisGenerator:
         return new_hypotheses
 
 
-# =============================================================================
 # Symbolic Reasoner
-# =============================================================================
 
 class SymbolicReasoner:
     """
@@ -345,9 +316,7 @@ class SymbolicReasoner:
         return results
 
 
-# =============================================================================
 # Experiment Validator
-# =============================================================================
 
 class ExperimentValidator:
     """
@@ -504,9 +473,7 @@ class ExperimentValidator:
         return experiments
 
 
-# =============================================================================
 # Knowledge Base
-# =============================================================================
 
 class KnowledgeBase:
     """

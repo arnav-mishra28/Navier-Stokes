@@ -1,37 +1,4 @@
-"""
-=============================================================================
-Gravity-Fluid Coupling Engine
-
-Fluids curve spacetime — spacetime tells fluids how to move.
-
-Core Einstein Equation:
-    G_μν = 8π T_μν
-
-Fluid Energy-Momentum Tensor:
-    T_μν = (ρ + p) u_μ u_ν + p g_μν
-
-Where:
-    ρ = energy density
-    p = pressure
-    u_μ = 4-velocity
-    g_μν = metric tensor
-
-Approximation Levels:
-    Level 1 — Weak gravity:    Newtonian potential (Poisson equation)
-    Level 2 — Intermediate:    Post-Newtonian (1PN corrections)
-    Level 3 — Advanced:        Numerical relativity (BSSN-lite)
-
-Applications:
-    - Black hole accretion disks
-    - Neutron star mergers
-    - Galaxy formation
-    - Gravitational wave emission
-
-References:
-    Baumgarte & Shapiro, "Numerical Relativity" (Cambridge, 2010)
-    Font, "Numerical Hydrodynamics and MHD in GR", Living Rev. Rel. 11, 7 (2008)
-=============================================================================
-"""
+"""Gravity-Fluid Coupling Engine"""
 
 import numpy as np
 from typing import Dict, List, Tuple, Optional
@@ -116,7 +83,7 @@ class GravityFluidSolver:
             'virial_ratio': [], 'gw_strain': [],
         }
 
-    # ─── Finite Differences ──────────────────────────────────────────
+    # Finite Differences
 
     def _ddx(self, f):
         return (np.roll(f, -1, 1) - np.roll(f, 1, 1)) / (2 * self.dx)
@@ -130,7 +97,7 @@ class GravityFluidSolver:
             + (np.roll(f, -1, 0) - 2 * f + np.roll(f, 1, 0)) / self.dy**2
         )
 
-    # ─── Equation of State ───────────────────────────────────────────
+    # Equation of State
 
     def _apply_eos(self):
         """Ideal gas EOS: p = (γ-1) ρ ε."""
@@ -141,7 +108,7 @@ class GravityFluidSolver:
         """Sound speed: c_s² = γ p / ρ."""
         return np.sqrt(self.gamma_eos * self.pressure / (self.rho + 1e-12))
 
-    # ─── Energy-Momentum Tensor ──────────────────────────────────────
+    # Energy-Momentum Tensor
 
     def compute_Tmunu(self):
         """
@@ -175,7 +142,7 @@ class GravityFluidSolver:
             arr = getattr(self, attr)
             arr[:] = np.nan_to_num(arr, nan=0.0, posinf=1e6, neginf=-1e6)
 
-    # ─── Gravity Solvers ─────────────────────────────────────────────
+    # Gravity Solvers
 
     def _solve_newtonian_gravity(self):
         """Solve ∇²Φ = 4πG ρ via FFT."""
@@ -275,7 +242,7 @@ class GravityFluidSolver:
         elif self.gravity_level == "numerical_gr":
             self._solve_numerical_gr()
 
-    # ─── Gravitational Wave Extraction ───────────────────────────────
+    # Gravitational Wave Extraction
 
     def compute_gw_strain(self) -> float:
         """
@@ -299,7 +266,7 @@ class GravityFluidSolver:
         result = np.sqrt(h_plus**2 + h_cross**2)
         return float(result) if np.isfinite(result) else 0.0
 
-    # ─── Time Step ───────────────────────────────────────────────────
+    # Time Step
 
     def step(self):
         """
@@ -386,7 +353,7 @@ class GravityFluidSolver:
             if record:
                 self._record_diagnostics()
 
-    # ─── Initial Conditions ──────────────────────────────────────────
+    # Initial Conditions
 
     def initialize_accretion_disk(
         self, M_bh: float = 10.0, rho0: float = 1.0,
@@ -516,7 +483,7 @@ class GravityFluidSolver:
         self.epsilon = 0.01 * np.ones((self.ny, self.nx))
         self._apply_eos()
 
-    # ─── Diagnostics ─────────────────────────────────────────────────
+    # Diagnostics
 
     def _record_diagnostics(self):
         dV = self.dx * self.dy

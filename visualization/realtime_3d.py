@@ -1,18 +1,4 @@
-"""
-=============================================================================
-Real-Time 3D Visualization using Matplotlib + PyVista
-Renders volumetric flow fields with isosurfaces, streamlines,
-interactive controls, and GPU-accelerated rendering.
-
-Upgrades:
-    - Interactive parameter sliders (viscosity, resolution)
-    - Multiple rendering modes (volume, isosurface, streamlines)
-    - Animated time-stepping with live diagnostics
-    - Q-criterion vortex visualization
-    - Energy spectrum with Kolmogorov -5/3 reference
-    - Safe headless fallback
-=============================================================================
-"""
+"""Real-Time 3D Visualization using Matplotlib + PyVista"""
 
 import numpy as np
 import sys
@@ -72,7 +58,7 @@ class RealtimeVisualizer3D:
         if self.solver is None:
             self.solver = self._create_default_solver()
         
-        # Publication-quality dark styling
+        # dark styling
         plt.rcParams.update({
             'figure.facecolor': '#0d1117',
             'axes.facecolor': '#161b22',

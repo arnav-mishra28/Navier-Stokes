@@ -1,22 +1,4 @@
-"""
-=============================================================================
-  Turbulence Autoencoder — Compresses flow fields to latent representations
-  
-  Architecture: Convolutional Autoencoder with skip connections
-  
-  Input:  (B, C, H, W)  flow field channels (u, v, p, ω)
-  Latent: (B, latent_dim) compressed representation
-  Output: (B, C, H, W)  reconstructed flow field
-  
-  Supports:
-      - Standard (MSE) autoencoder
-      - Variational (VAE) for generative modeling
-      - Physics-informed reconstruction loss
-      
-  Purpose: Learn reduced-order representations of turbulent flows
-           for downstream symbolic discovery and dynamics prediction.
-=============================================================================
-"""
+"""Turbulence Autoencoder — Compresses flow fields to latent representations"""
 
 import torch
 import torch.nn as nn

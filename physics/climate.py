@@ -1,26 +1,4 @@
-"""
-=============================================================================
-Climate & Oceanic Flow Solver
-Geophysical fluid dynamics: rotating frames, buoyancy, stratification.
-
-Governing equations (Boussinesq + Coriolis):
-    ∂u/∂t + (u·∇)u = -∇p/ρ₀ + ν∇²u - f×u + b·ẑ
-    ∂b/∂t + (u·∇)b = κ∇²b + N²w
-    ∇·u = 0
-
-where:
-    f = 2Ω sin(φ) = Coriolis parameter
-    b = -gδρ/ρ₀ = buoyancy
-    N² = -(g/ρ₀)(∂ρ̄/∂z) = Brunt-Väisälä frequency (stratification)
-    κ = thermal diffusivity
-    Ω = Earth's rotation rate
-
-Key dimensionless numbers:
-    Rossby number: Ro = U/(fL) — rotation importance
-    Richardson number: Ri = N²/(∂u/∂z)² — stratification vs shear
-    Ekman number: Ek = ν/(fL²) — viscous vs Coriolis
-=============================================================================
-"""
+"""Climate & Oceanic Flow Solver"""
 
 import numpy as np
 from typing import Dict, List, Optional

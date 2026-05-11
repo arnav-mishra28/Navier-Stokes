@@ -1,38 +1,4 @@
-"""
-=============================================================================
-  Blow-up Detection & Regularity Analysis AI
-  
-  ⚠️ The Navier–Stokes existence and smoothness problem is UNSOLVED.
-  
-  We do NOT claim to solve it. Instead, we build AI tools that:
-  
-  1. BLOW-UP DETECTION:
-     Train classifier to predict:
-       "Will this initial condition lead to singular behavior?"
-     Input: velocity field u(x, t₀)
-     Output: P(blow-up within T) ∈ [0, 1]
-  
-  2. REGULARITY CLASSIFIER:
-     Input: velocity field
-     Output: smooth / transitional / turbulent / unstable
-  
-  3. STABILITY ANALYSIS:
-     Map: initial condition → long-term behavior
-     Predict when and why solutions become irregular
-  
-  4. METRICS:
-     - Maximum vorticity growth rate
-     - Enstrophy production rate
-     - Beale-Kato-Majda (BKM) criterion monitoring
-     - Energy spectrum evolution
-     - Strain-vorticity alignment
-  
-  These are EMPIRICAL tools that generate:
-     - Regularity maps
-     - Failure region predictions
-     - Possibly new conjectures for mathematicians
-=============================================================================
-"""
+"""Blow-up Detection & Regularity Analysis AI"""
 
 import numpy as np
 import torch

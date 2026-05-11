@@ -1,9 +1,4 @@
-"""
-=============================================================================
-Physics-Informed Loss Functions
-Custom loss functions that embed physical laws into neural network training.
-=============================================================================
-"""
+"""Physics-Informed Loss Functions"""
 
 import torch
 import torch.nn as nn

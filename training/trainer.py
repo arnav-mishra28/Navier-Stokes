@@ -1,9 +1,4 @@
-"""
-=============================================================================
-Unified Training Loop
-Handles training for PINN, FNO, DeepONet, Surrogate, and Turbulence NN.
-=============================================================================
-"""
+"""Unified Training Loop"""
 
 import torch
 import torch.nn as nn
@@ -22,16 +17,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 class UnifiedTrainer:
     """
     Unified training infrastructure for all NS neural network models.
-    
-    Features:
-        - Multi-model support (PINN, FNO, DeepONet, Surrogate)
-        - Mixed precision training (AMP)
-        - Learning rate scheduling (cosine annealing, warmup)
-        - Gradient clipping
-        - Checkpointing
-        - TensorBoard logging
-        - Early stopping
-        - Curriculum learning for PINNs
     """
     
     def __init__(
@@ -486,11 +471,11 @@ class UnifiedTrainer:
         print(f"Loaded checkpoint from epoch {self.epoch}")
     
     def plot_training_history(self, save_path: Optional[str] = None):
-        """Plot training curves with publication-quality dark styling."""
+        """Plot training curves with dark styling."""
         import matplotlib
         import matplotlib.pyplot as plt
         
-        # Publication-quality dark styling
+        # dark styling
         plt.rcParams.update({
             'figure.facecolor': '#0d1117',
             'axes.facecolor': '#161b22',

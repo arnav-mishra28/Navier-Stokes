@@ -1,27 +1,4 @@
-"""
-=============================================================================
-Quantum Fluid Solver
-Simulates superfluid dynamics using the Gross-Pitaevskii equation (GPE).
-
-The GPE describes:
-    - Bose-Einstein condensates (BEC)
-    - Superfluid helium-4 (He-II)
-    - Quantized vortices
-
-Governing equation:
-    iℏ ∂ψ/∂t = [-ℏ²/(2m)∇² + V(r) + g|ψ|²]ψ
-
-The wavefunction ψ encodes both density and velocity via Madelung transform:
-    ρ = |ψ|²             (superfluid density)
-    u = (ℏ/m)∇(arg(ψ))   (superfluid velocity = gradient of phase)
-
-Key features:
-    - Irrotational flow EXCEPT at quantized vortices where ψ = 0
-    - Circulation is quantized: ∮ u·dl = n × h/m
-    - Quantum pressure (Bohm potential) prevents classical singularities
-    - Vortex reconnection events
-=============================================================================
-"""
+"""Quantum Fluid Solver"""
 
 import numpy as np
 from typing import Dict, List, Optional, Tuple

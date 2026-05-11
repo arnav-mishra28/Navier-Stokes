@@ -1,26 +1,4 @@
-"""
-=============================================================================
-  AI-Discovered Physics Laws — Neural + Symbolic Hybrid Engine
-
-  Pipeline:  Simulation → Encoder → Latent Space → Sparse Regression → Equation
-
-  Key Innovation: Combines neural latent representations with symbolic
-  regression to discover governing equations from simulation data.
-
-  Core Methods:
-      1. PhysicsAwareSINDy — Extended SINDy with physics-informed candidate
-         functions (gradients, Laplacians, nonlinear advection terms)
-      2. NeuralSymbolicHybrid — Neural net learns latent variables,
-         symbolic layer extracts equations
-      3. ConservationValidator — Validates discovered equations against
-         known conservation laws (energy, momentum, mass)
-      4. CorrectionTermDiscovery — Identifies novel correction terms
-         beyond known NS equations
-
-  The "correction term" is where discoveries happen:
-      du/dt = -u·∇u + ν∇²u + [DISCOVERED CORRECTION]
-=============================================================================
-"""
+"""AI-Discovered Physics Laws — Neural + Symbolic Hybrid Engine"""
 
 import numpy as np
 from typing import List, Tuple, Dict, Optional, Callable
@@ -28,9 +6,7 @@ import copy
 import time
 
 
-# =============================================================================
 # Physics-Aware Candidate Library
-# =============================================================================
 
 class PhysicsAwareLibrary:
     """
@@ -188,9 +164,7 @@ class PhysicsAwareLibrary:
         return Theta, names
 
 
-# =============================================================================
 # Physics-Aware SINDy with Conservation Constraints
-# =============================================================================
 
 class PhysicsAwareSINDy:
     """
@@ -417,9 +391,7 @@ class PhysicsAwareSINDy:
         return f'{lhs} = 0'
 
 
-# =============================================================================
 # Latent-to-Physical Equation Mapper
-# =============================================================================
 
 class LatentEquationMapper:
     """
@@ -492,9 +464,7 @@ class LatentEquationMapper:
         }
 
 
-# =============================================================================
 # Conservation Law Validator
-# =============================================================================
 
 class ConservationValidator:
     """
@@ -609,9 +579,7 @@ class ConservationValidator:
         return results
 
 
-# =============================================================================
 # Correction Term Discovery
-# =============================================================================
 
 class CorrectionTermDiscovery:
     """

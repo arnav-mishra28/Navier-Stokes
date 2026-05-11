@@ -1,18 +1,4 @@
-"""
-=============================================================================
-DeepONet (Deep Operator Network) for Navier-Stokes
-Learns mappings between infinite-dimensional function spaces.
-
-Architecture:
-    Branch Network: Encodes input function (e.g., boundary conditions, forces)
-    Trunk Network: Encodes query locations (x, y, t)
-    Output: dot product of branch and trunk outputs
-
-Key advantage: Can generalize to new input functions without retraining.
-
-Reference: Lu et al., "Learning nonlinear operators" (2021)
-=============================================================================
-"""
+"""DeepONet (Deep Operator Network) for Navier-Stokes"""
 
 import torch
 import torch.nn as nn

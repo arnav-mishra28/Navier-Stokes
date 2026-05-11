@@ -1,9 +1,4 @@
-"""
-=============================================================================
-Flow Renderer Utilities
-Colormaps, arrow drawing, field conversion for visualization.
-=============================================================================
-"""
+"""Flow Renderer Utilities"""
 
 import numpy as np
 from typing import Tuple, Optional

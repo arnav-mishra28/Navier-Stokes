@@ -1,9 +1,4 @@
-"""
-=============================================================================
-Turbulence Models
-RANS (k-ε, k-ω), LES (Smagorinsky, Dynamic), and DNS support.
-=============================================================================
-"""
+"""Turbulence Models"""
 
 import numpy as np
 from typing import Tuple, Optional

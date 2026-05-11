@@ -1,10 +1,4 @@
-"""
-=============================================================================
-Pressure Poisson Solver
-Multiple methods: FFT (fast), Jacobi, SOR, Conjugate Gradient
-Solves: ∇²p = f (Pressure Poisson Equation)
-=============================================================================
-"""
+"""Pressure Poisson Solver"""
 
 import numpy as np
 from scipy import fft as scipy_fft

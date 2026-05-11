@@ -1,18 +1,4 @@
-"""
-=============================================================================
-Streamlit Dashboard — Interactive Research Control Center
-Unified web interface for the NS ML/DL Hybrid System.
-
-Features:
-    - Real-time simulation with live parameter tinkering
-    - All physics domains with runtime switching
-    - ML model selection, training, and hybrid inference
-    - Vorticity confinement & turbulence model controls
-    - GPU/CPU solver switching
-    - Advanced diagnostics & flow statistics
-    - Interactive 3D slice visualization
-=============================================================================
-"""
+"""Streamlit Dashboard — Interactive Research Control Center"""
 
 import streamlit as st
 import numpy as np
@@ -26,9 +12,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-# =============================================================================
 # Plotly Visualization Helpers
-# =============================================================================
 
 def create_flow_heatmap(field, title, colorscale='Inferno', zmid=None):
     """Create a plotly heatmap for flow fields."""
@@ -85,9 +69,7 @@ def create_vector_field(u, v, density=10):
     return fig
 
 
-# =============================================================================
 # Solver Factory
-# =============================================================================
 
 def _create_solver(domain, nx, ny, nu, dt, init_type, psolver, advection,
                    turb, vort_conf, use_gpu):
@@ -205,9 +187,7 @@ def _create_solver(domain, nx, ny, nu, dt, init_type, psolver, advection,
     return solver
 
 
-# =============================================================================
 # Main Dashboard
-# =============================================================================
 
 def run_dashboard():
     """Main Streamlit dashboard application."""
@@ -241,7 +221,7 @@ def run_dashboard():
     st.title("🌊 Navier-Stokes ML/DL Hybrid Simulator")
     st.markdown("**Research-Grade CFD + Deep Learning  ·  Real-Time Interactive Control**")
 
-    # ---- Sidebar ----
+    # Sidebar
     with st.sidebar:
         st.header("⚙️ Configuration")
 
@@ -325,7 +305,7 @@ def run_dashboard():
                                 type="primary")
         reset_button = st.button("🔄 Reset", use_container_width=True)
 
-    # ---- Main Content ----
+    # Main Content
 
     # Initialize session state
     if 'solver' not in st.session_state or reset_button:
@@ -378,7 +358,7 @@ def run_dashboard():
 
         vel_mag = np.sqrt(u_np**2 + v_np**2)
 
-        # ---- Metrics Row ----
+        # Metrics Row
         col1, col2, col3, col4, col5, col6 = st.columns(6)
         col1.metric("⏱ Time", f"{solver.time:.4f}s")
         col2.metric("📊 Step", f"{solver.step_count}")
@@ -392,7 +372,7 @@ def run_dashboard():
 
         st.divider()
 
-        # ---- Visualization Tabs ----
+        # Visualization Tabs
         tab1, tab2, tab3, tab4, tab5 = st.tabs([
             "🌀 Vorticity", "💨 Velocity", "📊 Pressure",
             "📈 Diagnostics", "🧠 ML / Hybrid"

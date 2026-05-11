@@ -1,32 +1,4 @@
-"""
-=============================================================================
-Real-Time 2D Visualization using Pygame
-Interactive fluid simulation with FULL parameter tinkering.
-
-Controls:
-    LEFT MOUSE:  Draw obstacles / inject dye
-    RIGHT MOUSE: Apply force in drag direction
-    SCROLL:      Change viscosity
-    1-6:         Switch physics domain
-    V:           Toggle velocity arrows
-    S:           Toggle streamlines
-    P:           Toggle pressure view
-    W:           Toggle vorticity view
-    M:           Toggle speed view
-    SPACE:       Pause/Resume
-    R:           Reset simulation
-    +/-:         Increase/decrease sim speed
-    F:           Toggle vorticity confinement
-    G:           Toggle GPU solver
-    UP/DOWN:     Adjust vorticity confinement strength
-    LEFT/RIGHT:  Adjust time step
-    C:           Cycle colormap
-    I:           Toggle info panel
-    O:           Clear obstacles
-    T:           Cycle turbulence model
-    H:           Show full help
-=============================================================================
-"""
+"""Real-Time 2D Visualization using Pygame"""
 
 import numpy as np
 import sys
@@ -43,14 +15,6 @@ class RealtimeVisualizer2D:
     Renders flow fields (velocity, vorticity, pressure) with
     interactive user controls for obstacle placement, force injection,
     and REAL-TIME parameter modification.
-    
-    Features:
-        - Vorticity confinement toggle & strength control
-        - Live viscosity / dt / Re adjustment
-        - GPU/CPU solver switching
-        - All physics domains
-        - Turbulence model cycling
-        - Multiple colormaps and display modes
     """
     
     def __init__(
@@ -169,7 +133,7 @@ class RealtimeVisualizer2D:
         while running:
             frame_start = time.perf_counter()
             
-            # ---- Event handling ----
+            # Event handling
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -199,7 +163,7 @@ class RealtimeVisualizer2D:
                 elif event.type == pygame.MOUSEMOTION:
                     self._handle_mouse_motion(event.pos)
             
-            # ---- Simulation step ----
+            # Simulation step
             if not self.paused:
                 sim_start = time.perf_counter()
                 for _ in range(self.steps_per_frame):
@@ -209,15 +173,15 @@ class RealtimeVisualizer2D:
                 if len(self.sim_times) > 100:
                     self.sim_times = self.sim_times[-50:]
             
-            # ---- Rendering ----
+            # Rendering
             self._render_frame(screen)
             
-            # ---- Info overlay ----
+            # Info overlay
             if self.show_info:
                 self._render_info(screen, font, font_large, font_title,
                                   WHITE, YELLOW, CYAN, GREEN, RED, ORANGE, DIM)
             
-            # ---- Help overlay ----
+            # Help overlay
             if self.show_help:
                 self._render_help(screen, font, WHITE, YELLOW, CYAN)
             

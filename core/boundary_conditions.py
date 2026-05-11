@@ -1,9 +1,4 @@
-"""
-=============================================================================
-Boundary Condition Manager
-Handles all types of boundary conditions for the Navier-Stokes solver.
-=============================================================================
-"""
+"""Boundary Condition Manager"""
 
 import numpy as np
 from typing import Optional, Callable, Dict, Tuple
@@ -121,7 +116,7 @@ class BoundaryConditionManager:
         Returns:
             u, v: Modified velocity fields
         """
-        # ---- TOP boundary (j = ny-1) ----
+        # TOP boundary (j = ny-1)
         bc = self.bc_types['top']
         if bc == BCType.NO_SLIP:
             u[-1, :] = 0.0
@@ -139,7 +134,7 @@ class BoundaryConditionManager:
             u[-1, :] = u[1, :]
             v[-1, :] = v[1, :]
         
-        # ---- BOTTOM boundary (j = 0) ----
+        # BOTTOM boundary (j = 0)
         bc = self.bc_types['bottom']
         if bc == BCType.NO_SLIP:
             u[0, :] = 0.0
@@ -157,7 +152,7 @@ class BoundaryConditionManager:
             u[0, :] = u[-2, :]
             v[0, :] = v[-2, :]
         
-        # ---- LEFT boundary (i = 0) ----
+        # LEFT boundary (i = 0)
         bc = self.bc_types['left']
         if bc == BCType.NO_SLIP:
             u[:, 0] = 0.0
@@ -176,7 +171,7 @@ class BoundaryConditionManager:
             u[:, 0] = u[:, -2]
             v[:, 0] = v[:, -2]
         
-        # ---- RIGHT boundary (i = nx-1) ----
+        # RIGHT boundary (i = nx-1)
         bc = self.bc_types['right']
         if bc == BCType.NO_SLIP:
             u[:, -1] = 0.0
@@ -191,12 +186,12 @@ class BoundaryConditionManager:
             u[:, -1] = u[:, 1]
             v[:, -1] = v[:, 1]
         
-        # ---- Custom BCs ----
+        # Custom BCs
         for wall, func in self.custom_bc.items():
             if func is not None:
                 u, v = func(u, v, t, wall)
         
-        # ---- Obstacle enforcement ----
+        # Obstacle enforcement
         if self.obstacle_mask is not None:
             u[self.obstacle_mask] = 0.0
             v[self.obstacle_mask] = 0.0

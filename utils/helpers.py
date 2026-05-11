@@ -1,9 +1,4 @@
-"""
-=============================================================================
-Utility Functions & Helpers
-Grid generation, diagnostics, I/O, and performance tools.
-=============================================================================
-"""
+"""Utility Functions & Helpers"""
 
 import numpy as np
 import time

@@ -1,18 +1,4 @@
-"""
-=============================================================================
-  AGI-Style Scientific Discovery Pipeline
-
-  Observe -> Simulate -> Learn -> Hypothesize -> Test -> Improve
-
-  Unifies all components into a single autonomous discovery system:
-    1. Simulation Engine (classical + quantum + relativistic)
-    2. Neural Learning Layer (Autoencoder + Neural ODE)
-    3. Hypothesis Generator (from latent + physical space)
-    4. Symbolic Reasoner (simplify, check symmetries)
-    5. Experiment Validator (conservation, stability, prediction)
-    6. Knowledge Base (persistent store of discoveries)
-=============================================================================
-"""
+"""AGI-Style Scientific Discovery Pipeline"""
 
 import numpy as np
 import time
@@ -49,9 +35,7 @@ class AGIScientificPipeline:
         if self.verbose:
             print(msg)
 
-    # =========================================================================
-    # Phase 1: OBSERVE — Run multi-regime simulations
-    # =========================================================================
+    # OBSERVE — Run multi-regime simulations
     def phase_observe(self, nx=64, n_regimes=5, steps_per_regime=200):
         """Generate simulation data across multiple flow regimes."""
         from core.fluid_solver_2d import FluidSolver2D
@@ -115,9 +99,7 @@ class AGIScientificPipeline:
         self._print(f"    Total: {sum(len(d['u']) for d in all_data.values())} snapshots across {n_regimes} regimes")
         return all_data
 
-    # =========================================================================
-    # Phase 2: LEARN — Neural compression + latent dynamics
-    # =========================================================================
+    # LEARN — Neural compression + latent dynamics
     def phase_learn(self, observations: Dict, latent_dim=16):
         """Compress flow fields to latent space and learn dynamics."""
         self._print("\n  [PHASE 2] LEARN -- Neural compression + dynamics")
@@ -173,9 +155,7 @@ class AGIScientificPipeline:
         self.results['learning'] = learn_results
         return learn_results
 
-    # =========================================================================
-    # Phase 3: HYPOTHESIZE — Discover equations + generate hypotheses
-    # =========================================================================
+    # HYPOTHESIZE — Discover equations + generate hypotheses
     def phase_hypothesize(self, observations: Dict, learn_results: Dict):
         """Discover equations and generate scientific hypotheses."""
         from models.symbolic_discovery import SymbolicDiscoveryEngine
@@ -190,7 +170,7 @@ class AGIScientificPipeline:
         all_corrections = []
         all_equations = {}
 
-        # --- 3a: Latent-space SINDy discovery ---
+        # 3a: Latent-space SINDy discovery
         self._print("\n    [3a] Latent-space SINDy discovery...")
         for regime_key, traj in learn_results['trajectories'].items():
             if len(traj) < 10:
@@ -226,7 +206,7 @@ class AGIScientificPipeline:
             except Exception as e:
                 self._print(f"      {regime_key}: skipped ({e})")
 
-        # --- 3b: Physics-aware SINDy on raw fields ---
+        # 3b: Physics-aware SINDy on raw fields
         self._print("\n    [3b] Physics-aware SINDy on flow fields...")
         physics_sindy = PhysicsAwareSINDy(
             threshold=0.05, alpha=0.01,
@@ -278,9 +258,7 @@ class AGIScientificPipeline:
         self.results['hypotheses'] = hyp_results
         return hyp_results
 
-    # =========================================================================
-    # Phase 4: TEST — Validate hypotheses
-    # =========================================================================
+    # TEST — Validate hypotheses
     def phase_test(self, observations: Dict, hyp_results: Dict):
         """Validate hypotheses against simulation data."""
         from models.hypothesis_engine import ExperimentValidator, SymbolicReasoner
@@ -333,9 +311,7 @@ class AGIScientificPipeline:
         self.results['testing'] = test_results
         return test_results
 
-    # =========================================================================
-    # Phase 5: IMPROVE — Store and rank discoveries
-    # =========================================================================
+    # IMPROVE — Store and rank discoveries
     def phase_improve(self, hyp_results: Dict, test_results: Dict):
         """Store discoveries in knowledge base and rank them."""
         from models.hypothesis_engine import KnowledgeBase
@@ -385,9 +361,7 @@ class AGIScientificPipeline:
         self.results['knowledge_base'] = kb
         return kb
 
-    # =========================================================================
     # MAIN: Run full pipeline
-    # =========================================================================
     def run(self, nx=64, n_regimes=5, steps_per_regime=200, latent_dim=4):
         """Run the complete AGI scientific discovery pipeline."""
         t_start = time.perf_counter()
@@ -400,20 +374,20 @@ class AGIScientificPipeline:
         self._print("  +=====================================================+")
         self._print("=" * 72)
 
-        # Phase 1: OBSERVE
+        # OBSERVE
         observations = self.phase_observe(nx=nx, n_regimes=n_regimes,
                                           steps_per_regime=steps_per_regime)
 
-        # Phase 2: LEARN
+        # LEARN
         learn_results = self.phase_learn(observations, latent_dim=latent_dim)
 
-        # Phase 3: HYPOTHESIZE
+        # HYPOTHESIZE
         hyp_results = self.phase_hypothesize(observations, learn_results)
 
-        # Phase 4: TEST
+        # TEST
         test_results = self.phase_test(observations, hyp_results)
 
-        # Phase 5: IMPROVE
+        # IMPROVE
         kb = self.phase_improve(hyp_results, test_results)
 
         elapsed = time.perf_counter() - t_start
@@ -487,11 +461,9 @@ class AGIScientificPipeline:
         self._print("  Knowledge base saved to: " + str(self.checkpoint_dir / 'knowledge_base'))
         self._print("=" * 72 + "\n")
 
-    # =========================================================================
     # Visualization
-    # =========================================================================
     def plot_results(self, save_path: Optional[str] = None):
-        """Generate publication-quality visualization of discovery results."""
+        """Generate visualization of discovery results."""
         import matplotlib.pyplot as plt
 
         plt.rcParams.update({

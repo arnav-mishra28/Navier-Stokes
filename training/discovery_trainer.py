@@ -1,18 +1,4 @@
-"""
-=============================================================================
-  Turbulence Discovery Training Pipeline
-  
-  End-to-end training for the Turbulence Discovery AI system:
-  
-  Phase 1: Train Autoencoder (compress flow fields to latent z)
-  Phase 2: Train Latent ODE (learn dz/dt dynamics)
-  Phase 3: Train Blow-up Detector (classify flow stability)
-  Phase 4: Run Symbolic Discovery (SINDy + GP on latent trajectories)
-  
-  Each phase builds on the previous, creating a system that:
-      compresses turbulence → learns rules → outputs equations
-=============================================================================
-"""
+"""Turbulence Discovery Training Pipeline"""
 
 import torch
 import torch.nn as nn
@@ -58,9 +44,7 @@ class TurbulenceDiscoveryTrainer:
         
         print(f"  Discovery Trainer initialized on {self.device}")
     
-    # =========================================================================
-    # Phase 1: Autoencoder Training
-    # =========================================================================
+    # Autoencoder Training
     
     def train_autoencoder(
         self,
@@ -156,9 +140,7 @@ class TurbulenceDiscoveryTrainer:
         
         return model
     
-    # =========================================================================
-    # Phase 2: Latent ODE Training
-    # =========================================================================
+    # Latent ODE Training
     
     def train_latent_ode(
         self,
@@ -252,9 +234,7 @@ class TurbulenceDiscoveryTrainer:
         
         return ode_model
     
-    # =========================================================================
-    # Phase 3: Blow-up Detection Training
-    # =========================================================================
+    # Blow-up Detection Training
     
     def train_blowup_detector(
         self,
@@ -341,9 +321,7 @@ class TurbulenceDiscoveryTrainer:
         
         return model
     
-    # =========================================================================
-    # Phase 4: Symbolic Discovery
-    # =========================================================================
+    # Symbolic Discovery
     
     def run_symbolic_discovery(
         self,
@@ -372,7 +350,7 @@ class TurbulenceDiscoveryTrainer:
         print("  Discovering hidden structure in turbulence...")
         print("="*60 + "\n")
         
-        # Step 1: Encode all snapshots into latent space
+        # Encode all snapshots into latent space
         autoencoder.eval()
         all_latents = []
         
@@ -404,7 +382,7 @@ class TurbulenceDiscoveryTrainer:
             print(f"  PCA: {n_discovery_dims} components explain "
                   f"{np.sum(explained_var):.1%} variance")
         
-        # Step 2: Run discovery engine
+        # Run discovery engine
         engine = SymbolicDiscoveryEngine(
             n_latent_dims=n_discovery_dims,
             sindy_threshold=sindy_threshold,
@@ -433,9 +411,7 @@ class TurbulenceDiscoveryTrainer:
         
         return results
     
-    # =========================================================================
     # Full Pipeline
-    # =========================================================================
     
     def run_full_pipeline(
         self,

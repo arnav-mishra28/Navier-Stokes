@@ -1,22 +1,4 @@
-"""
-=============================================================================
-Astrophysical Flow Solver
-Extensions of Navier-Stokes for astrophysical phenomena.
-
-Includes:
-    - Self-gravity (Poisson equation for gravitational potential)
-    - Radiative cooling
-    - Accretion disk dynamics (Keplerian rotation)
-    - Stellar wind models
-    - Compressible effects (density variations)
-
-Governing equations (compressible with gravity):
-    ∂ρ/∂t + ∇·(ρu) = 0                              (continuity)
-    ∂(ρu)/∂t + ∇·(ρu⊗u) = -∇p + ρ∇Φ + ν∇²u        (momentum)
-    ∇²Φ = 4πGρ                                        (Poisson/gravity)
-    ∂e/∂t + ∇·(eu) = -p∇·u + Λ(T)                   (energy + cooling)
-=============================================================================
-"""
+"""Astrophysical Flow Solver"""
 
 import numpy as np
 from typing import Dict, List, Tuple, Optional

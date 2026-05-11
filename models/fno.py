@@ -1,22 +1,4 @@
-"""
-=============================================================================
-Fourier Neural Operator (FNO) for Navier-Stokes
-Learns the solution operator: a(x) → u(x) mapping between function spaces.
-
-Key innovation: Spectral convolution in Fourier space captures global patterns
-at all scales simultaneously, unlike local convolution.
-
-Architecture:
-    Input → Lifting → [Fourier Layer × N] → Projection → Output
-    
-Each Fourier Layer:
-    v^{l+1}(x) = σ(W·v^l(x) + K(v^l)(x))
-    where K is spectral convolution:
-    K(v)(x) = F^{-1}(R · F(v))(x)
-
-Reference: Li et al., "Fourier Neural Operator for Parametric PDEs" (2020)
-=============================================================================
-"""
+"""Fourier Neural Operator (FNO) for Navier-Stokes"""
 
 import torch
 import torch.nn as nn

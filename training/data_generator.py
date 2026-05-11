@@ -1,9 +1,4 @@
-"""
-=============================================================================
-Training Data Generator
-Creates training datasets from CFD simulations for ML models.
-=============================================================================
-"""
+"""Training Data Generator"""
 
 import numpy as np
 import torch

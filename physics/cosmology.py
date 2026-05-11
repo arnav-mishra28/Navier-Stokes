@@ -1,26 +1,4 @@
-"""
-=============================================================================
-Cosmological Fluid Modeling
-
-Universe as a fluid — from quantum fluctuations to cosmic structure.
-
-Friedmann Equation:
-    (a_dot/a)^2 = (8*pi*G/3)*rho - k/a^2 + Lambda/3
-
-Simulation Pipeline:
-    Initial quantum fluctuations -> Gravitational amplification
-    -> Cosmic structure formation (filaments, voids, halos)
-
-Scenarios:
-    1. Cosmic web formation (dark matter + baryonic fluid)
-    2. Inflationary expansion (scalar field driven)
-    3. Dark energy dominated expansion
-
-References:
-    Peebles, "The Large-Scale Structure of the Universe" (Princeton, 1980)
-    Springel et al., "Simulations of cosmic structure formation" (2005)
-=============================================================================
-"""
+"""Cosmological Fluid Modeling"""
 
 import numpy as np
 from typing import Dict, List, Optional
@@ -112,7 +90,7 @@ class CosmologicalFluidSolver:
             'dm_clumping': [], 'baryon_clumping': [],
         }
 
-    # ── Finite differences ──────────────────────────────────────────
+    # Finite differences
 
     def _ddx(self, f):
         return (np.roll(f, -1, 1) - np.roll(f, 1, 1)) / (2 * self.dx)
@@ -126,7 +104,7 @@ class CosmologicalFluidSolver:
             + (np.roll(f, -1, 0) - 2*f + np.roll(f, 1, 0)) / self.dy**2
         )
 
-    # ── Friedmann equation ──────────────────────────────────────────
+    # Friedmann equation
 
     def _friedmann_rhs(self, a, a_dot):
         """d(a_dot)/dt from Friedmann + acceleration equation."""
@@ -152,7 +130,7 @@ class CosmologicalFluidSolver:
     def redshift(self):
         return 1.0 / self.a - 1.0
 
-    # ── CIC deposit dark matter onto grid ───────────────────────────
+    # CIC deposit dark matter onto grid
 
     def _deposit_dm(self):
         """Cloud-in-Cell (CIC) deposit of DM particles onto grid."""
@@ -185,7 +163,7 @@ class CosmologicalFluidSolver:
 
         self.rho_dm_grid /= (self.dx * self.dy)
 
-    # ── Poisson solver ──────────────────────────────────────────────
+    # Poisson solver
 
     def _solve_poisson(self):
         """Solve comoving Poisson: nabla^2 Phi = 4*pi*G * a * (rho - rho_bar)."""
@@ -197,7 +175,7 @@ class CosmologicalFluidSolver:
         phi_hat[0, 0] = 0.0
         self.Phi = np.real(np.fft.ifft2(phi_hat))
 
-    # ── DM particle kick-drift ──────────────────────────────────────
+    # DM particle kick-drift
 
     def _interpolate_force(self, x, y):
         """Interpolate gravitational force at particle positions (CIC)."""
@@ -245,7 +223,7 @@ class CosmologicalFluidSolver:
         self.x_dm %= self.Lbox
         self.y_dm %= self.Lbox
 
-    # ── Baryon fluid step ───────────────────────────────────────────
+    # Baryon fluid step
 
     def _advance_baryons(self):
         """Euler equations on expanding background."""
@@ -290,7 +268,7 @@ class CosmologicalFluidSolver:
         self.vy_b = np.nan_to_num(self.vy_b, nan=0.0, posinf=v_max, neginf=-v_max)
         self.rho_b = np.nan_to_num(self.rho_b, nan=1e-10, posinf=1e6, neginf=1e-10)
 
-    # ── Initial conditions ──────────────────────────────────────────
+    # Initial conditions
 
     def initialize_cosmic_web(self, P_k_slope: float = -1.0, amplitude: float = 0.05):
         """
@@ -370,7 +348,7 @@ class CosmologicalFluidSolver:
         self.vx_dm = np.zeros(self.n_particles)
         self.vy_dm = np.zeros(self.n_particles)
 
-    # ── Time stepping ───────────────────────────────────────────────
+    # Time stepping
 
     def step(self):
         """Advance coupled cosmological system by one time step."""
@@ -401,7 +379,7 @@ class CosmologicalFluidSolver:
             if record and self.step_count % max(1, n_steps // 200) == 0:
                 self._record_diagnostics()
 
-    # ── Power spectrum ──────────────────────────────────────────────
+    # Power spectrum
 
     def compute_power_spectrum(self, field: Optional[np.ndarray] = None):
         """Compute 1D power spectrum P(k) of density contrast."""
@@ -428,7 +406,7 @@ class CosmologicalFluidSolver:
         valid = P_k > 0
         return k_centers[valid], P_k[valid]
 
-    # ── Diagnostics ─────────────────────────────────────────────────
+    # Diagnostics
 
     def _record_diagnostics(self):
         dV = self.dx * self.dy
