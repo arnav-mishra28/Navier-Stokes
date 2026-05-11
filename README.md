@@ -3,103 +3,143 @@
   <img src="https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white" alt="PyTorch">
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License">
   <img src="https://img.shields.io/badge/CFD-Research_Grade-blueviolet?style=for-the-badge" alt="CFD">
+  <img src="https://img.shields.io/badge/Physics_Domains-10-orange?style=for-the-badge" alt="Domains">
 </p>
 
 <h1 align="center">
-  🌊 Navier-Stokes ML/DL Hybrid Simulation System<br>
-  + 🧠 Turbulence Discovery AI<br>
-  + 🌀 Quantum Fluid Extensions
+  🌊 Navier-Stokes Research Platform
 </h1>
 
 <p align="center">
-  <b>Research-Grade Computational Fluid Dynamics + Deep Learning Platform</b><br>
+  <b>Research-Grade Computational Fluid Dynamics · Deep Learning · Scientific Discovery</b><br>
   <code>∂u/∂t + (u·∇)u = −∇p + ν∇²u + f</code>
+</p>
+
+<p align="center">
+  <i>A unified platform spanning classical fluids to cosmological structure formation —<br>
+  integrating high-fidelity CFD solvers, neural surrogates, and autonomous equation discovery.</i>
 </p>
 
 ---
 
-A production-ready, hybrid Navier-Stokes simulation system that integrates **classical CFD solvers** with **deep learning surrogates** (PINN, FNO, DeepONet, U-Net), a **Turbulence Discovery AI** pipeline (Autoencoder + Neural ODE + SINDy + Genetic Programming), and **Quantum Fluid Extensions** (Gross-Pitaevskii equation + Madelung transform + split-step Fourier). Supports 6 physics domains, blow-up detection & regularity analysis, real-time 2D/3D visualization, a Streamlit web dashboard, and a unified CLI for simulation, training, discovery, and benchmarking.
+## 🔭 Overview
 
-## ✨ Features
+This is a production-ready, research-grade simulation platform that unifies **10 physics domains**, **6 deep learning architectures**, and an **autonomous scientific discovery engine** under a single CLI. It bridges the gap between classical computational fluid dynamics and modern AI-driven physics research.
 
-| Category | Details |
-|----------|---------|
-| **CFD Solvers** | 2D/3D incompressible NS with projection method, FFT/Jacobi/SOR/CG pressure solvers, central/upwind/WENO-5 advection |
-| **ML Models** | PINN (physics-informed), FNO (Fourier operator), DeepONet (operator network), U-Net Surrogate (instant prediction) |
-| **Discovery AI** | Convolutional Autoencoder (flow compression), Neural ODE (latent dynamics), SINDy (sparse regression), Genetic Programming (symbolic equations) |
-| **Regularity** | Blow-up detection CNN, stability analysis (Re sweeps), BKM criterion monitoring, empirical regularity maps |
-| **Physics** | Classical Fluid · MHD · Astrophysics · Biophysics · Climate · Quantum Fluids |
-| **Turbulence** | DNS, Smagorinsky LES, Dynamic Smagorinsky, k-ε RANS, vorticity confinement |
-| **Metrics** | L2 error, energy spectrum error, vorticity accuracy, structure functions, DNS vs LES comparison |
-| **Visualization** | Real-time 2D (Pygame), 3D (PyVista/Matplotlib), Streamlit dashboard (Plotly) |
+**What makes this different:**
+
+- 🧮 **Classical CFD** — Projection-method NS solvers with FFT/Jacobi/SOR/CG pressure solvers, WENO-5 advection, and DNS/LES/RANS turbulence models
+- 🧠 **Neural Surrogates** — PINN, FNO, DeepONet, U-Net with attention gates — up to 1000× faster than CFD at inference
+- 🔬 **Discovery AI** — Autoencoder + Neural ODE + SINDy + Genetic Programming pipeline that *discovers governing equations from data*
+- 🤖 **AGI Orchestration** — Fully autonomous hypothesis → simulation → validation → knowledge-base loop
+- 🌌 **Beyond Fluids** — Relativistic viscous hydrodynamics, quantum field theory on the lattice, cosmological N-body + Euler solvers, gravity-fluid coupling via Einstein equations
+
+---
+
+## ✨ Feature Matrix
+
+| Domain | Capabilities |
+|--------|-------------|
+| **CFD Engine** | 2D/3D incompressible NS, projection method, FFT/Jacobi/SOR/CG pressure, central/upwind/WENO-5 advection |
+| **Turbulence** | DNS, Smagorinsky LES, Dynamic Smagorinsky, k-ε RANS, k-ω SST, vorticity confinement |
+| **ML Models** | PINN (physics-informed), FNO (Fourier operator), DeepONet (operator network), U-Net Surrogate (attention-gated) |
+| **Discovery AI** | Convolutional Autoencoder, Neural ODE (latent dynamics), SINDy (sparse regression), Genetic Programming |
+| **Regularity** | Blow-up detection CNN, BKM criterion, enstrophy budget, empirical regularity maps |
+| **AGI Engine** | Physics Discovery, Hypothesis Engine, Knowledge Base, autonomous scientific workflow |
+| **Visualization** | Real-time 2D (Pygame), 3D (PyVista/Matplotlib), Streamlit dashboard (Plotly), publication-quality plots |
 | **Training** | AMP, cosine annealing + warmup LR, gradient clipping, checkpointing, curriculum learning |
 
 ---
 
-## 📂 Project Structure
+## 🔬 Physics Domains
 
-```
-Navier-Stokes/
-├── main.py                 # Master entry point — CLI + interactive menu
-├── config.py               # Global configuration & hyperparameters
-├── requirements.txt        # Python dependencies
-│
-├── core/                   # Classical CFD engine
-│   ├── fluid_solver_2d.py  # 2D incompressible NS (projection method)
-│   ├── fluid_solver_3d.py  # 3D incompressible NS
-│   ├── pressure_solver.py  # FFT, Jacobi, SOR, CG, Multigrid
-│   ├── discretization.py   # Finite difference operators (central, upwind, WENO)
-│   ├── boundary_conditions.py  # Dirichlet, Neumann, periodic, no-slip, inflow/outflow
-│   └── turbulence_models.py    # Smagorinsky, Dynamic Smag, k-ε, k-ω
-│
-├── models/                 # Deep learning architectures
-│   ├── pinn.py             # Physics-Informed Neural Network
-│   ├── fno.py              # Fourier Neural Operator (2D)
-│   ├── deeponet.py         # Deep Operator Network
-│   ├── surrogate.py        # U-Net Surrogate with attention gates
-│   ├── turbulence_nn.py    # Neural turbulence closure model
-│   ├── autoencoder.py      # Flow Autoencoder + Latent ODE (discovery)
-│   ├── symbolic_discovery.py  # SINDy + Genetic Programming
-│   └── regularity_analysis.py # Blow-up detection + stability analysis
-│
-├── physics/                # Cross-physics domain solvers
-│   ├── mhd.py              # Magnetohydrodynamics (Orszag-Tang vortex)
-│   ├── astrophysics.py     # Stellar/galactic flows (Rayleigh-Taylor)
-│   ├── biophysics.py       # Blood flow (pulsatile, non-Newtonian)
-│   ├── climate.py          # Geophysical flows (Kelvin-Helmholtz)
-│   └── quantum_fluids.py   # BEC / superfluids (Gross-Pitaevskii)
-│
-├── training/               # ML training infrastructure
-│   ├── trainer.py          # Unified training loop (PINN, FNO, DeepONet, Surrogate)
-│   ├── discovery_trainer.py # 4-phase Turbulence Discovery pipeline
-│   ├── turbulence_data.py  # Multi-regime flow data generator
-│   ├── data_generator.py   # CFD-to-ML dataset generation
-│   └── losses.py           # Physics-informed loss functions
-│
-├── visualization/          # Rendering & real-time viz
-│   ├── renderer.py         # Flow field → RGB conversion, streamlines
-│   ├── realtime_2d.py      # Pygame-based interactive 2D visualizer
-│   └── realtime_3d.py      # PyVista/Matplotlib 3D visualizer
-│
-├── dashboard/              # Web interface
-│   └── app.py              # Streamlit dashboard (simulation + ML)
-│
-├── utils/                  # Shared utilities
-│   └── helpers.py          # Vorticity, KE, enstrophy, CFL, drag/lift
-│
-├── tests/                  # Test suite
-│   └── test_smoke.py       # Comprehensive smoke tests
-│
-├── images/                 # Generated plots & visualizations
-│   ├── demo_taylor_green.png
-│   ├── demo_quantum.png
-│   ├── quantum_extensions.png
-│   └── ...                 # All generated plots saved here
-│
-├── checkpoints/            # Saved model weights
-├── logs/                   # Training logs
-└── data/                   # Generated datasets
-```
+<table>
+  <tr>
+    <td width="50%">
+
+### 1. Classical Fluid Dynamics
+Incompressible Navier-Stokes with the projection method. Taylor-Green vortex, double shear layer, lid-driven cavity, channel flow.
+
+### 2. Magnetohydrodynamics (MHD)
+Coupled NS + Maxwell equations with Lorentz force and magnetic induction. Orszag-Tang vortex benchmark.
+
+### 3. Astrophysics
+Self-gravitating flows with radiative cooling. Rayleigh-Taylor instability and stellar dynamics.
+
+### 4. Biophysics (Hemodynamics)
+Pulsatile blood flow with non-Newtonian Carreau-Yasuda viscosity, stenosis geometry, wall shear stress.
+
+### 5. Climate & Ocean
+Geophysical flows with Coriolis force, thermal stratification, Ekman layers. Kelvin-Helmholtz instability.
+
+  </td>
+  <td width="50%">
+
+### 6. Quantum Fluids (BEC)
+Gross-Pitaevskii equation via split-step Fourier. Madelung transform, quantized vortices, quantum turbulence.
+
+### 7. Relativistic NS (Israel-Stewart)
+Causal viscous relativistic hydrodynamics. Bjorken flow, QGP fireballs, energy-momentum tensor evolution.
+
+### 8. Quantum Field Theory
+Lattice Klein-Gordon dynamics, Higgs-like symmetry breaking, FieldPINN for continuous spacetime learning.
+
+### 9. Gravity-Fluid Coupling
+Einstein field equations coupled with fluid dynamics. Gravitational wave–fluid interaction.
+
+### 10. Cosmological Fluids
+Friedmann equation-coupled N-body/Euler solver. Dark matter flow, baryonic structure formation, cosmic web evolution.
+
+  </td>
+  </tr>
+</table>
+
+---
+
+## 📸 Gallery
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="images/demo_taylor_green.png" width="400"><br>
+      <sub><b>Taylor-Green Vortex Decay</b></sub>
+    </td>
+    <td align="center">
+      <img src="images/quantum_extensions.png" width="400"><br>
+      <sub><b>Quantum Fluid Extensions (GPE)</b></sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="images/relativistic_ns.png" width="400"><br>
+      <sub><b>Relativistic NS — QGP Fireball</b></sub>
+    </td>
+    <td align="center">
+      <img src="images/qft_simulation.png" width="400"><br>
+      <sub><b>Quantum Field Theory Simulation</b></sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="images/agi_scientific_discovery.png" width="400"><br>
+      <sub><b>AGI Scientific Discovery</b></sub>
+    </td>
+    <td align="center">
+      <img src="images/cosmological_fluid.png" width="400"><br>
+      <sub><b>Cosmological Fluid Modeling</b></sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="images/demo_symbolic_discovery.png" width="400"><br>
+      <sub><b>Symbolic Equation Discovery</b></sub>
+    </td>
+    <td align="center">
+      <img src="images/gravity_fluid_coupling.png" width="400"><br>
+      <sub><b>Gravity-Fluid Coupling</b></sub>
+    </td>
+  </tr>
+</table>
 
 ---
 
@@ -111,233 +151,217 @@ Navier-Stokes/
 pip install -r requirements.txt
 ```
 
-> **Minimum:** `numpy`, `scipy`, `matplotlib`. **Full:** add `torch`, `pygame`, `pyvista`, `streamlit`, `plotly`.
+> **Minimum:** `numpy`, `scipy`, `matplotlib`
+> **Full stack:** add `torch`, `pygame`, `pyvista`, `streamlit`, `plotly`
 
-### 2. Run the Interactive Menu
+### 2. Launch Interactive Menu
 
 ```bash
 python main.py
 ```
 
-This launches a menu where you can select from 22 modes: demos, training, visualization, physics simulations, discovery AI, regularity analysis, and benchmarks.
+This opens a 29-mode interactive menu covering demos, training, physics simulations, discovery AI, and more.
 
-### 3. CLI Usage
-
-```bash
-# Taylor-Green vortex demo (saves publication-quality plot)
-python main.py --demo
-
-# Headless mode (no GUI, save plots only)
-python main.py --demo --no-gui
-
-# Real-time 2D visualizer (Pygame)
-python main.py --viz2d
-
-# 3D visualizer
-python main.py --viz3d
-
-# Streamlit web dashboard
-python main.py --dashboard
-
-# Train ML models
-python main.py --train pinn
-python main.py --train fno
-python main.py --train deeponet
-python main.py --train surrogate
-
-# Physics domain simulations
-python main.py --physics mhd
-python main.py --physics astro
-python main.py --physics bio
-python main.py --physics climate
-python main.py --physics quantum
-
-# Turbulence Discovery AI
-python main.py --discover           # Full pipeline (AE -> ODE -> Blow-up -> Symbolic)
-python main.py --stability           # Blow-up detection & stability analysis
-python main.py --regularity          # Empirical regularity map (Re sweep)
-python main.py --metrics             # DNS vs LES turbulence metrics comparison
-python main.py --symbolic            # SINDy + GP equation discovery
-
-# Quantum Fluid Extensions
-python main.py --quantum-ext          # GPE + Madelung + split-step Fourier + visualization
-
-# CFD performance benchmarks
-python main.py --benchmark
-```
-
----
-
-## 🧪 Physics Domains
-
-### Classical Fluid Dynamics
-Standard incompressible Navier-Stokes with the projection method. Supports Taylor-Green vortex, double shear layer, vortex pair, lid-driven cavity, and channel flow initial conditions.
-
-### Magnetohydrodynamics (MHD)
-Coupled NS + Maxwell equations with Lorentz force and magnetic induction. Benchmark: Orszag-Tang vortex system.
-
-### Astrophysics
-Self-gravitating flows with radiative cooling. Benchmark: Rayleigh-Taylor instability.
-
-### Biophysics (Blood Flow)
-Pulsatile hemodynamics with non-Newtonian Carreau-Yasuda viscosity model, stenosis geometry, and wall shear stress computation.
-
-### Climate & Ocean
-Geophysical flows with Coriolis force, thermal stratification, and Ekman layers. Benchmark: Kelvin-Helmholtz instability.
-
-### Quantum Fluids
-Bose-Einstein condensate dynamics via the Gross-Pitaevskii equation. Quantized vortex nucleation and quantum turbulence.
-
----
-
-## 🌀 Quantum Fluid Extensions
-
-> **What changes from classical fluids?** Instead of velocity fields alone, quantum fluids use a **complex wavefunction** ψ.
-
-### Gross-Pitaevskii Equation (GPE)
-
-The governing equation for superfluids and Bose-Einstein condensates:
-
-```
-iħ ∂ψ/∂t = [-ħ²/(2m)∇² + V + g|ψ|²]ψ
-```
-
-Used for:
-- **Superfluids** (liquid helium-4)
-- **Bose-Einstein condensates** (ultracold atoms)
-- **Quantum vortices** (quantized circulation)
-
-### Madelung Transform (ψ → Fluid Variables)
-
-Rewrite the wavefunction as:
-
-```
-ψ = √ρ · e^{iθ}
-```
-
-Then extract fluid variables:
-- **Density:** ρ = |ψ|²
-- **Velocity:** v = (ħ/m)∇θ
-
-👉 You recover a **Navier-Stokes-like system** with an additional **quantum pressure** (Bohm potential) term.
-
-### Implementation
-
-| Step | Method | Details |
-|------|--------|---------|
-| Field representation | Complex ψ field | Replaces scalar density |
-| Time evolution | Split-step Fourier | Symplectic, norm-preserving |
-| Kinetic step | FFT → k-space propagation | exp(-iħk²Δt/2m) |
-| Potential step | Real-space multiplication | V_ext + g|ψ|² |
-| Vortex detection | Phase winding number | ∮ ∇θ · dl = ±2πn |
-
-### Visualization (8-panel)
-
-1. **Superfluid density** |ψ|² — shows vortex cores as density zeros
-2. **Phase** arg(ψ) — shows 2π winding around vortices
-3. **Velocity magnitude** |v| — Madelung-derived velocity field
-4. **Vortex map** — +1 and -1 vortex positions overlaid on density
-5. **Quantum pressure** Q (Bohm potential) — the extra NS term
-6. **Energy spectrum** E(k) with Kolmogorov k⁻⁵″³ reference
-7. **Diagnostics** — energy + vortex count evolution
-8. **Particle conservation** — ΔN/N₀ should be ~0 (symplectic check)
-
-### Results
-
-- ✓ Classical + quantum fluid simulator
-- ✓ Vortex quantization (discrete vortices with Γ = n·h/m)
-- ✓ Wave interference effects
-- ✓ Madelung-derived NS-like system + quantum pressure term
-- ✓ Kolmogorov cascade at large scales
+### 3. CLI Reference
 
 ```bash
-# Run the full quantum extensions pipeline
-python main.py --quantum-ext
-python main.py --quantum-ext --no-gui   # Headless mode
+# ── Core Demos ──────────────────────────────────────────────
+python main.py --demo                  # Taylor-Green vortex benchmark
+python main.py --demo --no-gui         # Headless (save plots only)
+python main.py --viz2d                 # Real-time 2D visualizer (Pygame)
+python main.py --viz3d                 # 3D visualizer (PyVista/Matplotlib)
+python main.py --dashboard             # Streamlit web dashboard
+python main.py --benchmark             # CFD solver benchmarks
+python main.py --hybrid                # Hybrid CFD → PINN demo
+python main.py --gpu                   # GPU-accelerated solver
+python main.py --vort-conf 5.0         # Vorticity confinement demo
+
+# ── ML Model Training ──────────────────────────────────────
+python main.py --train pinn            # Physics-Informed Neural Network
+python main.py --train fno             # Fourier Neural Operator
+python main.py --train deeponet        # Deep Operator Network
+python main.py --train surrogate       # U-Net Surrogate
+
+# ── Physics Simulations ────────────────────────────────────
+python main.py --physics mhd           # Magnetohydrodynamics
+python main.py --physics astro         # Astrophysical flows
+python main.py --physics bio           # Blood flow (hemodynamics)
+python main.py --physics climate       # Geophysical / climate flows
+python main.py --physics quantum       # Quantum fluids (BEC)
+python main.py --physics relativistic  # Relativistic NS (Israel-Stewart)
+python main.py --physics qft           # Quantum Field Theory
+python main.py --physics gravity       # Gravity-fluid coupling
+python main.py --physics cosmology     # Cosmological fluid modeling
+
+# ── Discovery AI ───────────────────────────────────────────
+python main.py --discover              # Full Turbulence Discovery pipeline
+python main.py --symbolic              # SINDy + GP equation discovery
+python main.py --stability             # Blow-up detection & stability
+python main.py --regularity            # Empirical regularity map (Re sweep)
+python main.py --metrics               # DNS vs LES turbulence metrics
+
+# ── Quantum & Extensions ──────────────────────────────────
+python main.py --quantum-ext           # GPE + Madelung + split-step Fourier
+python main.py --relativistic          # Israel-Stewart causal viscous hydro
+python main.py --qft                   # Lattice QFT + FieldPINN
+python main.py --gravity-coupling      # Einstein equations + fluid
+python main.py --cosmology             # Friedmann + N-body + cosmic web
+
+# ── AGI Scientific Discovery ─────────────────────────────
+python main.py --agi                   # Full autonomous discovery system
+python main.py --physics-discover      # Physics-aware equation discovery
+```
+
+> **Tip:** Append `--no-gui` to any command to run headless and save plots to `images/`.
+
+---
+
+## 📂 Project Structure
+
+```
+Navier-Stokes/
+├── main.py                        # Master CLI + interactive menu (29 modes)
+├── config.py                      # Global configuration & hyperparameters
+├── requirements.txt               # Python dependencies
+│
+├── core/                          # Classical CFD engine
+│   ├── fluid_solver_2d.py         #   2D incompressible NS (projection method)
+│   ├── fluid_solver_3d.py         #   3D incompressible NS
+│   ├── pressure_solver.py         #   FFT, Jacobi, SOR, CG, Multigrid
+│   ├── discretization.py          #   Finite difference (central, upwind, WENO-5)
+│   ├── boundary_conditions.py     #   Dirichlet, Neumann, periodic, no-slip
+│   └── turbulence_models.py       #   Smagorinsky, Dynamic Smag, k-ε, k-ω
+│
+├── models/                        # Deep learning architectures
+│   ├── pinn.py                    #   Physics-Informed Neural Network
+│   ├── fno.py                     #   Fourier Neural Operator (2D)
+│   ├── deeponet.py                #   Deep Operator Network
+│   ├── surrogate.py               #   U-Net Surrogate + attention gates
+│   ├── turbulence_nn.py           #   Neural turbulence closure
+│   ├── autoencoder.py             #   Flow Autoencoder + Latent ODE
+│   ├── symbolic_discovery.py      #   SINDy + Genetic Programming
+│   ├── regularity_analysis.py     #   Blow-up detection + stability
+│   ├── hypothesis_engine.py       #   AGI hypothesis generation
+│   ├── physics_discovery.py       #   Physics-aware equation discovery
+│   └── qft_pinn.py               #   FieldPINN for QFT
+│
+├── physics/                       # Cross-domain solvers
+│   ├── mhd.py                     #   Magnetohydrodynamics
+│   ├── astrophysics.py            #   Stellar / galactic flows
+│   ├── biophysics.py              #   Hemodynamics (blood flow)
+│   ├── climate.py                 #   Geophysical flows
+│   ├── quantum_fluids.py          #   BEC / superfluids (GPE)
+│   ├── relativistic.py            #   Israel-Stewart relativistic NS
+│   ├── qft_lattice.py             #   Lattice QFT (Klein-Gordon)
+│   ├── gravity_fluid_coupling.py  #   Einstein + fluid coupling
+│   └── cosmology.py               #   Friedmann + N-body + Euler
+│
+├── training/                      # ML training infrastructure
+│   ├── trainer.py                 #   Unified training loop
+│   ├── discovery_trainer.py       #   4-phase Turbulence Discovery
+│   ├── agi_pipeline.py            #   AGI orchestration layer
+│   ├── turbulence_data.py         #   Multi-regime flow data gen
+│   ├── data_generator.py          #   CFD → ML dataset generation
+│   └── losses.py                  #   Physics-informed losses
+│
+├── visualization/                 # Rendering & real-time viz
+│   ├── renderer.py                #   Flow field → RGB, streamlines
+│   ├── realtime_2d.py             #   Pygame interactive 2D
+│   └── realtime_3d.py             #   PyVista / Matplotlib 3D
+│
+├── dashboard/                     # Web interface
+│   └── app.py                     #   Streamlit dashboard
+│
+├── utils/                         # Shared utilities
+│   └── helpers.py                 #   Vorticity, KE, enstrophy, CFL
+│
+├── tests/                         # Test suite
+│   └── test_smoke.py              #   Comprehensive smoke tests
+│
+├── images/                        # Generated plots & visualizations
+├── checkpoints/                   # Saved model weights
+├── logs/                          # Training logs
+└── data/                          # Generated datasets
 ```
 
 ---
 
-## 🧠 ML Models
+## 🧠 ML Architectures
 
-### PINN (Physics-Informed Neural Network)
-- Embeds NS equations directly into the loss function via automatic differentiation
-- Random Fourier feature embedding for multi-scale learning
-- Adaptive loss weighting (grad-norm based)
-- No labeled data required — learns from physics alone
-
-### FNO (Fourier Neural Operator)
-- Learns solution operators in Fourier space
-- Resolution-invariant: train on 64² → infer on 256²
-- Spectral convolution for global information mixing
-- ~100x faster than CFD at inference
-
-### DeepONet (Deep Operator Network)
-- Maps input functions (BCs, ICs, forces) to solution functions
-- Branch-trunk architecture with multi-output support
-- Physics-informed variant available
-- Generalizes to unseen input functions without retraining
-
-### U-Net Surrogate
-- Encoder-decoder with attention-gated skip connections
-- Conditional variant with FiLM (Feature-wise Linear Modulation)
-- ~1000x faster than CFD (~10ms per prediction)
-- Input: conditions (obstacle mask, Re, BCs) → Output: flow fields (u, v, p)
+<table>
+  <tr>
+    <th>Model</th>
+    <th>Architecture</th>
+    <th>Speedup</th>
+    <th>Key Idea</th>
+  </tr>
+  <tr>
+    <td><b>PINN</b></td>
+    <td>MLP + Fourier features</td>
+    <td>—</td>
+    <td>Embeds NS equations in loss via autodiff. No labeled data needed.</td>
+  </tr>
+  <tr>
+    <td><b>FNO</b></td>
+    <td>Spectral convolution layers</td>
+    <td>~100×</td>
+    <td>Learns in Fourier space. Resolution-invariant: train 64² → infer 256².</td>
+  </tr>
+  <tr>
+    <td><b>DeepONet</b></td>
+    <td>Branch-trunk network</td>
+    <td>~100×</td>
+    <td>Maps input functions (BCs, forces) → solution functions. Generalizes without retraining.</td>
+  </tr>
+  <tr>
+    <td><b>U-Net</b></td>
+    <td>Encoder-decoder + attention + FiLM</td>
+    <td>~1000×</td>
+    <td>Instant prediction (~10ms). Conditions → flow fields in one forward pass.</td>
+  </tr>
+  <tr>
+    <td><b>Autoencoder</b></td>
+    <td>Conv residual + GroupNorm</td>
+    <td>—</td>
+    <td>Compresses (u,v,p,ω) → latent z. Physics-informed (divergence-free).</td>
+  </tr>
+  <tr>
+    <td><b>Neural ODE</b></td>
+    <td>MLP + sinusoidal time embedding</td>
+    <td>—</td>
+    <td>Learns dz/dt = f(z,t) in latent space. RK4 integrator for prediction.</td>
+  </tr>
+</table>
 
 ---
 
-## 🧠 Turbulence Discovery AI
+## 🤖 Discovery & AGI Pipeline
 
-> **Goal:** Not just simulate turbulence — *discover hidden structure inside chaos.*
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│                   Autonomous Scientific Discovery                    │
+│                                                                      │
+│   Phase 1: Compress     Flow fields → Latent space (Autoencoder)    │
+│   Phase 2: Dynamics     dz/dt = f(z,t) in latent space (Neural ODE)│
+│   Phase 3: Detection    Blow-up / stability prediction (CNN)         │
+│   Phase 4: Discovery    Symbolic equations from data (SINDy + GP)   │
+│                                                                      │
+│   AGI Loop:  Hypothesize → Simulate → Validate → Store Knowledge   │
+│              Fully autonomous, cross-domain hypothesis management    │
+└──────────────────────────────────────────────────────────────────────┘
+```
 
-The Turbulence Discovery AI is a 4-phase pipeline that compresses turbulent flow fields, learns their temporal dynamics, and discovers interpretable governing equations:
+### Symbolic Discovery
+- **SINDy** — Sparse Identification of Nonlinear Dynamics. Builds a library of candidate functions (polynomials, trig) and applies STRidge sparse regression to discover parsimonious equations: `dz/dt = Θ(z) · ξ`
+- **Genetic Programming** — Evolves mathematical expression trees via tournament selection, subtree crossover, and point mutation with parsimony pressure for interpretable results
 
-### Phase 1: Flow Autoencoder
-- **Convolutional autoencoder** with residual blocks and GroupNorm
-- Compresses 4-channel flow fields `(u, v, p, ω)` → latent vector `z ∈ ℝ^d`
-- Physics-informed loss enforces divergence-free reconstructions (`∇·u ≈ 0`)
-- Optional **variational** (VAE) mode for generative modeling
-
-### Phase 2: Neural ODE (Latent Dynamics)
-- Learns `dz/dt = f_θ(z, t)` in latent space
-- Sinusoidal time embedding for temporal context
-- Euler and **RK4** integrators for forward prediction
-- Autoregressively predicts future flow fields
-
-### Phase 3: Blow-up Detection
+### Blow-up Detection & Regularity
 - CNN classifier predicts flow regime: `smooth / transitional / turbulent / unstable / singular_risk`
-- Binary blow-up probability head: `P(blow-up) ∈ [0, 1]`
-- **BKM criterion** monitoring: `∫‖ω‖_∞ dt`
+- Binary blow-up probability: P(blow-up) ∈ [0, 1]
+- BKM criterion monitoring: `∫‖ω‖_∞ dt`
 - Enstrophy budget analysis, strain-vorticity alignment
 
-### Phase 4: Symbolic Discovery (THE BIG MOVE)
-- **SINDy** (Sparse Identification of Nonlinear Dynamics):
-  - Builds library of candidate functions (polynomials, trig)
-  - STRidge sparse regression discovers parsimonious equations
-  - Output: `dz/dt = Θ(z) · ξ` where `ξ` is sparse
-- **Genetic Programming**:
-  - Evolves mathematical expression trees via tournament selection
-  - Subtree crossover + point mutation
-  - Parsimony pressure for interpretable equations
-
-### Validation & Metrics
-- DNS vs LES comparison with full turbulence metrics
-- Energy spectrum analysis (Kolmogorov `k^{-5/3}` reference)
-- Structure functions `S_n(r)` up to 4th order
-- Empirical regularity maps across Reynolds number space
-
-```bash
-# Run the full pipeline end-to-end
-python main.py --discover --no-gui
-
-# Individual components
-python main.py --symbolic     # SINDy + GP equation discovery
-python main.py --stability    # Blow-up detection & Re sweeps
-python main.py --regularity   # Enstrophy & dissipation vs Re
-python main.py --metrics      # DNS vs LES comparison
-```
-
-> ⚠️ **Disclaimer:** The Navier-Stokes existence and smoothness problem is **unsolved** (Millennium Prize). We do NOT claim to solve it. These are empirical tools for generating regularity maps, failure predictions, and possibly new conjectures.
+> ⚠️ **Disclaimer:** The Navier-Stokes existence and smoothness problem remains **unsolved** (Millennium Prize Problem). This platform provides empirical tools for regularity analysis, failure prediction, and conjecture generation — it does not claim to solve the problem.
 
 ---
 
@@ -345,34 +369,41 @@ python main.py --metrics      # DNS vs LES comparison
 
 Run with `python main.py --benchmark`:
 
-| Resolution | Steps/s | MLUPS | Method |
-|------------|---------|-------|--------|
-| 32×32      | ~5000+  | ~0.1  | FFT    |
-| 64×64      | ~1200+  | ~0.5  | FFT    |
-| 128×128    | ~300+   | ~1.6  | FFT    |
-| 256×256    | ~80+    | ~5.2  | FFT    |
+| Resolution | Steps/s | MLUPS | Pressure Solver |
+|:----------:|:-------:|:-----:|:---------------:|
+| 32 × 32    | ~5000+  | ~0.1  | FFT             |
+| 64 × 64    | ~1200+  | ~0.5  | FFT             |
+| 128 × 128  | ~300+   | ~1.6  | FFT             |
+| 256 × 256  | ~80+    | ~5.2  | FFT             |
 
-*MLUPS = Million Lattice-point Updates Per Second. Performance varies by hardware.*
+<sub>MLUPS = Million Lattice-point Updates Per Second. Performance varies by hardware.</sub>
 
 ---
 
-## 🧪 Testing
+## 📜 Governing Equations
 
-```bash
-# Run all smoke tests
-python -m pytest tests/test_smoke.py -v
-
-# Quick validation
-python -m pytest tests/ -x --tb=short
+**Incompressible Navier-Stokes:**
+```
+Momentum:    ∂u/∂t + (u·∇)u = −(1/ρ)∇p + ν∇²u + f
+Continuity:  ∇·u = 0
 ```
 
-The smoke test suite validates:
-- Core 2D/3D solvers (Taylor-Green, shear layer, obstacles, pressure solvers)
-- All 5 physics domains (MHD, astro, bio, climate, quantum)
-- All 5 ML model architectures (PINN, FNO, DeepONet, U-Net, Turbulence NN)
-- Training pipeline (data generation, FNO trainer, loss functions)
-- Utility functions (vorticity, KE, enstrophy, CFL, obstacle masks)
-- Visualization (scalar→RGB, velocity→RGB, streamlines)
+**Gross-Pitaevskii (Quantum Fluids):**
+```
+iħ ∂ψ/∂t = [−ħ²/(2m)∇² + V + g|ψ|²] ψ
+```
+
+**Israel-Stewart (Relativistic):**
+```
+∂μ T^μν = 0     (energy-momentum conservation)
+τ_π ∂π^μν/∂τ + π^μν = 2η σ^μν    (causal viscous relaxation)
+```
+
+**Friedmann (Cosmology):**
+```
+H² = (8πG/3)ρ − k/a²
+ä/a = −(4πG/3)(ρ + 3p)
+```
 
 ---
 
@@ -394,56 +425,53 @@ cfg = MasterConfig(
 )
 ```
 
-Available presets: `lid_driven_cavity`, `taylor_green_vortex`, `channel_flow`, `flow_around_cylinder`, `blood_flow_artery`, `mhd_reconnection`.
+**Available presets:** `lid_driven_cavity` · `taylor_green_vortex` · `channel_flow` · `flow_around_cylinder` · `blood_flow_artery` · `mhd_reconnection`
 
 ---
 
 ## 🖥️ Dashboard
 
-Launch the Streamlit web dashboard for interactive simulation control:
-
 ```bash
 streamlit run dashboard/app.py
 ```
 
-Features:
 - Real-time simulation with parameter sliders (grid, viscosity, dt, BCs)
-- Physics domain switching (all 6 domains)
+- Physics domain switching (all 10 domains)
 - Flow visualization (vorticity, velocity, pressure, streamlines)
 - Diagnostics (KE, enstrophy, divergence tracking)
 - ML model status and hybrid architecture overview
 
 ---
 
-## 📜 Governing Equations
+## 🧪 Testing
 
-**Incompressible Navier-Stokes:**
-
-```
-Momentum:    ∂u/∂t + (u·∇)u = −(1/ρ)∇p + ν∇²u + f
-Continuity:  ∇·u = 0
+```bash
+python -m pytest tests/test_smoke.py -v      # Full suite
+python -m pytest tests/ -x --tb=short         # Quick validation
 ```
 
-**Projection Method (Chorin's splitting):**
-
-1. **Advection-Diffusion:** Compute intermediate velocity u* ignoring pressure
-2. **Pressure Poisson:** Solve ∇²p = (ρ/Δt)∇·u* for pressure
-3. **Projection:** Correct velocity u^{n+1} = u* − (Δt/ρ)∇p
+The smoke tests validate:
+- Core 2D/3D solvers (Taylor-Green, shear layer, obstacles, all pressure solvers)
+- All physics domains (MHD, astro, bio, climate, quantum)
+- All ML model architectures (PINN, FNO, DeepONet, U-Net, Turbulence NN)
+- Training pipeline (data generation, trainers, loss functions)
+- Utility functions (vorticity, KE, enstrophy, CFL, drag/lift)
+- Visualization (scalar → RGB, velocity → RGB, streamlines)
 
 ---
 
 ## 🤝 Dependencies
 
 | Package | Purpose | Required |
-|---------|---------|----------|
-| numpy | Core numerics | ✅ |
-| scipy | Sparse solvers, filters | ✅ |
-| torch | Deep learning models | For ML features |
-| matplotlib | Plotting | For visualization |
-| pygame | Real-time 2D viz | Optional |
-| pyvista | 3D visualization | Optional |
-| streamlit | Web dashboard | Optional |
-| plotly | Interactive plots | Optional |
+|---------|---------|:--------:|
+| `numpy` | Core numerics | ✅ |
+| `scipy` | Sparse solvers, filters | ✅ |
+| `matplotlib` | Plotting & visualization | ✅ |
+| `torch` | Deep learning models | For ML features |
+| `pygame` | Real-time 2D viz | Optional |
+| `pyvista` | 3D visualization | Optional |
+| `streamlit` | Web dashboard | Optional |
+| `plotly` | Interactive plots | Optional |
 
 ---
 
